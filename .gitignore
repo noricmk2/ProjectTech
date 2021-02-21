@@ -1,1 +1,3 @@
 *.vsconfig
+Logs/AssetImportWorker0.log
+Packages/packages-lock.json
