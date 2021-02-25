@@ -35,19 +35,36 @@ public class CustomTileMapEditor : Editor
 
         public static SceneViewEditorWindow _instance;
 
-        public static Vector2 _scroll;
+        public  Vector2 _scroll;
 
-        private static Vector2 _pos = new Vector2(20, 20);
-        private static Vector2 _size = new Vector2(250, 200);
-        private static int _anchor = 0;
-
+        private  Vector2 _pos = new Vector2(20, 20);
+        private  Vector2 _size = new Vector2(1200, 900);
+        private Vector2 _hideSize = new Vector2(10, 10);
+        private Vector2 _tileSize = new Vector2(50, 50);
+        private int _anchor = 0;
+        private string _spriteBasePath = "";
+        private List<Texture2D> _spriteLists = new List<Texture2D>();
+        
+        bool _isHide = false;
         public void Init(float x, float y, float width, float height, int anchor = 0)
         {
+            _spriteBasePath = Application.dataPath + "/Resources/TileImages/Test";
             _pos = new Vector2(x, y);
             _size = new Vector2(width, height);
             _anchor = anchor;
 
             SceneView.duringSceneGui += OnSceneGUI;
+            string resourceSubPath = "/Resources/";
+            int startIdx = _spriteBasePath.IndexOf(resourceSubPath) + resourceSubPath.Length;
+            string subPath = _spriteBasePath.Substring(startIdx);
+            var allSprites = Resources.LoadAll(subPath);
+
+            _spriteLists.Clear();
+            foreach(Texture2D item  in allSprites)
+            {
+                _spriteLists.Add(item);
+            }
+
         }
 
         public void Exit()
@@ -62,19 +79,22 @@ public class CustomTileMapEditor : Editor
 
         void HandleEvent(SceneView scn)
         {
+           
             if (Event.current.type != EventType.Repaint)
             {
                 int controlId = GUIUtility.GetControlID(FocusType.Passive);
-                GUILayout.Window(controlId, CreateRect(scn, _pos, _size, _anchor, _tileMap), OnDisplay, "Editor");
-
+                
+             
+                GUILayout.Window(controlId, CreateRect(scn, _pos, _size, _anchor, _tileMap), OnDisplay, "TileMap");
                 int id = GUIUtility.GetControlID("CustomTileMapEditor".GetHashCode(), FocusType.Passive);
 
                 switch (Event.current.GetTypeForControl(id))
                 {
                     case EventType.MouseDown:
+                        CreateTileOnClick();
                         break;
                     case EventType.MouseUp:
-                        CreateTileOnClick();
+                        
                         break;
                     case EventType.MouseMove:
                         break;
@@ -107,21 +127,49 @@ public class CustomTileMapEditor : Editor
             }
         }
 
-        static void OnDisplay(int id)
+         void OnDisplay(int id)
         {
+            _isHide = GUILayout.Toggle(_isHide,"Hide");
             _scroll = GUILayout.BeginScrollView(_scroll);
 
-            EditorGUILayout.LabelField("Label");
 
-            if (GUILayout.Button("Button"))
+
+            if (GUILayout.Button("Set Directory(경로 설정)"))
             {
+                string path = EditorUtility.OpenFolderPanel("Overwrite with png", _spriteBasePath, "");
+
             }
 
+            DisplayAllSprites();
             GUILayout.EndScrollView();
+        }
+
+        void DisplayAllSprites()
+        {
+            var offset = new Vector2(10, 25);
+
+            int wid = 0;
+            int hei = 0;
+            int preHei = 0;
+            for (int i = 0; i < _spriteLists.Count; i++)
+            {
+               
+                hei =(int) ((i * _tileSize.x)  /_size.x );
+                if (preHei != hei)
+                    wid = 0;
+
+                float xPos = offset.x + (_tileSize.x * wid);
+
+                preHei = hei;
+                GUI.DrawTexture(new Rect(xPos, offset.y + (hei * _tileSize.y), _tileSize.x, _tileSize.y), _spriteLists[i]);
+                wid++;
+            }
         }
 
         private Rect CreateRect(SceneView scn, Vector2 pos, Vector2 size, int anchor, CustomTileMap customTileMap)
         {
+            if (_isHide == true)
+                size = _hideSize;
             Vector2 rc = new Vector2(pos.x, pos.y);
             if (scn != null)
             {
@@ -141,6 +189,6 @@ public class CustomTileMapEditor : Editor
     private void OnEnable()
     {
         SceneViewEditorWindow.Instance.TileMap = (CustomTileMap)target;
-        SceneViewEditorWindow.Instance.Init(20, 20, 250, 250,0);
+        SceneViewEditorWindow.Instance.Init(20, 20, 500, 500,0);
     }
 }
