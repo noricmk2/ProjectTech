@@ -5,9 +5,13 @@ using UnityEngine;
 public class PathfindGrid
 {
     private JPSNode[,] _grid;
+    private int _width;
+    private int _height;
 
     public void Init(int width, int height, List<JPSNode> nodeList)
     {
+        _width = width;
+        _height = height;
         _grid = new JPSNode[width, height];
         for (int i = 0; i < width; ++i)
         {
@@ -48,7 +52,7 @@ public class PathfindGrid
     {
         if (_grid.GetLength(0) <= x || _grid.GetLength(1) <= y)
         {
-            Debug.LogError("not exist index - grid:" + _grid.GetLength(0) + "," + _grid.GetLength(1) + "/pos:" + pos);
+            Debug.LogError("not exist index - grid:" + _grid.GetLength(0) + "," + _grid.GetLength(1) + "/pos:" + x + "," + y);
             return null;
         }
 

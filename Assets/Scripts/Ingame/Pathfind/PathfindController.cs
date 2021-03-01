@@ -120,7 +120,7 @@ public class PathfindController
                 if (!_openList.Contains(jumpPoint) || startToJump < jumpPoint.G)
                 {
                     jumpPoint.G = startToJump;
-                    jumpPoint.H = jumpPoint.H == null ? CalHeuristic(Mathf.Abs(jumpPoint.X - targetNode.X), Mathf.Abs(jumpPoint.Y - targetNode.Y));
+                    jumpPoint.H = jumpPoint.H == null ? CalHeuristic(Mathf.Abs(jumpPoint.X - targetNode.X), Mathf.Abs(jumpPoint.Y - targetNode.Y)) : jumpPoint.H;
                     jumpPoint.F = jumpPoint.G + jumpPoint.H.Value;
                     jumpPoint.parent = curNode;
 
