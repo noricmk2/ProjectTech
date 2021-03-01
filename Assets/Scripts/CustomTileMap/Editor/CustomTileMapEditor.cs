@@ -37,34 +37,42 @@ public class CustomTileMapEditor : Editor
 
         public  Vector2 _scroll;
 
-        private  Vector2 _pos = new Vector2(20, 20);
-        private  Vector2 _size = new Vector2(1200, 900);
+        private Vector2 _pos = new Vector2(20, 20);
+        private Vector2 _size = new Vector2(1200, 900);
         private Vector2 _hideSize = new Vector2(10, 10);
         private Vector2 _tileSize = new Vector2(50, 50);
         private int _anchor = 0;
-        private string _spriteBasePath = "";
         private List<Texture2D> _spriteLists = new List<Texture2D>();
-        
+        private Texture2D _selectTexture;
+        private int _gridHei = 0;
+        private string _spritesPath = ""; 
+        private readonly string _spritePathPlayerPrefsKey = "SpritePath";
         bool _isHide = false;
         public void Init(float x, float y, float width, float height, int anchor = 0)
         {
-            _spriteBasePath = Application.dataPath + "/Resources/TileImages/Test";
+            _spritesPath = PlayerPrefs.GetString(_spritePathPlayerPrefsKey, Application.dataPath + "/Resources/TileImages/Test");
             _pos = new Vector2(x, y);
             _size = new Vector2(width, height);
             _anchor = anchor;
-
+            SceneView.duringSceneGui -= OnSceneGUI;
             SceneView.duringSceneGui += OnSceneGUI;
+            _gridHei = (int)((_spriteLists.Count * _tileSize.x) / _size.x);
+            SetSpriteList();
+            SelectTile(_spriteLists[0]);
+        }
+
+        private void SetSpriteList()
+        {
             string resourceSubPath = "/Resources/";
-            int startIdx = _spriteBasePath.IndexOf(resourceSubPath) + resourceSubPath.Length;
-            string subPath = _spriteBasePath.Substring(startIdx);
+            int startIdx = _spritesPath.IndexOf(resourceSubPath) + resourceSubPath.Length;
+            string subPath = _spritesPath.Substring(startIdx);
             var allSprites = Resources.LoadAll(subPath);
 
             _spriteLists.Clear();
-            foreach(Texture2D item  in allSprites)
+            foreach (Texture2D item in allSprites)
             {
                 _spriteLists.Add(item);
             }
-
         }
 
         public void Exit()
@@ -117,53 +125,92 @@ public class CustomTileMapEditor : Editor
             RaycastHit hitInfo;
             Vector3 hitPos = Vector3.zero;
             var dist = 0f;
-            if (p.Raycast(worldRay, out dist))
+            if (p.Raycast(worldRay, out dist) && _selectTexture != null)
             {
                 hitPos = worldRay.origin + worldRay.direction.normalized * dist;
                 Vector2 pos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
                 GameObject obj = new GameObject("tile");
+                obj.transform.SetParent(_tileMap.transform);
                 obj.transform.position = _tileMap.transform.InverseTransformPoint(pos);
                 SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
+                Rect rect = new Rect(0, 0, _selectTexture.width, _selectTexture.height);
+                sr.sprite = Sprite.Create(_selectTexture, rect, new Vector2(0.5f, 0.5f));
             }
         }
 
          void OnDisplay(int id)
         {
             _isHide = GUILayout.Toggle(_isHide,"Hide");
+            GUILayout.Label("CurSpritePath : " + _spritesPath);
             _scroll = GUILayout.BeginScrollView(_scroll);
 
-
-
-            if (GUILayout.Button("Set Directory(경로 설정)"))
+            if (GUILayout.Button("Set Sprite Folder Directory(스프라이트 폴더 경로 설정)"))
             {
-                string path = EditorUtility.OpenFolderPanel("Overwrite with png", _spriteBasePath, "");
-
+                string  setPath = EditorUtility.OpenFolderPanel("Set Sprite Folder", _spritesPath, "");
+                if (string.IsNullOrEmpty(setPath) == false)
+                {
+                    PlayerPrefs.SetString(_spritePathPlayerPrefsKey, setPath);
+                    _spritesPath = setPath;
+                }
             }
 
+            if (GUILayout.Button("Open Sprite Folder (스프라이트 폴더 오픈)"))
+            {
+                Application.OpenURL(_spritesPath);
+            }
+
+
             DisplayAllSprites();
+            DisplayCurrentSelect();
             GUILayout.EndScrollView();
         }
 
         void DisplayAllSprites()
         {
-            var offset = new Vector2(10, 25);
+            var offset = new Vector2(10, 50);
 
             int wid = 0;
             int hei = 0;
             int preHei = 0;
-            for (int i = 0; i < _spriteLists.Count; i++)
+
+            int i = 0;
+           
+            foreach (Texture2D texture2D in _spriteLists)
             {
-               
-                hei =(int) ((i * _tileSize.x)  /_size.x );
+                hei = (int)((i * _tileSize.x) / _size.x);
                 if (preHei != hei)
                     wid = 0;
 
                 float xPos = offset.x + (_tileSize.x * wid);
 
                 preHei = hei;
-                GUI.DrawTexture(new Rect(xPos, offset.y + (hei * _tileSize.y), _tileSize.x, _tileSize.y), _spriteLists[i]);
+
+                var textureRect = new Rect(xPos, offset.y + (hei * _tileSize.y), _tileSize.x, _tileSize.y);
+
+                GUI.color = new Color(1, 1, 1, 1f);
+                GUI.DrawTexture(textureRect, texture2D);
+                GUI.color = new Color(1, 1, 1, 0f);
+                if (GUI.Button(textureRect, ""))
+                {
+                    SelectTile(texture2D);
+                }
                 wid++;
+                i++;
             }
+        }
+        private void DisplayCurrentSelect()
+        {
+            GUI.color = new Color(1, 1, 1, 1f);
+            GUI.TextArea(new Rect(0, (float)(_gridHei) * 100, 60,100),"Selected Texture");
+            if (_selectTexture != null)
+            {
+               GUI.DrawTexture(new Rect(0, (float)(_gridHei) * 100 + 30, _tileSize.x, _tileSize.y), _selectTexture);
+            }
+        }
+
+        private void SelectTile(Texture2D texture)
+        {
+            _selectTexture = texture;
         }
 
         private Rect CreateRect(SceneView scn, Vector2 pos, Vector2 size, int anchor, CustomTileMap customTileMap)
@@ -185,7 +232,10 @@ public class CustomTileMapEditor : Editor
             return new Rect(rc.x, rc.y, size.x, size.y);
         }
     }
-
+    private void OnDisable()
+    {
+        SceneViewEditorWindow.Instance.Exit();
+    }
     private void OnEnable()
     {
         SceneViewEditorWindow.Instance.TileMap = (CustomTileMap)target;
