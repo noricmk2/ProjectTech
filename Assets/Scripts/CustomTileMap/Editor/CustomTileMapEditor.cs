@@ -42,7 +42,10 @@ public class CustomTileMapEditor : Editor
         private Vector2 _hideSize = new Vector2(10, 10);
         private Vector2 _tileSize = new Vector2(50, 50);
         private int _anchor = 0;
+        private int _bottomBaseOffset = 50;
+        private float _bottomOffset = -1;
         private List<Texture2D> _spriteLists = new List<Texture2D>();
+        private List<GameObject> _tileList = new List<GameObject>();
         private Texture2D _selectTexture;
         private int _gridHei = 0;
         private string _spritesPath = ""; 
@@ -56,7 +59,9 @@ public class CustomTileMapEditor : Editor
             _anchor = anchor;
             SceneView.duringSceneGui -= OnSceneGUI;
             SceneView.duringSceneGui += OnSceneGUI;
-            _gridHei = (int)((_spriteLists.Count * _tileSize.x) / _size.x);
+
+            _bottomOffset = ((_spriteLists.Count * _tileSize.x) / _size.x) * (_tileSize.x*2) + _bottomBaseOffset;
+
             SetSpriteList();
             SelectTile(_spriteLists[0]);
         }
@@ -127,14 +132,35 @@ public class CustomTileMapEditor : Editor
             var dist = 0f;
             if (p.Raycast(worldRay, out dist) && _selectTexture != null)
             {
+                float tileWid = _selectTexture.width;
+                float tileHei = _selectTexture.height;
+
+                var tileSize = tileWid / 100;
+
                 hitPos = worldRay.origin + worldRay.direction.normalized * dist;
+
+                var invHitPos = _tileMap.transform.InverseTransformPoint(hitPos);
+
                 Vector2 pos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
                 GameObject obj = new GameObject("tile");
                 obj.transform.SetParent(_tileMap.transform);
-                obj.transform.position = _tileMap.transform.InverseTransformPoint(pos);
+
+                var x = Mathf.Floor(invHitPos.x / tileSize) * tileSize;
+                var y = Mathf.Floor(invHitPos.y / tileSize) * tileSize;
+
+                var row = x / tileSize;
+                var column = Mathf.Abs(y / tileSize) - 1;
+
+                x += _tileMap.transform.position.x + tileSize / 2;
+                y += _tileMap.transform.position.y + tileSize / 2;
+               
+                obj.transform.position = new Vector3(x, y, _tileMap.transform.position.z);
+
                 SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
-                Rect rect = new Rect(0, 0, _selectTexture.width, _selectTexture.height);
+                Rect rect = new Rect(0, 0, tileWid, tileHei);
                 sr.sprite = Sprite.Create(_selectTexture, rect, new Vector2(0.5f, 0.5f));
+
+                _tileList.Add(obj);
             }
         }
 
@@ -142,6 +168,7 @@ public class CustomTileMapEditor : Editor
         {
             _isHide = GUILayout.Toggle(_isHide,"Hide");
             GUILayout.Label("CurSpritePath : " + _spritesPath);
+         
             _scroll = GUILayout.BeginScrollView(_scroll);
 
             if (GUILayout.Button("Set Sprite Folder Directory(스프라이트 폴더 경로 설정)"))
@@ -152,6 +179,16 @@ public class CustomTileMapEditor : Editor
                     PlayerPrefs.SetString(_spritePathPlayerPrefsKey, setPath);
                     _spritesPath = setPath;
                 }
+            }
+
+            if (GUI.Button(new Rect(100, _bottomOffset,100,50),"Clear Tiles"))
+            { 
+                foreach(GameObject child in _tileList)
+                {
+                    DestroyImmediate(child.gameObject);
+                }
+
+                _tileList.Clear();
             }
 
             if (GUILayout.Button("Open Sprite Folder (스프라이트 폴더 오픈)"))
@@ -200,11 +237,13 @@ public class CustomTileMapEditor : Editor
         }
         private void DisplayCurrentSelect()
         {
+            if (_selectTexture == null)
+                return;
             GUI.color = new Color(1, 1, 1, 1f);
-            GUI.TextArea(new Rect(0, (float)(_gridHei) * 100, 60,100),"Selected Texture");
+            GUI.TextArea(new Rect(0, (float)_bottomOffset, 60,100),"Selected Texture");
             if (_selectTexture != null)
             {
-               GUI.DrawTexture(new Rect(0, (float)(_gridHei) * 100 + 30, _tileSize.x, _tileSize.y), _selectTexture);
+               GUI.DrawTexture(new Rect(0, _bottomOffset + _bottomBaseOffset, _tileSize.x, _tileSize.y), _selectTexture);
             }
         }
 
