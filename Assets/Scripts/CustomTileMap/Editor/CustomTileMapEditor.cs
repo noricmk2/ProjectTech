@@ -60,7 +60,7 @@ public class CustomTileMapEditor : Editor
             SceneView.duringSceneGui -= OnSceneGUI;
             SceneView.duringSceneGui += OnSceneGUI;
 
-            _bottomOffset = ((_spriteLists.Count * _tileSize.x) / _size.x) * (_tileSize.x*2) + _bottomBaseOffset;
+            _bottomOffset = ((_spriteLists.Count * _tileSize.x) / _size.x) * (_tileSize.x) + _bottomBaseOffset;
 
             SetSpriteList();
             SelectTile(_spriteLists[0]);
@@ -182,11 +182,8 @@ public class CustomTileMapEditor : Editor
             }
 
             if (GUI.Button(new Rect(100, _bottomOffset,100,50),"Clear Tiles"))
-            { 
-                foreach(GameObject child in _tileList)
-                {
-                    DestroyImmediate(child.gameObject);
-                }
+            {
+                _tileMap.DestroyAllTiles();
 
                 _tileList.Clear();
             }

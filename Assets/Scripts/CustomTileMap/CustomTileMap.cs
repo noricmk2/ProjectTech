@@ -4,15 +4,13 @@ using UnityEngine;
 
 public class CustomTileMap : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
+    
+    public void DestroyAllTiles()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
+        foreach(Transform child in transform)
+        {
+            DestroyImmediate(child.gameObject);
+        }
+                
     }
 }
