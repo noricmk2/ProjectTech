@@ -1,50 +1,51 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using TCUtil;
 using System;
+using TCUtil;
 
 public interface IPoolObjectBase
 {
     void PushAction();
     void PopAction();
+    GameObject GetGameObject();
 }
 
 public class ObjectFactory : Singleton<ObjectFactory>
 {
     private Dictionary<string, ObjectPool<IPoolObjectBase>> _poolListDict = new Dictionary<string, ObjectPool<IPoolObjectBase>>();
-    public Transform IngamePoolParent { get; private set; }
 
     #region StaticMethod
-    public static GameObject Instantiate(Transform parent, GameObject prefab)
+    public static GameObject Instantiate(Transform parent, GameObject prefab, bool stayWorldPos = false)
     {
         GameObject createdObj = Instantiate(prefab);
         if (parent != null)
         {
-            createdObj.transform.Init(parent);
+            createdObj.transform.Init(parent, stayWorldPos);
         }
         return createdObj;
     }
 
-    public static T Instantiate<T>(Transform parent, GameObject prefab, int layer = -1)
+    public static T Instantiate<T>(Transform parent, GameObject prefab, int layer = -1, bool stayWorldPos = false)
     {
-        var createdObj = Instantiate(parent, prefab);
+        var createdObj = Instantiate(parent, prefab, stayWorldPos);
         if (layer > -1)
             createdObj.transform.SetLayerRecursively(layer);
         return createdObj.GetComponent<T>();
     }
     #endregion
-    public T CreateObject<T>(ResourceType type, string name, Transform parent, int layer = -1) where T : UnityEngine.Object
+    public T CreateObject<T>(ResourceType type, string name, Transform parent, int layer = -1, bool stayWorldPos = false) where T : UnityEngine.Object
     {
         T result = null;
         string path = ResourceManager.GetPathByResourcesType(type);
         var prefab = ResourceManager.Instance.LoadResource<GameObject>(path, name);
-        result = Instantiate<T>(parent, prefab, layer);
+        result = Instantiate<T>(parent, prefab, layer, stayWorldPos);
         return result;
     }
 
     public T GetPoolObject<T>(ResourceType type, string name) where T : class, IPoolObjectBase
     {
+        var parent = transform;
         if (_poolListDict.ContainsKey(name))
         {
             var objectPool = _poolListDict[name];
@@ -52,7 +53,7 @@ public class ObjectFactory : Singleton<ObjectFactory>
         }
         else
         {
-            CreatePool<T>(1, type, name, transform);
+            CreatePool<T>(1, type, name, parent);
             return _poolListDict[name].Pop() as T;
         }
     }
@@ -72,7 +73,7 @@ public class ObjectFactory : Singleton<ObjectFactory>
             T poolObj = Instantiate<T>(parent, prefab);
             if (poolObj == null)
             {
-                Debug.LogError("[Failed]pool object is null: " + name);
+                DebugEx.LogError("[Failed]pool object is null: " + name);
             }
             return poolObj;
         }

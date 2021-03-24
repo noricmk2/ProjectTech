@@ -18,9 +18,9 @@ namespace TCUtil
             }
         }
 
-        public static void Init(this Transform transform, Transform parent)
+        public static void Init(this Transform transform, Transform parent, bool stayWorldPos)
         {
-            transform.SetParent(parent);
+            transform.SetParent(parent, stayWorldPos);
             //transform.localScale = new Vector3(1f, 1f, 1f);
             transform.localPosition = Vector3.zero;
             transform.localRotation = Quaternion.identity;
@@ -170,34 +170,9 @@ namespace TCUtil
         }
         #endregion
 
-        public static Vector2 GetViewPortPosInCamera(Vector2 screenPos, Camera cam, Vector2 margin)
+        public static Vector2Int GetTilePos(Vector3 worldPos)
         {
-            Vector2 viewPortPos = cam.ScreenToViewportPoint(screenPos);
-            margin.x /= Screen.width;
-            margin.y /= Screen.height;
-            if ((viewPortPos.x - margin.x) < 0)
-                viewPortPos.x = margin.x;
-            if ((viewPortPos.x + margin.x) > 1)
-                viewPortPos.x = 1 - margin.x;
-            if ((viewPortPos.y - margin.y) < 0)
-                viewPortPos.y = margin.y;
-            if ((viewPortPos.y + margin.y) > 1)
-                viewPortPos.y = 1 - margin.y;
-            return viewPortPos;
-        }
-
-        public static bool IsInCamera(Vector3 worldPos, Camera cam, Vector2 margin)
-        {
-            Vector2 viewPortPos = cam.WorldToViewportPoint(worldPos);
-            if ((viewPortPos.x - margin.x) <= 0)
-                return false;
-            if ((viewPortPos.x + margin.x) > 1)
-                return false;
-            if ((viewPortPos.y - margin.y) < 0)
-                return false;
-            if ((viewPortPos.y + margin.y) > 1)
-                return false;
-            return true;
+            return new Vector2Int(Mathf.RoundToInt(worldPos.x), Mathf.RoundToInt(worldPos.z));
         }
 
         public static Vector2 GetSizeByCorner(Vector3[] corners)
@@ -306,6 +281,21 @@ namespace TCUtil
                 first = source.IndexOf(c0, ++first, limit - first);
             }
             return -1;
+        }
+
+        public static List<Vector3> NodeToVectorList(List<JPSNode> nodeList)
+        {
+            if (nodeList == null)
+            {
+                DebugEx.Log("[Failed] no exist path");
+                return null;
+            }
+            var vectorList = new List<Vector3>();
+            for (int i = 0; i < nodeList.Count; ++i)
+            {
+                vectorList.Add(new Vector3(nodeList[i].X, 0, nodeList[i].Y));
+            }
+            return vectorList;
         }
     }
     #endregion

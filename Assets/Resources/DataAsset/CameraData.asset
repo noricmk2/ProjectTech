@@ -12,5 +12,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8f36f560ca2413040b7d4d898f3d710d, type: 3}
   m_Name: CameraData
   m_EditorClassIdentifier: 
-  Position: {x: 10, y: 10, z: -6}
+  Position: {x: 10, y: 5, z: 5}
   Rotate: {x: 45, y: -70, z: 0}

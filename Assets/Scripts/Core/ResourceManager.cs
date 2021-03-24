@@ -3,11 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public enum ResourceType
-{
-
-}
-
 public class ResourceManager : Singleton<ResourceManager>
 {
     #region Property
@@ -15,16 +10,50 @@ public class ResourceManager : Singleton<ResourceManager>
     private Queue<LoadOperation> _resourceLoadQueue = new Queue<LoadOperation>();
     private List<LoadOperation> _loadingList = new List<LoadOperation>();
     private int _loadLimit = 10;
+
+    private static readonly string dataAssetPath = "DataAsset/";
+    private static readonly string ingamePath = "Ingame/";
+    private static readonly string characterPath = "Ingame/";
     #endregion
 
     public static string GetPathByResourcesType(ResourceType type)
     {
         string path = string.Empty;
+
+        switch (type)
+        {
+            case ResourceType.DataAsset:
+                path = dataAssetPath;
+                break;
+            case ResourceType.Tile:
+                path = ingamePath;
+                break;
+            case ResourceType.Character:
+                path = characterPath;
+                break;
+        }
         return path;
     }
 
     public T LoadResourceFromResources<T>(string path, string objectName) where T : UnityEngine.Object
     {
+        string fullPath = string.Concat(path, objectName);
+        T retObj = null;
+        if (_resourceCacheDict.ContainsKey(fullPath))
+        {
+            retObj = _resourceCacheDict[fullPath] as T;
+        }
+        else
+        {
+            retObj = Resources.Load<T>(fullPath);
+            _resourceCacheDict[fullPath] = retObj;
+        }
+        return retObj;
+    }
+
+    public T LoadResourceFromResources<T>(ResourceType type, string objectName) where T : UnityEngine.Object
+    {
+        var path = GetPathByResourcesType(type);
         string fullPath = string.Concat(path, objectName);
         T retObj = null;
         if (_resourceCacheDict.ContainsKey(fullPath))

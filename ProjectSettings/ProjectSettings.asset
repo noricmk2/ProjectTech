@@ -582,6 +582,7 @@ PlayerSettings:
   webGLDecompressionFallback: 0
   scriptingDefineSymbols:
     1: MADORCA;LOAD_FROM_RESOURCES
+    7: LOAD_FROM_RESOURCES;LOCAL_SAVE;ENABLE_LOG;MADORCA
   additionalCompilerArguments: {}
   platformArchitecture: {}
   scriptingBackend:

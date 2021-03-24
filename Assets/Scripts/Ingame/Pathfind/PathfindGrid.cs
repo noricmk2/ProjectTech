@@ -7,16 +7,19 @@ public class PathfindGrid
     private JPSNode[,] _grid;
     private int _width;
     private int _height;
+    private List<JPSNode> _nodeList;
+
 
     public void Init(int width, int height, List<JPSNode> nodeList)
     {
         _width = width;
         _height = height;
+        _nodeList = nodeList;
         _grid = new JPSNode[width, height];
         for (int i = 0; i < width; ++i)
         {
             for (int j = 0; j < height; ++j)
-                _grid[i, j] = nodeList.Find(x => x.X == i && x.Y == j);
+                _grid[i, j] = nodeList.Find(x => x.X == i && x.Y == j).Clone();
         }
     }
 
@@ -29,17 +32,10 @@ public class PathfindGrid
         }
     }
 
-    public PathfindGrid Clone()
-    {
-        var clone = new PathfindGrid();
-        clone._grid = _grid.Clone() as JPSNode[,];
-        //ХЌЗа
-        return clone;
-    }
-
     public bool IsWalkable(int x, int y)
     {
-        if (_grid.GetLength(0) <= x || _grid.GetLength(1) <= y)
+        if (x < 0 || y < 0 ||
+            _grid.GetLength(0) <= x || _grid.GetLength(1) <= y)
             return false;
 
         if (_grid[x, y].state != 1)
@@ -50,9 +46,10 @@ public class PathfindGrid
 
     public JPSNode GetNode(int x, int y)
     {
-        if (_grid.GetLength(0) <= x || _grid.GetLength(1) <= y)
+        if (x < 0 || y < 0 ||
+            _grid.GetLength(0) <= x || _grid.GetLength(1) <= y)
         {
-            Debug.LogError("not exist index - grid:" + _grid.GetLength(0) + "," + _grid.GetLength(1) + "/pos:" + x + "," + y);
+            //Debug.Log("[Failed]not exist index - grid:" + _grid.GetLength(0) + "," + _grid.GetLength(1) + "/pos:" + x + "," + y);
             return null;
         }
 

@@ -26,7 +26,7 @@ public class JPSNode
     public void Reset()
     {
         G = 0;
-        H = 0;
+        H = null;
         F = 0;
         parent = null;
         closed = false;
@@ -71,6 +71,11 @@ public class PathfindController
         _grid = grid;
     }
 
+    public void SetDiagonalMovement(DiagonalMovement type)
+    {
+        _diagonalMovement = type;
+    }
+
     public void Reset()
     {
         _grid.Reset();
@@ -78,12 +83,12 @@ public class PathfindController
 
     public List<JPSNode> FindPath(Vector2Int start, Vector2Int target)
     {
-        var cloneGrid = _grid.Clone();
+        Reset();
         _openList.Clear();
         _closeList.Clear();
 
-        var startNode = cloneGrid.GetNode(start);
-        var targetNode = cloneGrid.GetNode(target);
+        var startNode = _grid.GetNode(start);
+        var targetNode = _grid.GetNode(target);
         startNode.G = 0;
         startNode.F = 0;
 
@@ -97,7 +102,7 @@ public class PathfindController
             if (node == targetNode)
                 return Backtrace(node);
             else
-                Search(node, targetNode, cloneGrid);
+                Search(node, targetNode, _grid);
         }
 
         return null;

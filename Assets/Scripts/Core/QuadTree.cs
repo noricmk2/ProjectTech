@@ -8,38 +8,44 @@ public interface IQuadTreeObject
     Guid ID { get; }
     Rect rect { get; }
     Collider2D Collider { get; }
-    void SetDebugColor(Color col);
+    void OnQuadQuery(List<IQuadTreeObject> colList);
 }
 
 class QuadTree<T> where T : IQuadTreeObject
 {
-    public Rect boundry;
-    T[] nodes;
-    bool root = false;
-    bool divided = false;
-    int numberOfNodesInserted = 0;
-    int maxSize;
-    QuadTree<T> northEast, northWest, southEast, southWest;
+    public Rect _boundry;
+    T[] _nodes;
+    bool _root = false;
+    bool _divided = false;
+    int _numberOfNodesInserted = 0;
+    int _maxSize;
+    QuadTree<T> _northEast, _northWest, _southEast, _southWest;
+    int _curLevel;
+    int _maxLevel;
+    List<T> _maxLevelNodeList;
+
     public int Count()
     {
-        int result = numberOfNodesInserted;
-        if (divided && root)
+        int result = _numberOfNodesInserted;
+        if (_divided && _root)
         {
-            result += northEast.Count();
-            result += northWest.Count();
-            result += southEast.Count();
-            result += southWest.Count();
+            result += _northEast.Count();
+            result += _northWest.Count();
+            result += _southEast.Count();
+            result += _southWest.Count();
         }
         return result;
     }
-    public QuadTree(Rect boundry, int size)
+    public QuadTree(Rect boundry, int size, int maxLevel, int curLevel)
     {
         if (boundry.width == 0 || boundry.height == 0)
             Debug.LogError("Radius of the boundry cannot be zero.");
 
-        nodes = new T[size];
-        maxSize = size;
-        this.boundry = boundry;
+        _maxLevel = maxLevel;
+        _curLevel = curLevel;
+        _nodes = new T[size];
+        _maxSize = size;
+        this._boundry = boundry;
     }
 
     #region Methods
@@ -47,125 +53,150 @@ class QuadTree<T> where T : IQuadTreeObject
     //Clear all the nodes in the Quad-Tree
     public void ClearAllNodes()
     {
-        if (numberOfNodesInserted == 0 && !root) return;
-        numberOfNodesInserted = 0;
-        root = false;
+        if (_numberOfNodesInserted == 0 && !_root) return;
+        _numberOfNodesInserted = 0;
+        _root = false;
 
-        if (divided)
+        if(_maxLevelNodeList != null)
         {
-            northEast.ClearAllNodes();
-            northWest.ClearAllNodes();
-            southEast.ClearAllNodes();
-            southWest.ClearAllNodes();
+            _maxLevelNodeList.Clear();
+            _maxLevelNodeList = null;
         }
-        divided = false;
+
+        if (_divided)
+        {
+            _northEast.ClearAllNodes();
+            _northWest.ClearAllNodes();
+            _southEast.ClearAllNodes();
+            _southWest.ClearAllNodes();
+        }
+        _divided = false;
     }
     /// <summary>Insert a node in the Quad-Tree</summary>
     public bool Insert(T node)
     {
         if (node.rect.width == 0 || node.rect.height == 0)
 			Debug.LogError("boundry cannot be zero.");
-		
-		//Checking if the position is in the boundries of the node.
-		//if(!boundry.Contains(node.rect.center))
-  //          return false;
-		if(numberOfNodesInserted < maxSize && !root) 
+
+        //Checking if the position is in the boundries of the node.
+        if (!InBoundry(node.rect))
+            return false;
+
+        bool success = false;
+
+        if (_numberOfNodesInserted < _maxSize && !_root) 
 		{
-			nodes[numberOfNodesInserted] = node;
-			numberOfNodesInserted++;
+			_nodes[_numberOfNodesInserted] = node;
+			_numberOfNodesInserted++;
 			return true;
 		}
-		else if(root)
+		else if(_root)
 		{
-            if (northEast.boundry.Overlaps(node.rect))
-                northEast.Insert(node);
-            if (northWest.boundry.Overlaps(node.rect))
-                northWest.Insert(node);
-            if (southEast.boundry.Overlaps(node.rect))
-                southEast.Insert(node);
-            if (southWest.boundry.Overlaps(node.rect))
-                southWest.Insert(node);
-
-			//if(northEast.Insert(node)) return true;			
-			//if(northWest.Insert(node)) return true;		
-			//if(southEast.Insert(node)) return true;
-			//if(southWest.Insert(node)) return true;	
-		}
-		else if(!root && numberOfNodesInserted == maxSize)
+            success |= _northEast.Insert(node);
+            success |= _northWest.Insert(node);
+            success |= _southEast.Insert(node);
+            success |= _southWest.Insert(node);
+            return success;
+        }
+		else if(!_root && _numberOfNodesInserted == _maxSize)
 		{
-			root = true;
-			numberOfNodesInserted = 0;
-            
-			if(!divided)
-				SubDivide();
-            
-            //Moving current nodes to subnodes
-			for (int i = 0; i < maxSize; i++)
-			{
-                if (northEast.boundry.Overlaps(nodes[i].rect))
-                    northEast.Insert(nodes[i]);
-                if (northWest.boundry.Overlaps(nodes[i].rect))
-                    northWest.Insert(nodes[i]);
-                if (southEast.boundry.Overlaps(nodes[i].rect))
-                    southEast.Insert(nodes[i]);
-                if (southWest.boundry.Overlaps(nodes[i].rect))
-                    southWest.Insert(nodes[i]);
+            if (_curLevel == _maxLevel)
+            {
+                if (_maxLevelNodeList == null)
+                    _maxLevelNodeList = _nodes.ToList();
+                _maxLevelNodeList.Add(node);
+            }
+            else
+            {
+                _root = true;
+                _numberOfNodesInserted = 0;
 
-    //            if (!northEast.Insert(nodes[i]))			
-				//if(!northWest.Insert(nodes[i]))		
-				//if(!southEast.Insert(nodes[i]))
-				//if(!southWest.Insert(nodes[i])) { Debug.LogError("It should not reach here"); }
-			}
+                if (!_divided)
+                    SubDivide();
 
-            if (northEast.boundry.Overlaps(node.rect))
-                northEast.Insert(node);
-            if (northWest.boundry.Overlaps(node.rect))
-                northWest.Insert(node);
-            if (southEast.boundry.Overlaps(node.rect))
-                southEast.Insert(node);
-            if (southWest.boundry.Overlaps(node.rect))
-                southWest.Insert(node);
+                //Moving current nodes to subnodes
+                for (int i = 0; i < _maxSize; i++)
+                {
+                    _northEast.Insert(_nodes[i]);
+                    _northWest.Insert(_nodes[i]);
+                    _southEast.Insert(_nodes[i]);
+                    _southWest.Insert(_nodes[i]);
+                }
 
-   //         if (!northEast.Insert(node))			
-			//if(!northWest.Insert(node))		
-			//if(!southEast.Insert(node))
-			//if(!southWest.Insert(node)) { Debug.LogError("It should not reach here"); }
-			return true;
+                success |= _northEast.Insert(node);
+                success |= _northWest.Insert(node);
+                success |= _southEast.Insert(node);
+                success |= _southWest.Insert(node);
+                return success;
+            }
 		}
 		return false;
 	}
 
-    private List<IQuadTreeObject> QueryObject(Rect searchingArea)
+    private bool InBoundry(Rect target)
     {
-        var founded = new List<IQuadTreeObject>();
-        if (numberOfNodesInserted == 0 && !root)
-            return founded;
-        if (!boundry.Overlaps(searchingArea))
-            return founded;
-
-        if (!root && numberOfNodesInserted != 0)
+        bool inBoundry = false;
+        if (target.x <= _boundry.x + _boundry.width &&
+            target.x + target.width >= _boundry.x &&
+            target.y <= _boundry.y + _boundry.height &&
+            target.y + target.height >= _boundry.y)
         {
-            for (int i = 0; i < numberOfNodesInserted; i++)
+            inBoundry = true;
+        }
+
+        return inBoundry;
+    }
+
+
+    private List<IQuadTreeObject> QueryObject(IQuadTreeObject target)
+    {
+        Rect searchingArea = target.rect;
+        var founded = new List<IQuadTreeObject>();
+
+        if (_curLevel == _maxLevel)
+        {
+            if (_maxLevelNodeList != null)
             {
-                if (searchingArea.Overlaps(nodes[i].rect))
-                    founded.Add(nodes[i]);
+                for (int i = 0; i < _maxLevelNodeList.Count; ++i)
+                {
+                    if (searchingArea.Overlaps(_maxLevelNodeList[i].rect))
+                        founded.Add(_maxLevelNodeList[i]);
+                }
             }
             return founded;
         }
-        else if (root && numberOfNodesInserted == 0)
+
+        if (_numberOfNodesInserted == 0 && !_root)
+            return founded;
+        if (!InBoundry(searchingArea))
+            return founded;
+
+        if (!_root && _numberOfNodesInserted != 0)
         {
-            founded.AddRange(northEast.QueryObject(searchingArea));
-            founded.AddRange(northWest.QueryObject(searchingArea));
-            founded.AddRange(southEast.QueryObject(searchingArea));
-            founded.AddRange(southWest.QueryObject(searchingArea));
+            for (int i = 0; i < _numberOfNodesInserted; i++)
+            {
+                if (_nodes[i].ID == target.ID)
+                    continue;
+
+                if (searchingArea.Overlaps(_nodes[i].rect))
+                    founded.Add(_nodes[i]);
+            }
+            return founded;
+        }
+        else if (_root && _numberOfNodesInserted == 0)
+        {
+            founded.AddRange(_northEast.QueryObject(target));
+            founded.AddRange(_northWest.QueryObject(target));
+            founded.AddRange(_southEast.QueryObject(target));
+            founded.AddRange(_southWest.QueryObject(target));
         }
 
         return founded;
     }
 
-    public List<IQuadTreeObject> Query(Rect searchingArea)
+    public List<IQuadTreeObject> Query(IQuadTreeObject targetNode)
     {
-        var foundList = QueryObject(searchingArea);
+        var foundList = QueryObject(targetNode);
         var distinctList = foundList.Distinct().ToList();
         return distinctList;
     }
@@ -176,66 +207,44 @@ class QuadTree<T> where T : IQuadTreeObject
     private void SubDivide() 
 	{
 		//Size of the sub boundries 
-		if(northEast == null) 
+		if(_northEast == null) 
 		{	
-			float x = boundry.x;
-			float y = boundry.y;
-			float width = boundry.width * 0.5f;
-			float height = boundry.height * 0.5f;
+			float x = _boundry.x;
+			float y = _boundry.y;
+			float width = _boundry.width * 0.5f;
+			float height = _boundry.height * 0.5f;
 	
-			northEast = new QuadTree<T>(new Rect(x + width, y + height, width, height), maxSize);
-			northWest = new QuadTree<T>(new Rect(x, y + height, width, height), maxSize);
-			southEast = new QuadTree<T>(new Rect(x + width, y, width, height), maxSize);
-			southWest = new QuadTree<T>(new Rect(x, y, width, height), maxSize);
+			_northEast = new QuadTree<T>(new Rect(x + width, y + height, width, height), _maxSize, _maxLevel, _curLevel + 1);
+			_northWest = new QuadTree<T>(new Rect(x, y + height, width, height), _maxSize, _maxLevel, _curLevel + 1);
+			_southEast = new QuadTree<T>(new Rect(x + width, y, width, height), _maxSize, _maxLevel, _curLevel + 1);
+			_southWest = new QuadTree<T>(new Rect(x, y, width, height), _maxSize, _maxLevel, _curLevel + 1);
 		} 
-		divided = true; 
+		_divided = true; 
 	}
-
-	// Shows boundires of the quadtree and SubNodes
-	// public void LogNodes() 
-	// {
-	// 	if(numberOfNodesInserted == 0 && !root) return;
-	// 	else if(root)
-	// 	{
-	// 		northEast.LogNodes();
-	// 		northWest.LogNodes();
-	// 		southWest.LogNodes();
-	// 		southEast.LogNodes();
-	// 		return;
-	// 	}
-	// 	else if(numberOfNodesInserted > 0)
-	// 	{
-	// 		for (int i = 0; i < numberOfNodesInserted; i++)
-	// 		{	
-	// 			Debug.Log(nodes[i].rect.x + " " + nodes[i].rect.y + " id:" + nodes[i].ID);	
-	// 		}
-	// 		return;
-	// 	}
-	// }
 	
-	public void ShowBoundries()
+	public void ShowBoundries(Color col)
 	{ 
-		float x = boundry.x;
-		float y = boundry.y;
-		float w = boundry.width;
-		float h = boundry.height;
+		float x = _boundry.x;
+		float y = _boundry.y;
+		float w = _boundry.width;
+		float h = _boundry.height;
 
 		Vector2 bottomLeftPoint = new Vector2(x, y);
 		Vector2 bottomRightPoint = new Vector2(x + w, y);
 		Vector2 topRightPoint = new Vector2(x + w, y + h);
 		Vector2 topLeftPoint = new Vector2(x, y + h);
 		
-		Debug.DrawLine(bottomLeftPoint, bottomRightPoint, Color.red);	//bottomLine
-		Debug.DrawLine(bottomLeftPoint, topLeftPoint, Color.red);		//leftLine
-		Debug.DrawLine(bottomRightPoint, topRightPoint, Color.red);		//rightLine
-		Debug.DrawLine(topLeftPoint, topRightPoint, Color.red);			//topLine
+		Debug.DrawLine(bottomLeftPoint, bottomRightPoint, col);	//bottomLine
+		Debug.DrawLine(bottomLeftPoint, topLeftPoint, col);		//leftLine
+		Debug.DrawLine(bottomRightPoint, topRightPoint, col);		//rightLine
+		Debug.DrawLine(topLeftPoint, topRightPoint, col);			//topLine
 
-		if(divided)
+		if(_divided)
 		{
-			northEast.ShowBoundries();
-			northWest.ShowBoundries();
-			southEast.ShowBoundries();
-			southWest.ShowBoundries();
+			_northEast.ShowBoundries(col);
+			_northWest.ShowBoundries(col);
+			_southEast.ShowBoundries(col);
+			_southWest.ShowBoundries(col);
 		}
 	}
 	#endregion
