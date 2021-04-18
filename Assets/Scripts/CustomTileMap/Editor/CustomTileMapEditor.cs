@@ -2,10 +2,12 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
+using System.Linq;
 [CustomEditor(typeof(CustomTileMap))]
 public class CustomTileMapEditor : Editor
 {
     int _lastHandleID = -1;
+
 
     public CustomTileMap _tileMap;
     public class SceneViewEditorWindow
@@ -18,6 +20,14 @@ public class CustomTileMapEditor : Editor
             L_Bottom,
             R_Bottom
         }
+        public enum ToolModes
+        {
+            Transform,
+            Building,
+            Painting
+        }
+
+        private ToolModes toolMode = ToolModes.Building;
 
         public static SceneViewEditorWindow Instance
         {
@@ -34,7 +44,7 @@ public class CustomTileMapEditor : Editor
         public CustomTileMap TileMap { get => _tileMap; set => _tileMap = value; }
 
         public static SceneViewEditorWindow _instance;
-
+        public GameObject _prefabTest;
         public  Vector2 _scroll;
 
         private Vector2 _pos = new Vector2(20, 20);
@@ -44,26 +54,28 @@ public class CustomTileMapEditor : Editor
         private int _anchor = 0;
         private int _bottomBaseOffset = 50;
         private float _bottomOffset = -1;
-        private List<Texture2D> _spriteLists = new List<Texture2D>();
         private List<GameObject> _tileList = new List<GameObject>();
+        private List<GameObject> _prefabList = new List<GameObject>();
         private Texture2D _selectTexture;
+        private GameObject _selectPrefab;
         private int _gridHei = 0;
         private string _spritesPath = ""; 
         private readonly string _spritePathPlayerPrefsKey = "SpritePath";
+        private int _curIndex = 0;
         bool _isHide = false;
-        public void Init(float x, float y, float width, float height, int anchor = 0)
+        public void Init(float x, float y, float width, float height, int anchor = 0)//C:\Users\o7716\Desktop\projecttech\ProjectTech\Assets\Resources\TileSample
         {
-            _spritesPath = PlayerPrefs.GetString(_spritePathPlayerPrefsKey, Application.dataPath + "/Resources/TileImages/Test");
+            _spritesPath = PlayerPrefs.GetString(_spritePathPlayerPrefsKey, Application.dataPath + "/Resources/TileSample");
             _pos = new Vector2(x, y);
             _size = new Vector2(width, height);
             _anchor = anchor;
             SceneView.duringSceneGui -= OnSceneGUI;
             SceneView.duringSceneGui += OnSceneGUI;
 
-            _bottomOffset = ((_spriteLists.Count * _tileSize.x) / _size.x) * (_tileSize.x) + _bottomBaseOffset;
+            _bottomOffset = ((_prefabList.Count * _tileSize.x) / _size.x) * (_tileSize.x) + _bottomBaseOffset;
 
             SetSpriteList();
-            SelectTile(_spriteLists[0]);
+            SelectTile(_prefabList[0]);
         }
 
         private void SetSpriteList()
@@ -71,12 +83,15 @@ public class CustomTileMapEditor : Editor
             string resourceSubPath = "/Resources/";
             int startIdx = _spritesPath.IndexOf(resourceSubPath) + resourceSubPath.Length;
             string subPath = _spritesPath.Substring(startIdx);
-            var allSprites = Resources.LoadAll(subPath);
-
-            _spriteLists.Clear();
-            foreach (Texture2D item in allSprites)
+            var allPrefabs = Resources.LoadAll(subPath);
+            _prefabList.Clear();
+            for (int i=0; i< allPrefabs.Length; i++)
             {
-                _spriteLists.Add(item);
+                GameObject gameObject = allPrefabs[i] as GameObject;
+                if(gameObject != null && gameObject.layer == 8) 
+                {
+                    _prefabList.Add(gameObject);
+                }
             }
         }
 
@@ -101,75 +116,155 @@ public class CustomTileMapEditor : Editor
                 GUILayout.Window(controlId, CreateRect(scn, _pos, _size, _anchor, _tileMap), OnDisplay, "TileMap");
                 int id = GUIUtility.GetControlID("CustomTileMapEditor".GetHashCode(), FocusType.Passive);
 
+
                 switch (Event.current.GetTypeForControl(id))
                 {
                     case EventType.MouseDown:
-                        CreateTileOnClick();
-                        break;
-                    case EventType.MouseUp:
-                        
-                        break;
-                    case EventType.MouseMove:
-                        break;
-                    case EventType.MouseDrag:
-                        break;
-                    case EventType.KeyDown:
-                        break;
-                    case EventType.KeyUp:
+
+                        if (Event.current.button == 0)
+                        {
+                            if (toolMode == ToolModes.Painting)
+                            {
+                                CreateTileOnClick();
+                            }
+                    
+                            
+
+                        }
                         break;
 
                 }
 
+               
+
             }
+        }
+        
+        void SetEditorViewCamera()
+        {
+            var scene_view = UnityEditor.SceneView.lastActiveSceneView;
+
+            // SceneView.lastActiveSceneView.cameraDistance is private, compute it.
+            var offset = scene_view.pivot - scene_view.camera.transform.position;
+            var cameraDistance = offset.magnitude;
+
+            scene_view.pivot = new Vector3(0,0) + new Vector3(0,0) * cameraDistance * -1.0f;
+            scene_view.rotation = Quaternion.LookRotation(new Vector3(0,0));
         }
 
         void CreateTileOnClick()
         {
+         
+
             var p = new Plane(_tileMap.transform.TransformDirection(Vector3.forward), Vector3.zero);
             Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
             RaycastHit hitInfo;
             Vector3 hitPos = Vector3.zero;
             var dist = 0f;
-            if (p.Raycast(worldRay, out dist) && _selectTexture != null)
+            p.Raycast(worldRay, out dist);
+            RaycastHit2D hit2d = Physics2D.Raycast(worldRay.origin, worldRay.direction);
+            
+            GameObject selectObject = _prefabList[_curIndex];
+            if (selectObject != null)
             {
-                float tileWid = _selectTexture.width;
-                float tileHei = _selectTexture.height;
+                Texture texture = selectObject.GetComponent<MeshRenderer>().sharedMaterial.mainTexture;
+                Debug.Log("TextureNAme  :" + texture.name);
+                float tileWid = (int)texture.width;// 512; //_selectTexture.width;
+                float tileHei = (int)texture.height;//_selectTexture.height;
 
-                var tileSize = tileWid / 100;
+                var tileSize = 1;
 
                 hitPos = worldRay.origin + worldRay.direction.normalized * dist;
 
                 var invHitPos = _tileMap.transform.InverseTransformPoint(hitPos);
 
                 Vector2 pos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
-                GameObject obj = new GameObject("tile");
-                obj.transform.SetParent(_tileMap.transform);
-
+                //GameObject obj = new GameObject("tile");
                 var x = Mathf.Floor(invHitPos.x / tileSize) * tileSize;
                 var y = Mathf.Floor(invHitPos.y / tileSize) * tileSize;
+                var spawnPos = new Vector3(x, y, _tileMap.transform.position.z);
 
-                var row = x / tileSize;
-                var column = Mathf.Abs(y / tileSize) - 1;
 
-                x += _tileMap.transform.position.x + tileSize / 2;
-                y += _tileMap.transform.position.y + tileSize / 2;
-               
-                obj.transform.position = new Vector3(x, y, _tileMap.transform.position.z);
 
-                SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
-                Rect rect = new Rect(0, 0, tileWid, tileHei);
-                sr.sprite = Sprite.Create(_selectTexture, rect, new Vector2(0.5f, 0.5f));
+                if (_tileMap.SpawnablePostions.Count == 0 /*|| _tileMap.SpawnablePostions.Contains(spawnPos) == true*/)
+                {
+                    //SetEditorViewCamera()
+                    GameObject obj = GameObject.Instantiate(selectObject);
+                    obj.transform.SetParent(_tileMap.transform);
 
-                _tileList.Add(obj);
+                    var row = x / tileSize;
+                    var column = Mathf.Abs(y / tileSize) - 1;
+
+                    x += _tileMap.transform.position.x + tileSize / 2;
+                    y += _tileMap.transform.position.y + tileSize / 2;
+
+                    obj.transform.position = spawnPos;
+
+                    _tileMap.SpawnablePostions.Add(Vector3Int.FloorToInt(spawnPos));
+                    CreateChildNodes(obj);
+                    // obj.transform.localScale = new Vector3(tileWid, tileHei,1);
+                    _tileList.Add(obj);
+                }
+                else
+                {
+                    var selectObj = Selection.activeGameObject;
+                    
+                    Debug.Log("dwdw");
+                    if(selectObj.GetComponent<ChildTile>() != null)
+                        CreateChildNodes(selectObj);
+                }
+                //SpriteRenderer sr = obj.AddComponent<SpriteRenderer>();
+                //Rect rect = new Rect(0, 0, tileWid, tileHei);
+                //sr.sprite = Sprite.Create(_selectTexture, rect, new Vector2(0.5f, 0.5f));
+
+          
+            }
+        }
+
+        void CreateChildNodes(GameObject baseObj)
+        {
+            var meshFil = baseObj.GetComponent<MeshFilter>().sharedMesh.bounds;
+            var bound = meshFil.size;
+            float[] dx = { - bound.x, 0, bound.x, 0 };
+            float[] dz = { 0, bound.y, 0, - bound.y };
+            //bot,right,up,left
+            Vector3 basePos = baseObj.transform.position;
+
+            MeshRenderer originMeshRen = baseObj.GetComponent<MeshRenderer>();
+  
+            EditorUtility.SetDirty(baseObj);
+            
+
+         //   originMeshRen.sharedMaterial = _tileMap.OriginMaterial;
+            _tileMap.SpawnablePostions.Add(Vector3Int.FloorToInt(basePos));
+            for (int i=0; i < dx.Length; i++)
+            {
+                Vector3 newPos = new Vector3(basePos.x + dx[i],basePos.y, basePos.z + dz[i]);
+
+                if (_tileMap.SpawnablePostions.Contains(Vector3Int.FloorToInt(newPos)) == false)
+                {
+                    GameObject copy = GameObject.Instantiate(_selectPrefab);
+                    copy.transform.parent = baseObj.transform.parent;
+                    MeshRenderer meshRen = copy.GetComponent<MeshRenderer>();
+             //       meshRen.sharedMaterial = _tileMap.CopyObjMaterial;
+          
+                    copy.transform.position = newPos;
+                    copy.transform.rotation = baseObj.transform.rotation;
+                    _tileMap.ChildTiles.Add(copy.AddComponent<ChildTile>());
+                    _tileMap.SpawnablePostions.Add(Vector3Int.FloorToInt(newPos));
+                }
             }
         }
 
          void OnDisplay(int id)
         {
+            toolMode = (ToolModes)GUI.Toolbar(new Rect(10, 10, 200, 30), (int)toolMode, new[] { "Move", "Build", "Paint" });
             _isHide = GUILayout.Toggle(_isHide,"Hide");
             GUILayout.Label("CurSpritePath : " + _spritesPath);
-         
+        
             _scroll = GUILayout.BeginScrollView(_scroll);
+
+               
 
             if (GUILayout.Button("Set Sprite Folder Directory(스프라이트 폴더 경로 설정)"))
             {
@@ -194,43 +289,19 @@ public class CustomTileMapEditor : Editor
             }
 
 
-            DisplayAllSprites();
+            DisplayAllPrefabs();
             DisplayCurrentSelect();
             GUILayout.EndScrollView();
         }
 
-        void DisplayAllSprites()
+        void DisplayAllPrefabs()
         {
-            var offset = new Vector2(10, 50);
-
-            int wid = 0;
-            int hei = 0;
-            int preHei = 0;
-
-            int i = 0;
-           
-            foreach (Texture2D texture2D in _spriteLists)
+            for(int i =0; i <_prefabList.Count; i++)
             {
-                hei = (int)((i * _tileSize.x) / _size.x);
-                if (preHei != hei)
-                    wid = 0;
-
-                float xPos = offset.x + (_tileSize.x * wid);
-
-                preHei = hei;
-
-                var textureRect = new Rect(xPos, offset.y + (hei * _tileSize.y), _tileSize.x, _tileSize.y);
-
-                GUI.color = new Color(1, 1, 1, 1f);
-                GUI.DrawTexture(textureRect, texture2D);
-                GUI.color = new Color(1, 1, 1, 0f);
-                if (GUI.Button(textureRect, ""))
-                {
-                    SelectTile(texture2D);
-                }
-                wid++;
-                i++;
+            
             }
+            var prefabList = _prefabList.Select(x => x.name).ToArray();
+            _curIndex = GUI.SelectionGrid(new Rect(10, 30, 600, 50), _curIndex, _prefabList.Select(x => x.name).ToArray(), 2);
         }
         private void DisplayCurrentSelect()
         {
@@ -244,9 +315,9 @@ public class CustomTileMapEditor : Editor
             }
         }
 
-        private void SelectTile(Texture2D texture)
+        private void SelectTile(GameObject selectObj)
         {
-            _selectTexture = texture;
+            _selectPrefab = selectObj;
         }
 
         private Rect CreateRect(SceneView scn, Vector2 pos, Vector2 size, int anchor, CustomTileMap customTileMap)
