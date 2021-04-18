@@ -3,7 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ResourceManager : Singleton<ResourceManager>
+public class ResourceManager : MonoSingleton<ResourceManager>
 {
     #region Property
     private Dictionary<string, UnityEngine.Object> _resourceCacheDict = new Dictionary<string, UnityEngine.Object>();

@@ -10,3 +10,9 @@ public enum IngameState
     Init,
     StartUpdate,
 }
+
+public enum CharacterType
+{
+    Player,
+    Enemy,
+}

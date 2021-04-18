@@ -8,12 +8,21 @@ public class CharacterController
     private CharacterBase _testCharacter;
     private Transform _charRoot;
     private readonly float moveValue = 0.5f;
+    private BattleBlackBoard _blackBoard;
 
-    public void Init(Transform charRoot)
+    public void Init(Transform charRoot, BattleBlackBoard blackBoard)
     {
+        //TODO:블랙보드에 데이터 저장
+        _blackBoard = blackBoard;
         _charRoot = charRoot;
         _testCharacter = ObjectFactory.Instance.CreateObject<CharacterBase>(ResourceType.Character, "TestCharacter", _charRoot);
         _testCharacter.CachedTransform.position = new Vector3(1, 0, 1);
+
+        var charData = new CharacterBase.CharacterInitData();
+        charData.blackBoard = blackBoard;
+        charData.checkFindEnemyDelegate = FindEnemy;
+        charData.checkMoveDelegate = FindMoveTarget;
+        _testCharacter.Init(charData);
     }
 
     public void OnUpdate()
@@ -35,7 +44,7 @@ public class CharacterController
                     var charPos = Func.GetTilePos(_testCharacter.CachedTransform.position);
                     var path = IngameManager.Instance.GetPathNodeList(charPos, new Vector2Int(node.X, node.Y));
 
-                    if (path != null)
+                    if (path != null && path.Count > 0)
                     {
                         var firstNode = path.Peek();
                         _testCharacter.MovePath(Func.NodeToVectorList(path), firstNode.F  * moveValue);
@@ -43,5 +52,15 @@ public class CharacterController
                 }
             }
         }
+    }
+
+    public bool FindEnemy(IBehaviorTreeOwner owner)
+    {
+        return false;
+    }
+
+    public bool FindMoveTarget(IBehaviorTreeOwner owner)
+    {
+        return false;
     }
 }

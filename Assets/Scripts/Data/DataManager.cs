@@ -6,3 +6,9 @@ public class DataManager : Singleton<DataManager>
 {
 
 }
+
+public class CharacterData
+{
+    public CharacterType characterType;
+
+}

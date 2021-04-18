@@ -17,8 +17,9 @@ public class MapController
 
     private readonly Vector3 _tileStartPos = new Vector3(0, 0, 0);
 
-    public void Init(MapData data)
+    public void Init(MapData data, BattleBlackBoard blackBoard)
     {
+        //TODO:블랙보드에 데이터 저장
         _curMapData = data;
         var grid = new PathfindGrid();
         grid.Init(data.width, data.height, data.nodeList);

@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class TCSceneManager : Singleton<TCSceneManager>
+public class TCSceneManager : MonoSingleton<TCSceneManager>
 {
     private Dictionary<SceneBase.GameSceneType, SceneBase> _sceneDic = new Dictionary<SceneBase.GameSceneType, SceneBase>();
     private SceneBase _currentScene;

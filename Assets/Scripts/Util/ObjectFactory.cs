@@ -11,7 +11,7 @@ public interface IPoolObjectBase
     GameObject GetGameObject();
 }
 
-public class ObjectFactory : Singleton<ObjectFactory>
+public class ObjectFactory : MonoSingleton<ObjectFactory>
 {
     private Dictionary<string, ObjectPool<IPoolObjectBase>> _poolListDict = new Dictionary<string, ObjectPool<IPoolObjectBase>>();
 

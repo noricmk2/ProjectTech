@@ -5,15 +5,20 @@ using TCUtil;
 
 public class BehaviorTree
 {
-    private SelectorNode _root;
+    private CompositeNode _root;
 
-    public void Init()
+    public void Init(CompositeNode root)
     {
-
+        _root = root;
     }
 
-    public void Execute()
+    public void AddNode(BehaviorTreeNode node)
     {
-        _root.Execute();
+        _root.AddNode(node);
+    }
+
+    public BehaviorNodeState OnUpdate()
+    {
+        return _root.Execute();
     }
 }

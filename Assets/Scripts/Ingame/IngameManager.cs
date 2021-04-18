@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IngameManager : Singleton<IngameManager>
+public class IngameManager : MonoSingleton<IngameManager>
 {
     #region Inspector
     [SerializeField]
@@ -22,6 +22,8 @@ public class IngameManager : Singleton<IngameManager>
     private IngameState _curState;
     public IngameState CurrentIngameState => _curState;
     public Camera IngameCamera => _ingameCamera;
+
+    private BattleBlackBoard _battleBlackBoard;
     #endregion
 
     private int[] testMap =
@@ -80,6 +82,7 @@ public class IngameManager : Singleton<IngameManager>
 
     public void Init()
     {
+        _battleBlackBoard = new BattleBlackBoard();
         _curState = IngameState.Init;
         InitCamera();
         //Test
@@ -93,10 +96,10 @@ public class IngameManager : Singleton<IngameManager>
             mapData.nodeList.Add(node);
         }
 
-        _mapController.Init(mapData);
+        _mapController.Init(mapData, _battleBlackBoard);
         _mapController.GenerateMap(_mapRoot);
 
-        _charController.Init(_characterRoot);
+        _charController.Init(_characterRoot, _battleBlackBoard);
         _curState = IngameState.StartUpdate;
     }
 

@@ -4,7 +4,7 @@ using UnityEngine;
 
 public interface IBehaviorTreeOwner
 {
-
+    Blackboard GetBlackBoard();
 }
 
 public enum BehaviorNodeState
@@ -20,6 +20,16 @@ public class BehaviorTreeNode
     protected bool _isActivate;
     protected IBehaviorTreeOwner _owner;
     public IBehaviorTreeOwner Owner => _owner;
+
+    public void SetOwner(IBehaviorTreeOwner owner)
+    {
+        _owner = owner;
+    }
+
+    public virtual void AddNode(BehaviorTreeNode node)
+    {
+        node.SetParent(this);
+    }
 
     public void SetParent(BehaviorTreeNode node)
     {
@@ -84,9 +94,9 @@ public class CompositeNode : BehaviorTreeNode
     protected BehaviorTreeNode _curNode;
     protected List<BehaviorTreeNode> _childList = new List<BehaviorTreeNode>();
 
-    public void AddNode(BehaviorTreeNode node)
+    public override void AddNode(BehaviorTreeNode node)
     {
-        node.SetParent(this);
+        base.AddNode(node);
         _childList.Add(node);
     }
 
@@ -159,7 +169,7 @@ public class SelectorNode : CompositeNode
 
         if (_childList.Count <= _curStep)
         {
-            Debug.LogError("[Failed]" + typeof(SequenceNode) + "child list out of range:" + _curStep);
+            Debug.LogError("[Failed]" + typeof(SelectorNode) + "child list out of range:" + _curStep);
             return BehaviorNodeState.Fail;
         }
 
@@ -187,12 +197,53 @@ public class SelectorNode : CompositeNode
         return BehaviorNodeState.Fail;
     }
 }
+
+public class RandomSelector : SelectorNode
+{
+    public override BehaviorNodeState OnExecute()
+    {
+        if (_childList.Count == 0)
+            return BehaviorNodeState.Success;
+
+        if (_childList.Count <= _curStep)
+        {
+            Debug.LogError("[Failed]" + typeof(RandomSelector) + "child list out of range:" + _curStep);
+            return BehaviorNodeState.Fail;
+        }
+
+        if(_curNode == null)
+        {
+            var rand = Random.Range(0, _childList.Count);
+            _curNode = _childList[rand];
+        }
+
+        var state = _curNode.Execute();
+        switch (state)
+        {
+            case BehaviorNodeState.Success:
+                return state;
+            case BehaviorNodeState.Fail:
+                _curNode = null;
+                return state;
+            case BehaviorNodeState.Running:
+                return state;
+        }
+
+        return BehaviorNodeState.Fail;
+    }
+}
 #endregion
 
 #region Decorator
 public class DecoratorNode : BehaviorTreeNode
 {
     protected BehaviorTreeNode _child;
+
+    public override void AddNode(BehaviorTreeNode node)
+    {
+        base.AddNode(node);
+        _child = node;
+    }
 
     protected override void OnDeactivate()
     {
@@ -254,14 +305,14 @@ public class Repeater : DecoratorNode
     }
 }
 
-public class ConditionCheck : DecoratorNode
+public class ConditionNode : DecoratorNode
 {
-    public delegate bool ConditionCheckDelegate();
+    public delegate bool ConditionCheckDelegate(IBehaviorTreeOwner owner);
     public ConditionCheckDelegate ConditionCheckFunc { private get; set; }
 
     public override BehaviorNodeState OnExecute()
     {
-        if (ConditionCheckFunc())
+        if (ConditionCheckFunc(_owner))
         {
             return _child.Execute();
         }
@@ -270,9 +321,3 @@ public class ConditionCheck : DecoratorNode
     }
 }
 #endregion
-
-public class ActionNode : BehaviorTreeNode
-{
-
-}
-

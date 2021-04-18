@@ -4,7 +4,7 @@
 /// Inherit from this base class to create a singleton.
 /// e.g. public class MyClassName : Singleton<MyClassName> {}
 /// </summary>
-public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
+public class MonoSingleton<T> : MonoBehaviour where T : MonoBehaviour
 {
     // Check to see if we're about to be destroyed.
     private static object m_Lock = new object();
@@ -40,5 +40,27 @@ public class Singleton<T> : MonoBehaviour where T : MonoBehaviour
                 return m_Instance;
             }
         }
+    }
+}
+
+public class Singleton<T> where T : class, new()
+{
+    protected static T _instance;
+
+    public static T Instance
+    {
+        get
+        {
+            if (_instance == null)
+            {
+                _instance = new T();
+            }
+            return _instance;
+        }
+    }
+
+    public static bool IsInitialized()
+    {
+        return (_instance != null);
     }
 }
