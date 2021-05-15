@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using TCUtil;
 
 public class IngameManager : MonoSingleton<IngameManager>
 {
@@ -16,111 +17,63 @@ public class IngameManager : MonoSingleton<IngameManager>
     #endregion
 
     #region Property
+    private IngameStageMachine _stateMachine = new IngameStageMachine();
     private MapController _mapController = new MapController();
     private CharacterController _charController = new CharacterController();
-
-    private IngameState _curState;
-    public IngameState CurrentIngameState => _curState;
+    private Spawner _spawner = new Spawner();
     public Camera IngameCamera => _ingameCamera;
-
-    private BattleBlackBoard _battleBlackBoard;
     #endregion
-
-    private int[] testMap =
-        {
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,0,0,0,0,0,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,0,0,1,1,
-        0,1,1,1,1,1,0,0,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,0,0,1,1,1,1,1,
-        0,1,1,0,0,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,0,1,1,1,0,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,0,0,0,0,
-        0,1,1,1,0,0,0,0,0,0,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,1,0,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,0,0,0,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,0,1,1,
-        0,1,1,1,1,1,1,0,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1
-    };
 
     public void Init()
     {
-        _battleBlackBoard = new BattleBlackBoard();
-        _curState = IngameState.Init;
         InitCamera();
+
+        var initState = new IngameStateBase();
+        initState.UpdateAction = InitCheck;
+        initState.StateType = IngameStageMachine.IngameState.IngameStateInit;
+        var updateState = new IngameStateBase();
+        updateState.UpdateAction = ControllerUpdate;
+        updateState.StateType = IngameStageMachine.IngameState.IngameStateUpdate;
+        _stateMachine.AddState(IngameStageMachine.IngameState.IngameStateInit, initState);
+        _stateMachine.AddState(IngameStageMachine.IngameState.IngameStateUpdate, updateState);
+
         //Test
-        var mapData = new MapController.MapData();
-        mapData.width = 10;
-        mapData.height = 50;
-        mapData.nodeList = new List<JPSNode>();
-        for (int i = 0; i < testMap.Length; ++i)
-        {
-            var node = new JPSNode(i % mapData.width, i / mapData.width, testMap[i]);
-            mapData.nodeList.Add(node);
-        }
-
-        _mapController.Init(mapData, _battleBlackBoard);
+        var stageData = DataManager.Instance.GetStageDataByIndex(-1);
+        var mapData = stageData.mapData;
+        _mapController.Init(mapData);
         _mapController.GenerateMap(_mapRoot);
+        _charController.Init(_characterRoot);
 
-        _charController.Init(_characterRoot, _battleBlackBoard);
-        _curState = IngameState.StartUpdate;
+        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit);
+    }
+
+    private List<CharacterBase.CharacterInitData> CreateCharacterInitData()
+    {
+        return null;
     }
 
     private void InitCamera()
     {
-        var cameraData = ResourceManager.Instance.LoadResourceFromResources<CameraData>(ResourceType.DataAsset, "CameraData");
+        var cameraData = AddressableManager.Instance.LoadAssetSync<CameraData>("CameraData");
         _ingameCamera.transform.position = cameraData.Position;
         _ingameCamera.transform.rotation = Quaternion.Euler(cameraData.Rotate);
     }
 
+    private void InitCheck()
+    {
+        //Test
+        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateUpdate);
+    }
+
+    private void ControllerUpdate()
+    {
+        _charController.OnUpdate();
+        _mapController.OnUpdate();
+    }
+
     private void Update()
     {
-        switch (_curState)
-        {
-            case IngameState.Init:
-                break;
-            case IngameState.StartUpdate:
-                _mapController.OnUpdate();
-                _charController.OnUpdate();
-                break;
-        }
+        _stateMachine.OnUpdate();
     }
 
     public List<Vector3> GetPathPositionList(Vector2Int start, Vector2Int dest)

@@ -4,13 +4,6 @@ public enum ResourceType
     Tile,
     Character,
 }
-
-public enum IngameState
-{
-    Init,
-    StartUpdate,
-}
-
 public enum CharacterType
 {
     Player,

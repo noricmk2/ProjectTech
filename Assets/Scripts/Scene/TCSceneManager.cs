@@ -31,7 +31,6 @@ public class TCSceneManager : MonoSingleton<TCSceneManager>
 
         if (unloadResource)
         {
-            ResourceManager.Instance.Release();
             ObjectFactory.Instance.Release();
             Resources.UnloadUnusedAssets();
             System.GC.Collect();

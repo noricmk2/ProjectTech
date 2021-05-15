@@ -3,3 +3,12 @@ Logs/AssetImportWorker0.log
 Packages/packages-lock.json
 Logs/ApiUpdaterCheck.txt
 Logs/
+Library/
+obj/
+Temp/
+Assembly-CSharp.csproj
+Assembly-CSharp-Editor.csproj
+ProjectTech.sln
+Unity.AddressableImporter.Editor.csproj
+Unity_lic.alf
+.vs/ProjectTech/v16/.suo

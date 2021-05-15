@@ -2,8 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEditor;
-using TCUtil;
 using System.Linq;
+using TCUtil;
 
 public class ProjectUFSettings : EditorWindow
 {

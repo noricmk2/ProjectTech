@@ -7,19 +7,15 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner
     #region Define
     public class CharacterInitData
     {
-        public BattleBlackBoard blackBoard;
+        public CharacterData charData;
         public ConditionNode.ConditionCheckDelegate checkFindEnemyDelegate;
         public ConditionNode.ConditionCheckDelegate checkMoveDelegate;
     }
     #endregion
 
     private BehaviorTree _behaviorTree = new BehaviorTree();
-    private BattleBlackBoard _blackBoard;
-
     public void Init(CharacterInitData data)
     {
-        _blackBoard = data.blackBoard;
-
         var rootNode = new SelectorNode();
         rootNode.SetOwner(this);
 
@@ -61,11 +57,6 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner
         baseSequence.AddNode(idle);
 
         _behaviorTree.Init(rootNode);
-    }
-
-    public Blackboard GetBlackBoard()
-    {
-        return _blackBoard;
     }
 }
 

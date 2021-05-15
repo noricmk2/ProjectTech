@@ -4,7 +4,6 @@ using UnityEngine;
 
 public interface IBehaviorTreeOwner
 {
-    Blackboard GetBlackBoard();
 }
 
 public enum BehaviorNodeState

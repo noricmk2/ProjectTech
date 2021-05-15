@@ -34,16 +34,15 @@ public class ObjectFactory : MonoSingleton<ObjectFactory>
         return createdObj.GetComponent<T>();
     }
     #endregion
-    public T CreateObject<T>(ResourceType type, string name, Transform parent, int layer = -1, bool stayWorldPos = false) where T : UnityEngine.Object
+    public T CreateObject<T>(string name, Transform parent, int layer = -1, bool stayWorldPos = false) where T : UnityEngine.Object
     {
         T result = null;
-        string path = ResourceManager.GetPathByResourcesType(type);
-        var prefab = ResourceManager.Instance.LoadResource<GameObject>(path, name);
-        result = Instantiate<T>(parent, prefab, layer, stayWorldPos);
+        var gameObject = AddressableManager.Instance.InstantiateSync(name, parent, stayWorldPos);
+        result = gameObject.GetComponent<T>();
         return result;
     }
 
-    public T GetPoolObject<T>(ResourceType type, string name) where T : class, IPoolObjectBase
+    public T GetPoolObject<T>(string name) where T : class, IPoolObjectBase
     {
         var parent = transform;
         if (_poolListDict.ContainsKey(name))
@@ -53,7 +52,7 @@ public class ObjectFactory : MonoSingleton<ObjectFactory>
         }
         else
         {
-            CreatePool<T>(1, type, name, parent);
+            CreatePool<T>(1, name, parent);
             return _poolListDict[name].Pop() as T;
         }
     }
@@ -64,13 +63,11 @@ public class ObjectFactory : MonoSingleton<ObjectFactory>
             _poolListDict[name].Push(obj);
     }
 
-    public void CreatePool<T>(int count, ResourceType type, string name, Transform parent = null) where T : IPoolObjectBase
+    public void CreatePool<T>(int count, string name, Transform parent = null) where T : IPoolObjectBase
     {
-        string path = ResourceManager.GetPathByResourcesType(type);
         var pool = new ObjectPool<IPoolObjectBase>(count, () =>
         {
-            var prefab = ResourceManager.Instance.LoadResource<GameObject>(path, name);
-            T poolObj = Instantiate<T>(parent, prefab);
+            T poolObj = AddressableManager.Instance.InstantiateSync(name, parent).GetComponent<T>();
             if (poolObj == null)
             {
                 DebugEx.LogError("[Failed]pool object is null: " + name);

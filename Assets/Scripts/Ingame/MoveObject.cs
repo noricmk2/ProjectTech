@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System;
+using TCUtil;
 
 public enum MoveState
 {
@@ -10,17 +11,22 @@ public enum MoveState
     MoveTo,
     MoveDirection,
     MoveTween,
+    MovePath,
 }
 
 public class MoveObject : ObjectBase
 {
+    protected readonly float nearWaypointValue = 1f;
+
     protected Vector3 _smoothDampVelocity = Vector3.zero;
     protected Vector3 _accelVelocity = Vector3.zero;
     protected virtual float _accelMagnitude => 3f;
     protected virtual float _accelSqr => 1.732f;
     protected MoveState _curState;
-    protected List<Vector3> _pathList;
-    protected float _moveToSpeed;
+    protected Vector3[] _wayPoints;
+    protected Vector3 _prevWaypoint;
+    protected int _curWaypointIndex;
+    protected float _moveSpeed;
 
     public virtual void MoveInit()
     {
@@ -57,18 +63,25 @@ public class MoveObject : ObjectBase
         CachedTransform.position = Vector3.SmoothDamp(CachedTransform.position, targetPos, ref _smoothDampVelocity, duration);
     }
 
-    public virtual void MovePath(List<Vector3> path, float duration, Ease ease = Ease.Linear)
+    public virtual void MovePath(List<Vector3> path, float speed)
     {
-        CachedTransform.DOKill();
+        _moveSpeed = speed;
+        _curWaypointIndex = 0;
         var array = path.ToArray();
-        CachedTransform.DOPath(array, duration, PathType.CatmullRom, gizmoColor: Color.blue).SetEase(ease);
-    }
-
-    public virtual void MoveTo(List<Vector3> path, float speed)
-    {
-        _curState = MoveState.MoveTo;
-        _pathList = path;
-        _moveToSpeed = speed;
+        float sqrMagnitude = 0;
+        for (int i = 0; i < path.Count - 1; ++i)
+        {
+            sqrMagnitude += (path[i + 1] - path[i]).sqrMagnitude;
+        }
+        int segment = (int)sqrMagnitude * 10;
+        _wayPoints = new Vector3[segment];
+        for (int i = 0; i < segment; ++i)
+        {
+            Vector3 waypoint = CatmullRom.EasyInterp3D(array, i / (float)segment);
+            _wayPoints[i] = waypoint;
+        }
+        _curState = MoveState.MovePath;
+        _prevWaypoint = CachedTransform.position;
     }
 
     public virtual void OnUpdate()
@@ -77,12 +90,35 @@ public class MoveObject : ObjectBase
         {
             case MoveState.MoveTo:
                 break;
-        }
-    }
+            case MoveState.MovePath:
+                if (_wayPoints == null)
+                {
+                    DebugEx.Log("[Failed] waypoint is null");
+                    _curState = MoveState.Stational;
+                    return;
+                }
 
-    public static Vector3 CatmullRomPoint(Vector3 p0, Vector3 p1, Vector3 p2, Vector3 p3, float t)
-    {
-        return p1 + (0.5f * (p2 - p0) * t) + 0.5f * (2f * p0 - 5f * p1 + 4f * p2 - p3) * t * t +
-                0.5f * (-p0 + 3f * p1 - 3f * p2 + p3) * t * t * t;
+                if (_curWaypointIndex >= _wayPoints.Length)
+                {
+                    DebugEx.Log("[Notify] move path end");
+                    _curState = MoveState.Stational;
+                    return;
+                }
+
+                Vector3 targetPoint = _wayPoints[_curWaypointIndex];
+                var curPos = CachedTransform.position;
+                var lerpVal = Func.InverseLerp(_prevWaypoint, targetPoint, curPos);
+                if (lerpVal > 0.99f)
+                {
+                    ++_curWaypointIndex;
+                    _prevWaypoint = targetPoint;
+                }
+                else
+                {
+                    var dir = targetPoint - curPos;
+                    MoveDirection(dir.normalized, _moveSpeed);
+                }
+                break;
+        }
     }
 }

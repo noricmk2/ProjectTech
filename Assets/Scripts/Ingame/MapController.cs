@@ -4,20 +4,13 @@ using UnityEngine;
 
 public class MapController
 {
-    public class MapData
-    {
-        public int width;
-        public int height;
-        public List<JPSNode> nodeList;
-    }
-
     private PathfindController _pathfindController = new PathfindController();
     private MapData _curMapData = new MapData();
     private Transform _mapRoot;
 
     private readonly Vector3 _tileStartPos = new Vector3(0, 0, 0);
 
-    public void Init(MapData data, BattleBlackBoard blackBoard)
+    public void Init(MapData data)
     {
         //TODO:블랙보드에 데이터 저장
         _curMapData = data;
@@ -33,7 +26,7 @@ public class MapController
         for (int i = 0; i < _curMapData.nodeList.Count; ++i)
         {
             var node = _curMapData.nodeList[i];
-            var tile = ObjectFactory.Instance.CreateObject<TileBase>(ResourceType.Tile, "TestTile", _mapRoot);
+            var tile = ObjectFactory.Instance.CreateObject<TileBase>("TestTile", _mapRoot);
             var tilePos = _tileStartPos;
             tilePos.x += node.X;
             tilePos.z += node.Y;
