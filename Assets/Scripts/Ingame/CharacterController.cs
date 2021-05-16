@@ -14,10 +14,10 @@ public class CharacterController
     {
         //TODO:블랙보드에 데이터 저장
         _charRoot = charRoot;
-        _testCharacter = ObjectFactory.Instance.CreateObject<CharacterBase>("TestCharacter", _charRoot);
+        _testCharacter = ObjectFactory.Instance.CreateObject<PlayerCharacter>("TestCharacter", _charRoot);
         _testCharacter.CachedTransform.position = new Vector3(1, 0, 1);
 
-        var charData = new CharacterBase.CharacterInitData();
+        var charData = new PlayerCharacter.PlayerCharacterInitData();
         charData.checkFindEnemyDelegate = FindEnemy;
         charData.checkMoveDelegate = FindMoveTarget;
         _testCharacter.Init(charData);
