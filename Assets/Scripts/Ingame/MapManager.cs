@@ -2,27 +2,30 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MapController
+public class MapManager : MonoSingleton<MapManager>
 {
+    #region Inspector
+    [SerializeField] private Transform _mapRoot;
+    #endregion
+
+    #region Property
     private PathfindController _pathfindController = new PathfindController();
     private MapData _curMapData = new MapData();
-    private Transform _mapRoot;
-
     private readonly Vector3 _tileStartPos = new Vector3(0, 0, 0);
+    #endregion
 
     public void Init(MapData data)
     {
-        //TODO:블랙보드에 데이터 저장
         _curMapData = data;
         var grid = new PathfindGrid();
         grid.Init(data.width, data.height, data.nodeList);
         _pathfindController.Init(grid);
         _pathfindController.SetDiagonalMovement(DiagonalMovement.IfAtLeastOneWalkable);
+        GenerateMap();
     }
 
-    public void GenerateMap(Transform root)
+    public void GenerateMap()
     {
-        _mapRoot = root;
         for (int i = 0; i < _curMapData.nodeList.Count; ++i)
         {
             var node = _curMapData.nodeList[i];
@@ -52,16 +55,12 @@ public class MapController
         {
             list.Add(new Vector3(nodeList[i].X, 0, nodeList[i].Y));
         }
+
         return list;
     }
 
     public List<JPSNode> GetPathNodeList(Vector2Int start, Vector2Int dest)
     {
         return _pathfindController.FindPath(start, dest);
-    }
-
-    public void OnUpdate()
-    {
-
     }
 }

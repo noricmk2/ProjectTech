@@ -18,16 +18,27 @@ public class IngameManager : MonoSingleton<IngameManager>
 
     #region Property
     private IngameStageMachine _stateMachine = new IngameStageMachine();
-    private MapController _mapController = new MapController();
-    private CharacterController _charController = new CharacterController();
-    private Spawner _spawner = new Spawner();
+    private PlayerController _charController = new PlayerController();
+    private WaveController _waveController = new WaveController();
     public Camera IngameCamera => _ingameCamera;
     #endregion
 
     public void Init()
     {
         InitCamera();
+        InitIngameState();
+       
+        //Test
+        var stageData = DataManager.Instance.GetStageDataByIndex(-1);
+        var mapData = stageData.mapData;
+        MapManager.Instance.Init(mapData);
+        _charController.Init();
+        _waveController.Init(stageData.waveList);
+        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit);
+    }
 
+    private void InitIngameState()
+    {
         var initState = new IngameStateBase();
         initState.UpdateAction = InitCheck;
         initState.StateType = IngameStageMachine.IngameState.IngameStateInit;
@@ -36,15 +47,6 @@ public class IngameManager : MonoSingleton<IngameManager>
         updateState.StateType = IngameStageMachine.IngameState.IngameStateUpdate;
         _stateMachine.AddState(IngameStageMachine.IngameState.IngameStateInit, initState);
         _stateMachine.AddState(IngameStageMachine.IngameState.IngameStateUpdate, updateState);
-
-        //Test
-        var stageData = DataManager.Instance.GetStageDataByIndex(-1);
-        var mapData = stageData.mapData;
-        _mapController.Init(mapData);
-        _mapController.GenerateMap(_mapRoot);
-        _charController.Init(_characterRoot);
-
-        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit);
     }
 
     private List<CharacterBase.CharacterInitData> CreateCharacterInitData()
@@ -68,21 +70,11 @@ public class IngameManager : MonoSingleton<IngameManager>
     private void ControllerUpdate()
     {
         _charController.OnUpdate();
-        _mapController.OnUpdate();
+        _waveController.OnUpdate();
     }
 
     private void Update()
     {
         _stateMachine.OnUpdate();
-    }
-
-    public List<Vector3> GetPathPositionList(Vector2Int start, Vector2Int dest)
-    {
-        return _mapController.GetPathPositionList(start, dest);
-    }
-
-    public List<JPSNode> GetPathNodeList(Vector2Int start, Vector2Int dest)
-    {
-        return _mapController.GetPathNodeList(start, dest);
     }
 }

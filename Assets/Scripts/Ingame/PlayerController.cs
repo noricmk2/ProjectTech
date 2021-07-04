@@ -3,27 +3,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using TCUtil;
 
-public class CharacterController
+public class PlayerController
 {
     private CharacterBase _testCharacter;
-    private Transform _charRoot;
     private readonly float moveValue = 0.5f;
-    private List<CharacterBase> _characterList = new List<CharacterBase>();
+    private Dictionary<int, PlayerCharacter> _playerSqaud;
 
-    public void Init(Transform charRoot)
+    public void Init()
     {
-        //TODO:블랙보드에 데이터 저장
-        _charRoot = charRoot;
-        _testCharacter = ObjectFactory.Instance.CreateObject<PlayerCharacter>("TestCharacter", _charRoot);
-        _testCharacter.CachedTransform.position = new Vector3(1, 0, 1);
 
-        var charData = new PlayerCharacter.PlayerCharacterInitData();
-        charData.checkFindEnemyDelegate = FindEnemy;
-        charData.checkMoveDelegate = FindMoveTarget;
-        _testCharacter.Init(charData);
-        _characterList.Add(_testCharacter);
     }
-
+    
     public void OnUpdate()
     {
         if (InputWrapper.Input.touchCount > 0)
@@ -41,7 +31,7 @@ public class CharacterController
                 {
                     var node = tile.Info.nodeInfo;
                     var charPos = Func.GetTilePos(_testCharacter.CachedTransform.position);
-                    var path = IngameManager.Instance.GetPathNodeList(charPos, new Vector2Int(node.X, node.Y));
+                    var path = MapManager.Instance.GetPathNodeList(charPos, new Vector2Int(node.X, node.Y));
 
                     if (path != null && path.Count > 0)
                     {
@@ -51,11 +41,6 @@ public class CharacterController
                     }
                 }
             }
-        }
-
-        for (int i = 0; i < _characterList.Count; ++i)
-        {
-            _characterList[i].OnUpdate();
         }
     }
 

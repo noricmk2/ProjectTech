@@ -10,6 +10,9 @@ public class IntroScene : SceneBase
 
     public override IEnumerator Enter_C()
     {
+        GameManager.Instance.LoadTable();
+        while (!GameManager.Instance.TableLoadFinished)
+            yield return null;
         TCSceneManager.Instance.EnterScene(GameSceneType.Ingame);
         yield return null;
     }
