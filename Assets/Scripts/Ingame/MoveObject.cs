@@ -73,7 +73,7 @@ public class MoveObject : ObjectBase
         {
             sqrMagnitude += (path[i + 1] - path[i]).sqrMagnitude;
         }
-        int segment = (int)sqrMagnitude * 10;
+        int segment = (int)sqrMagnitude * 5;
         _wayPoints = new Vector3[segment];
         for (int i = 0; i < segment; ++i)
         {
