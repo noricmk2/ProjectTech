@@ -30,7 +30,11 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: acb7a468b78adc04c82b6a44022d2e8c
-    m_Address: TestEnemy
+    m_Address: TestEnemy2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4fc6380dd7f4d004babaa9935defefe2
+    m_Address: TestEnemy1
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

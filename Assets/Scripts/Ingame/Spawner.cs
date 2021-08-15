@@ -6,6 +6,7 @@ public class Spawner : MonoBehaviour
 {
     #region Inspector
     [SerializeField] private Transform _spawnRoot;
+    [SerializeField] private string _spawnerName;
     #endregion
 
     #region Property
@@ -13,8 +14,8 @@ public class Spawner : MonoBehaviour
     private WaveController _controller;
     private float _delay;
     private float _deltaTime;
-    private int _maxSpawnCount;
-    private int _curSpawnCount;
+
+    public string SpawnerName => _spawnerName;
     #endregion
 
     public void Init(SpawnData data, WaveController controller)
@@ -22,32 +23,32 @@ public class Spawner : MonoBehaviour
         _curSpawnData = data;
         _controller = controller;
         _delay = data.spawnDelay;
-        _maxSpawnCount = data.count;
-        _curSpawnCount = 0;
         _deltaTime = 0;
+    }
+
+    public void SetSpanwerName(string name)
+    {
+        _spawnerName = name;
     }
 
     public CharacterBase SpawnCharacter()
     {
-        if (_maxSpawnCount <= _curSpawnCount)
-        {
-            DebugEx.Log($"[Faild] spawn count is max {_curSpawnCount}/{_maxSpawnCount}");
-            return null;
-        }
-
         if (_curSpawnData != null)
         {
-            ++_curSpawnCount;
-            CharacterBase character = null;
             if (_curSpawnData.spawnCharacter.characterType == CharacterType.Enemy)
             {
-                character = new EnemyCharacter();
+                var charData = _curSpawnData.spawnCharacter;
+                var enemy = ObjectFactory.Instance.CreateObject<EnemyCharacter>(charData.resourceName, IngameManager.Instance.CharacterRoot);
+                enemy.CachedTransform.position = new Vector3(transform.position.x, 0, transform.position.z);
+                var initData = new CharacterBase.CharacterInitData();
+                initData.charData = _curSpawnData.spawnCharacter;
+                enemy.Init(initData);
+                return enemy;
             }
             else
             {
-                character = new PlayerCharacter();
+                return null;
             }
-            return character;
         }
         else
         {
@@ -58,12 +59,8 @@ public class Spawner : MonoBehaviour
     
     private void Update()
     {
-        if (_maxSpawnCount > _curSpawnCount)
+        if (_deltaTime >= _delay)
         {
-            if (_deltaTime >= _delay)
-            {
-                _controller.OnSpawnCooldown(_curSpawnData.spawnId);
-            }
         }
     }
 }

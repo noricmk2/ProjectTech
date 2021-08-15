@@ -24,3 +24,10 @@ public enum TableType
     Status,
     Length
 }
+
+public enum MapNodeType
+{
+    Block = 0,
+    Road = 1,
+    Spanwer = 9
+}

@@ -38,7 +38,7 @@ public class PathfindGrid
             _grid.GetLength(0) <= x || _grid.GetLength(1) <= y)
             return false;
 
-        if (_grid[x, y].state != 1)
+        if (_grid[x, y].state == (int) MapNodeType.Road || _grid[x, y].state == (int) MapNodeType.Spanwer)
             return false;
 
         return true;
