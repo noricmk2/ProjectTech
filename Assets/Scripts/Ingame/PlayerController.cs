@@ -11,7 +11,9 @@ public class PlayerController
 
     public void Init()
     {
-
+        //Test
+        _testCharacter = ObjectFactory.Instance.CreateObject<PlayerCharacter>("TestCharacter", IngameManager.Instance.CharacterRoot);
+        _testCharacter.CachedTransform.position = new Vector3(1, 0, 1);
     }
     
     public void OnUpdate()
@@ -42,6 +44,7 @@ public class PlayerController
                 }
             }
         }
+        _testCharacter.OnUpdate();
     }
 
     public bool FindEnemy(IBehaviorTreeOwner owner)

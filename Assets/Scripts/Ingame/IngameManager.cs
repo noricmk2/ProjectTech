@@ -21,6 +21,7 @@ public class IngameManager : MonoSingleton<IngameManager>
     private PlayerController _charController = new PlayerController();
     private WaveController _waveController = new WaveController();
     public Camera IngameCamera => _ingameCamera;
+    public Transform CharacterRoot => _characterRoot;
     #endregion
 
     public void Init()
@@ -29,7 +30,7 @@ public class IngameManager : MonoSingleton<IngameManager>
         InitIngameState();
        
         //Test
-        var stageData = DataManager.Instance.GetStageDataByIndex(-1);
+        var stageData = DataManager.Instance.GetStageDataByIndex(1);
         var mapData = stageData.mapData;
         MapManager.Instance.Init(mapData);
         _charController.Init();

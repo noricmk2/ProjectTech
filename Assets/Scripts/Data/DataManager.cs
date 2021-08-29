@@ -5,7 +5,7 @@ using TCUtil;
 using UnityEngine;
 
 #region Define
-public class MapData
+public class MapRawData
 {
     public int width;
     public int height;
@@ -15,7 +15,7 @@ public class MapData
 public class StageData
 {
     public List<WaveData> waveList;
-    public MapData mapData;
+    public MapRawData mapData;
 }
 
 public class CharacterData
@@ -42,11 +42,9 @@ public class WaveData
 
 public class SpawnData
 {
-    public int spawnId;
     public string spawnerName;
     public CharacterData spawnCharacter;
     public float spawnDelay;
-    public int count;
 }
 #endregion
 
@@ -121,17 +119,17 @@ public class DataManager : Singleton<DataManager>
 
     public StageData GetStageDataByIndex(int index)
     {
-        //Test
         var table = GetRecord<StageTable>(index);
-        
+        var rawMapData = AddressableManager.Instance.LoadAssetSync<TextAsset>(table.MapData);
         var result = new StageData();
-        var mapData = new MapData();
-        mapData.width = 10;
-        mapData.height = 50;
+        var mapData = new MapRawData();
+        mapData.width = (int)table.MapSize.x;
+        mapData.height = (int)table.MapSize.y;
         mapData.nodeList = new List<JPSNode>();
-        for (int i = 0; i < testMap.Length; ++i)
+        var mapNodeList = GetNodeListByRawMapData(rawMapData.text);
+        for (int i = 0; i < mapNodeList.Count; ++i)
         {
-            var node = new JPSNode(i % mapData.width, i / mapData.width, testMap[i]);
+            var node = new JPSNode(i % mapData.width, i / mapData.width, mapNodeList[i]);
             mapData.nodeList.Add(node);
         }
         result.mapData = mapData;
@@ -149,18 +147,21 @@ public class DataManager : Singleton<DataManager>
             var waveData = new WaveData();
             waveData.waveOrder = i;
             waveData.spawnDataList = new List<SpawnData>();
-            for(int j=0; j<waveTable.CharacterIndexes.Length; ++j)
-                waveData.spawnDataList.Add(CreateSpawnData(waveTable.CharacterIndexes[j], waveTable.SpawnPoints[j]));
+            for (int j = 0; j < waveTable.CharacterIndexes.Length; ++j)
+                waveData.spawnDataList.Add(CreateSpawnData(waveTable.CharacterIndexes[j], waveTable.SpawnNames[j],
+                    waveTable.SpawnDelay[j]));
             result.Add(waveData);
         }
 
         return result;
     }
 
-    public SpawnData CreateSpawnData(int characterIdx, Vector2 spawnPoint)
+    public SpawnData CreateSpawnData(int characterIdx, string spawnPoint, float spawnDelay)
     {
         var spawnData = new SpawnData();
         spawnData.spawnCharacter = CreateCharacterData(characterIdx);
+        spawnData.spawnerName = spawnPoint;
+        spawnData.spawnDelay = spawnDelay;
         return spawnData;
     }
 
@@ -186,57 +187,17 @@ public class DataManager : Singleton<DataManager>
         return result;
     }
 
-    private int[] testMap =
+    private List<int> GetNodeListByRawMapData(string text)
+    {
+        var result = new List<int>();
+        for (int i = 0; i < text.Length; ++i)
         {
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,0,0,0,0,0,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,0,0,1,1,
-        0,1,1,1,1,1,0,0,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,0,0,1,1,1,1,1,
-        0,1,1,0,0,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,0,1,1,1,0,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,0,0,0,0,
-        0,1,1,1,0,0,0,0,0,0,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,0,0,1,1,1,1,
-        0,1,1,1,1,0,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,0,0,0,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,0,1,1,
-        0,1,1,1,1,1,1,0,1,1,
-        0,1,1,1,1,1,1,1,1,1,
-        0,1,1,1,1,1,1,1,1,1
-    };
+            if (text[i] == ',' || text[i] == '\r' || text[i] == '\n')
+                continue;
+            
+            int nodeValue = (int)Char.GetNumericValue(text[i]);
+            result.Add(nodeValue);
+        }
+        return result;
+    }
 }
