@@ -48,23 +48,50 @@ public class CustomTileMap : MonoBehaviour
 
     public GameObject ingameTest;
 
-    HashSet<Vector3Int> _spawnablePostions = new HashSet<Vector3Int>();
+    Dictionary<Vector2Int,List<GameObject>> _spawnablePostions = new Dictionary<Vector2Int, List<GameObject>>();
+
     List<ChildTile> _childTiles = new List<ChildTile>();
     public Material CopyObjMaterial { get => _copyObjMaterial; }
-    public HashSet<Vector3Int> SpawnablePostions { get => _spawnablePostions; set => _spawnablePostions = value; }
+  //  public Dictionary<Vector2Int,GameObject> SpawnablePostions { get => _spawnablePostions; set => _spawnablePostions = value; }
     public Material OriginMaterial { get => _originMaterial; set => _originMaterial = value; }
     public List<ChildTile> ChildTiles { get => _childTiles; set => _childTiles = value; }
 
     private void OnDrawGizmos()
     {
-        _childTiles.Clear();
-        for(int i=0; i < _childTiles.Count; i++)
+
+        for (int i = 0; i < _childTiles.Count; i++)
         {
-            if(_childTiles[i] != null)
-                Gizmos.DrawCube(_childTiles[i].transform.position,Vector3.one);
+            if (_childTiles[i] != null)
+            {
+                ChildTile curTile = _childTiles[i];
+                Gizmos.DrawWireMesh(curTile.mesh, 0, curTile.pos, curTile.rot, curTile.scale);
+
+            }
+
         }
     }
 
+    public void RegisterTileItem(Vector2Int pos, GameObject obj)
+    {
+        List<GameObject> itemList = null;
+        if(_spawnablePostions.TryGetValue(pos , out itemList) == false)
+        {
+            itemList = new List<GameObject>();
+        }
+
+        itemList.Add(obj);
+
+    }
+
+    public bool IsRegisteredTile(Vector2Int pos, GameObject obj)
+    {
+        return _spawnablePostions.ContainsKey(pos);
+    }
+
+    public int GetTileCount()
+    {
+        return _spawnablePostions.Count;
+    }
 
     public void DestroyAllTiles()
     {
@@ -73,6 +100,6 @@ public class CustomTileMap : MonoBehaviour
         {
             DestroyImmediate(child.gameObject);
         }
-                
+        _childTiles.Clear();
     }
 }
