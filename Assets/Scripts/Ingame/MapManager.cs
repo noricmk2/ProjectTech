@@ -98,4 +98,21 @@ public class MapManager : MonoSingleton<MapManager>
     {
         return _pathfindController.FindPath(start, dest);
     }
+
+    public List<Vector3> GetRandomPathByRange(Vector2Int start, float range)
+    {
+        var list = new List<Vector3>();
+        var nodeList = _pathfindController.GetRandomPathInRange(start, (int)range);
+        if (nodeList == null)
+        {
+            DebugEx.Log("[Failed] no exist path");
+            return null;
+        }
+
+        for (int i = 0; i < nodeList.Count; ++i)
+        {
+            list.Add(new Vector3(nodeList[i].X, 0, nodeList[i].Y));
+        }
+        return list;
+    }
 }

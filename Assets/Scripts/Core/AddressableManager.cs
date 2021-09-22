@@ -4,9 +4,11 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
+using TMPro;
 using UnityEngine;
 using UnityEngine.AddressableAssets;
 using UnityEngine.AddressableAssets.ResourceLocators;
+using UnityEngine.ResourceManagement;
 using UnityEngine.ResourceManagement.AsyncOperations;
 using UnityEngine.ResourceManagement.ResourceLocations;
 
@@ -18,7 +20,40 @@ public class AddressableManager : MonoSingleton<AddressableManager>
 
     private Queue<AddressableOperation> _operationQueue = new Queue<AddressableOperation>();
     private AddressableOperation _curOperation;
+    private bool _isInit;
+    private int _initLoadCount;
     #endregion
+    
+    public void Init(Action onComplete)
+    {
+        if(_isInit)
+            return;
+
+        _initLoadCount = 0;
+        DebugEx.Log($"[GameInfo] Addressable Init Start");
+        ResourceManager.ExceptionHandler = CustomExceptionHandler;
+        
+        var textAsset =LoadAssetSync<TextAsset>(atlasDataName);
+        _atlasData = JsonConvert.DeserializeObject<SpriteAtlasData>(textAsset.text);
+
+        _isInit = true;
+        StartCoroutine(InitCheck_C(onComplete));
+    }
+
+    private IEnumerator InitCheck_C(Action action)
+    {
+        int totalCount = 0;
+        while (_initLoadCount < totalCount)
+        {
+            yield return null;
+        }
+        action?.Invoke();
+    }
+    
+    private void CustomExceptionHandler(AsyncOperationHandle handle, Exception exception)
+    {
+        
+    }
 
     void Update()
     {
@@ -26,6 +61,7 @@ public class AddressableManager : MonoSingleton<AddressableManager>
         {
             _curOperation = _operationQueue.Dequeue();
             _curOperation.StartOperation();
+            DebugEx.Log($"operation start:{_curOperation.Handler.DebugName}");
         }
 
         if (_curOperation != null)
@@ -35,14 +71,23 @@ public class AddressableManager : MonoSingleton<AddressableManager>
                 _curOperation = null;
         }
     }
-
+    
     public long CheckDownload(string label)
     {
         var handler = Addressables.GetDownloadSizeAsync(label);
         handler.WaitForCompletion();
         return handler.Result;
     }
-    
+
+    public void CheckDownloadAsync(string label, Action<long> endAction)
+    {
+        var handler = Addressables.GetDownloadSizeAsync(label);
+        handler.Completed += hdl =>
+        {
+            endAction?.Invoke(hdl.Result);
+        };
+    }
+
     private IEnumerator CheckDownloadSize_C(string address, Action<bool> onCheck)
     {
         var handler = Addressables.GetDownloadSizeAsync(address);
@@ -50,10 +95,10 @@ public class AddressableManager : MonoSingleton<AddressableManager>
         onCheck?.Invoke(handler.Result > 0);
     }
 
-    public void DownloadDependencyAsync(string label, Action<AsyncOperationHandle> onLoadDone, Action onFailed = null)
+    public void DownloadDependencyAsync(string label, Action<AsyncOperationHandle> onLoadDone, Action onFailed = null, Action<AsyncOperationHandle> onLoad = null)
     {
         var downloadOper = new AddressableDownloadOperation();
-        downloadOper.Init(label, onLoadDone, onFailed);
+        downloadOper.Init(label, onLoadDone, onFailed, onLoad);
         _operationQueue.Enqueue(downloadOper);
     }
 
@@ -66,9 +111,16 @@ public class AddressableManager : MonoSingleton<AddressableManager>
 
     public Sprite LoadSpriteSync(string address)
     {
-        var oper = Addressables.LoadAssetAsync<Sprite>(_atlasData.GetAddressBySpriteName(address));
-        oper.WaitForCompletion();
-        return oper.Result;
+        var spriteName = _atlasData.GetAddressBySpriteName(address);
+        if (string.IsNullOrEmpty(spriteName))
+            return null;
+        else
+        {
+            var oper = Addressables.LoadAssetAsync<Sprite>(spriteName);
+            oper.WaitForCompletion();
+
+            return oper.Result;
+        }
     }
 
     public void LoadAssetAsync(string address, Action<AsyncOperationHandle> onLoadDone, Action onFailed = null)
@@ -84,10 +136,7 @@ public class AddressableManager : MonoSingleton<AddressableManager>
         var oper = Addressables.LoadAssetAsync<T>(address);
         oper.WaitForCompletion();
         if (oper.Status == AsyncOperationStatus.Failed)
-        {
-            DebugEx.LogError($"{address} load is fail {oper.OperationException.Message}");
             onFail?.Invoke();
-        }
 
         result = oper.Result;
         return result;
@@ -101,6 +150,19 @@ public class AddressableManager : MonoSingleton<AddressableManager>
         return validateKeyAsync;
     }
 
+    public void InstantiateAsync(string address,Transform parent, Action<AsyncOperationHandle> onLoadDone, bool inWorldSpace = false, Action onFailed = null)
+    {
+        var handler = Addressables.InstantiateAsync(address, parent, inWorldSpace);
+        handler.Completed += hdl =>
+        {
+            onLoadDone?.Invoke(hdl);
+        };
+
+        // var instatiateOper = new AddressableInstantiateOperation(parent);
+        // instatiateOper.Init(address, onLoadDone, onFailed);
+        // _operationQueue.Enqueue(instatiateOper);
+    }
+    
     public GameObject InstantiateSync(string address, Transform parent, bool inWorldSpace = false)
     {
         var handler = Addressables.InstantiateAsync(address, parent, inWorldSpace);
@@ -120,6 +182,7 @@ public class AddressableManager : MonoSingleton<AddressableManager>
 
     public void ReleaseInstance(GameObject obj)
     {
-        Addressables.ReleaseInstance(obj);
+        if(!Addressables.ReleaseInstance(obj))
+            Destroy(obj);
     }
 }

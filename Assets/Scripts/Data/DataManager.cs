@@ -20,6 +20,7 @@ public class StageData
 
 public class CharacterData
 {
+    public int index;
     public string resourceName;
     public CharacterType characterType;
     public StatusData statusData;
@@ -32,6 +33,25 @@ public class StatusData
     public float def;
     public float evade;
     public float accuracyRate;
+    public float moveRange;
+    public float atkRange;
+    public float moveSpeed;
+    public float atkSpeed;
+
+    public StatusData Clone()
+    {
+        var clone = new StatusData();
+        clone.hp = hp;
+        clone.atk = atk;
+        clone.def = def;
+        clone.evade = evade;
+        clone.accuracyRate = accuracyRate;
+        clone.moveRange = moveRange;
+        clone.atkRange = atkRange;
+        clone.moveSpeed = moveSpeed;
+        clone.atkSpeed = atkSpeed;
+        return clone;
+    }
 }
 
 public class WaveData
@@ -169,6 +189,7 @@ public class DataManager : Singleton<DataManager>
     {
         var table = GetRecord<CharacterTable>(index);
         var data = new CharacterData();
+        data.index = index;
         data.statusData = CreateStatusData(table.StatusIndex);
         data.resourceName = table.ResourceName;
         data.characterType = table.CharacterType;
@@ -184,9 +205,60 @@ public class DataManager : Singleton<DataManager>
         result.def = table.Def;
         result.evade = table.Evade;
         result.accuracyRate = table.AccuracyRate;
+        result.moveRange = table.MoveRange;
+        result.atkRange = table.AttackRange;
+        result.moveSpeed = table.MoveSpeed;
+        result.atkSpeed = table.AttackSpeed;
         return result;
     }
+    
+    public CharacterBase.AIData CreateAIData(int index)
+    {
+        //TODO: ai데이터 생성 구조화
+        var data = new CharacterBase.AIData();
+        
+        var rootNode = new SelectorNode();
+        var baseSequence = new SelectorNode();
+        rootNode.AddNode(baseSequence);
 
+        var deadChcek = new ConditionNode();
+        deadChcek.ConditionCheckFunc = null;
+        baseSequence.AddNode(deadChcek);
+
+        var dead = new DeadNode();
+        deadChcek.AddNode(dead);
+
+        var findEnemyCheck = new ConditionNode();
+        findEnemyCheck.ConditionCheckFunc = IngameManager.CheckFindEnemy;
+        baseSequence.AddNode(findEnemyCheck);
+
+        var attackSequence = new SequenceNode();
+        findEnemyCheck.AddNode(attackSequence);
+
+        var attack = new AttackNode();
+        var skill = new ExcuteSkillNode();
+        attackSequence.AddNode(attack);
+        attackSequence.AddNode(skill);
+
+        var findMoveCheck = new ConditionNode();
+        findMoveCheck.ConditionCheckFunc = IngameManager.CheckFindMove;
+        baseSequence.AddNode(findMoveCheck);
+
+        var moveSequence = new SelectorNode();
+        findMoveCheck.AddNode(moveSequence);
+
+        var move = new MoveNode();
+        var hide = new HideNode();
+        moveSequence.AddNode(move);
+        moveSequence.AddNode(hide);
+
+        var idle = new IdleNode();
+        baseSequence.AddNode(idle);
+
+        data.rootNode = rootNode;
+        return data;
+    }
+    
     private List<int> GetNodeListByRawMapData(string text)
     {
         var result = new List<int>();

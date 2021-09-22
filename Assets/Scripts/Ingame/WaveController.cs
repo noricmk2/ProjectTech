@@ -24,7 +24,10 @@ public class WaveController
             }
             else
             {
-                
+                for (int i = 0; i < _activateEnemyList.Count; ++i)
+                {
+                    _activateEnemyList[i].OnUpdate();
+                }
             }
         }
         else
@@ -51,6 +54,7 @@ public class WaveController
                 targetSpawner.Init(spawnData, this);
             var character = targetSpawner.SpawnCharacter() as EnemyCharacter;
             _activateEnemyList.Add(character);
+            character.SetAIEnable(true);
         }
     }
 }

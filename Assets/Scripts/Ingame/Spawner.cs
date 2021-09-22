@@ -30,7 +30,7 @@ public class Spawner : MonoBehaviour
     {
         _spawnerName = name;
     }
-
+    
     public CharacterBase SpawnCharacter()
     {
         if (_curSpawnData != null)
@@ -42,6 +42,8 @@ public class Spawner : MonoBehaviour
                 enemy.CachedTransform.position = new Vector3(transform.position.x, 0, transform.position.z);
                 var initData = new CharacterBase.CharacterInitData();
                 initData.charData = _curSpawnData.spawnCharacter;
+                //TODO:ai인덱스 연결
+                initData.aiData = DataManager.Instance.CreateAIData(-1);
                 enemy.Init(initData);
                 return enemy;
             }

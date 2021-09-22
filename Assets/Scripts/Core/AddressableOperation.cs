@@ -12,20 +12,22 @@ public class AddressableOperation
     #region Property
     protected AsyncOperationHandle _handler;
     protected Action _onFailed;
+    protected Action<AsyncOperationHandle> _onLoad;
     protected Action<AsyncOperationHandle> _onLoadDone;
     protected string _address;
-    public AsyncOperationHandle Handler => _handler;
     protected bool _startOper = false;
     protected bool _isOver;
+    public AsyncOperationHandle Handler => _handler;
     public bool IsOver => _isOver;
     #endregion
 
-    public void Init(string address, Action<AsyncOperationHandle> onLoadDone, Action onFailed = null)
+    public void Init(string address, Action<AsyncOperationHandle> onLoadDone, Action onFailed = null, Action<AsyncOperationHandle> onLoad = null)
     {
         _isOver = false;
         _address = address;
         _onLoadDone = onLoadDone;
         _onFailed = onFailed;
+        _onLoad = onLoad;
         _startOper = false;
     }
 
@@ -63,7 +65,6 @@ public class AddressableDownloadOperation : AddressableOperation
         {
             if (_handler.Status == AsyncOperationStatus.Failed)
             {
-                DebugEx.Log($"[Failed] download failed:{_handler.OperationException.Message}");
                 _startOper = false;
                 _onFailed?.Invoke();
                 Release();
@@ -71,7 +72,8 @@ public class AddressableDownloadOperation : AddressableOperation
             else
             {
                 var dowloadStatus = _handler.GetDownloadStatus();
-                DebugEx.Log($"{dowloadStatus.Percent}");
+                _onLoad?.Invoke(_handler);
+                //DebugEx.Log($"{dowloadStatus.Percent}");
             }
         }
     }
@@ -110,7 +112,6 @@ public class AddressableLoadOperation : AddressableOperation
         {
             if (_handler.Status == AsyncOperationStatus.Failed)
             {
-                DebugEx.Log($"[Failed]{_handler.DebugName} download failed:{_handler.OperationException.Message}");
                 _startOper = false;
                 _onFailed?.Invoke();
                 Release();
@@ -121,21 +122,32 @@ public class AddressableLoadOperation : AddressableOperation
 
 public class AddressableInstantiateOperation : AddressableOperation
 {
-    private Vector3 _position;
-    private Quaternion _rotation;
     private Transform _parent;
 
-    public AddressableInstantiateOperation(Vector3 position, Quaternion rotation, Transform parent)
+    public AddressableInstantiateOperation(Transform parent)
     {
-        _position = position;
-        _rotation = rotation;
         _parent = parent;
     }
 
     public override void StartOperation()
     {
         base.StartOperation();
-        _handler = Addressables.InstantiateAsync(_address, _position, _rotation, _parent);
+        _handler = Addressables.InstantiateAsync(_address, _parent);
         _handler.Completed += _onLoadDone;
+        _startOper = true;
+    }
+    
+    public override void OnUpdate()
+    {
+        base.OnUpdate();
+        if (_startOper)
+        {
+            if (_handler.Status == AsyncOperationStatus.Failed)
+            {
+                _startOper = false;
+                _onFailed?.Invoke();
+                Release();
+            }
+        }
     }
 }

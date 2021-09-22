@@ -20,7 +20,7 @@ public class BehaviorTreeNode
     protected IBehaviorTreeOwner _owner;
     public IBehaviorTreeOwner Owner => _owner;
 
-    public void SetOwner(IBehaviorTreeOwner owner)
+    public virtual void SetOwner(IBehaviorTreeOwner owner)
     {
         _owner = owner;
     }
@@ -92,6 +92,13 @@ public class CompositeNode : BehaviorTreeNode
     protected int _curStep;
     protected BehaviorTreeNode _curNode;
     protected List<BehaviorTreeNode> _childList = new List<BehaviorTreeNode>();
+
+    public override void SetOwner(IBehaviorTreeOwner owner)
+    {
+        base.SetOwner(owner);
+        for (int i = 0; i < _childList.Count; ++i)
+            _childList[i].SetOwner(owner);
+    }
 
     public override void AddNode(BehaviorTreeNode node)
     {
@@ -238,6 +245,13 @@ public class DecoratorNode : BehaviorTreeNode
 {
     protected BehaviorTreeNode _child;
 
+    public override void SetOwner(IBehaviorTreeOwner owner)
+    {
+        base.SetOwner(owner);
+        if(_child != null)
+            _child.SetOwner(owner);
+    }
+
     public override void AddNode(BehaviorTreeNode node)
     {
         base.AddNode(node);
@@ -311,7 +325,7 @@ public class ConditionNode : DecoratorNode
 
     public override BehaviorNodeState OnExecute()
     {
-        if (ConditionCheckFunc(_owner))
+        if (ConditionCheckFunc != null && ConditionCheckFunc(_owner))
         {
             return _child.Execute();
         }

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TCUtil;
 using System;
+using Random = UnityEngine.Random;
 
 public class JPSNode
 {
@@ -14,12 +15,14 @@ public class JPSNode
     public float? H = null;
     public float F;
     public int state;
-
+    public Vector2Int pos;
+    
     public JPSNode(int x, int y, int state)
     {
         this.X = x;
         this.Y = y;
         this.state = state;
+        pos = new Vector2Int(x, y);
         Reset();
     }
 
@@ -79,6 +82,39 @@ public class PathfindController
     public void Reset()
     {
         _grid.Reset();
+    }
+
+    public List<JPSNode> GetRandomPathInRange(Vector2Int start, int range)
+    {
+        var targetList = GetAllNodeInRange(start, range);
+        for (int i = 0; i < targetList.Count;)
+        {
+            var rand = Random.Range(0, targetList.Count);
+            var path = FindPath(start, targetList[rand].pos);
+            if (path != null && path.Count > 0)
+                return path;
+            else
+                targetList.RemoveAt(rand);
+        }
+
+        return null;
+    }
+
+    public List<JPSNode> GetAllNodeInRange(Vector2Int start, int range)
+    {
+        var list = new List<JPSNode>();
+        int xCount = 0;
+        for (int i = start.x - range; i < start.x + range; ++i)
+        {
+            for (int j = start.y - xCount; j < start.y + xCount; ++j)
+            {
+                var target = _grid.GetNode(i, j);
+                if (target != null && target.state != (int)MapNodeType.Block)
+                    list.Add(target);
+            }
+            ++xCount;
+        }
+        return list;
     }
 
     public List<JPSNode> FindPath(Vector2Int start, Vector2Int target)

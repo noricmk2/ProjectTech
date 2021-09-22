@@ -78,4 +78,19 @@ public class IngameManager : MonoSingleton<IngameManager>
     {
         _stateMachine.OnUpdate();
     }
+
+    public static bool CheckFindEnemy(IBehaviorTreeOwner owner)
+    {
+        return false;
+    }
+    
+    public static bool CheckFindMove(IBehaviorTreeOwner owner)
+    {
+        if (owner is EnemyCharacter)
+        {
+            var enemy = owner as EnemyCharacter;
+            return enemy.FindMoveTarget();
+        }
+        return false;
+    }
 }

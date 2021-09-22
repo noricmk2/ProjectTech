@@ -9,7 +9,6 @@ public class PathfindGrid
     private int _height;
     private List<JPSNode> _nodeList;
 
-
     public void Init(int width, int height, List<JPSNode> nodeList)
     {
         _width = width;
@@ -38,7 +37,7 @@ public class PathfindGrid
             _grid.GetLength(0) <= x || _grid.GetLength(1) <= y)
             return false;
 
-        if (_grid[x, y].state == (int) MapNodeType.Road || _grid[x, y].state == (int) MapNodeType.Spanwer)
+        if (_grid[x, y].state != (int) MapNodeType.Road && _grid[x, y].state != (int) MapNodeType.Spanwer)
             return false;
 
         return true;
@@ -49,7 +48,7 @@ public class PathfindGrid
         if (x < 0 || y < 0 ||
             _grid.GetLength(0) <= x || _grid.GetLength(1) <= y)
         {
-            //Debug.Log("[Failed]not exist index - grid:" + _grid.GetLength(0) + "," + _grid.GetLength(1) + "/pos:" + x + "," + y);
+            DebugEx.Log("[Failed]not exist index - grid:" + _grid.GetLength(0) + "," + _grid.GetLength(1) + "/pos:" + x + "," + y);
             return null;
         }
 

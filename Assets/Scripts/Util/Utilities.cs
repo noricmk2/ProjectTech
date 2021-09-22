@@ -44,6 +44,14 @@ namespace TCUtil
                 transform.GetChild(i).SetLayerRecursively(layer);
         }
 
+        public static void Init(this Transform transform, Transform parent)
+        {
+            transform.SetParent(parent);
+            transform.localPosition = Vector3.zero;
+            transform.localScale = Vector3.one;
+            transform.localRotation = Quaternion.identity;
+        }
+
         public static List<T> ShallowCopy<T>(List<T> source)
         {
             List<T> destination = new List<T>();

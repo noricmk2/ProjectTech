@@ -1,9 +1,4 @@
-public enum ResourceType
-{
-    DataAsset,
-    Tile,
-    Character,
-}
+
 public enum CharacterType
 {
     Player,
@@ -30,4 +25,17 @@ public enum MapNodeType
     Block = 0,
     Road = 1,
     Spanwer = 9
+}
+
+public enum StatusType
+{
+    Hp,
+    Atk,
+    Def,
+    Evade,
+    AccuracyRate,
+    MoveRange,
+    AtkRange,
+    MoveSpeed,
+    AtkSpeed,
 }
