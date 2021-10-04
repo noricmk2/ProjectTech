@@ -109,7 +109,7 @@ public class PathfindController
             for (int j = start.y - xCount; j < start.y + xCount; ++j)
             {
                 var target = _grid.GetNode(i, j);
-                if (target != null && target.state != (int)MapNodeType.Block)
+                if (target != null && target.state != (int)MapNodeType.Block && target.pos != start)
                     list.Add(target);
             }
             ++xCount;

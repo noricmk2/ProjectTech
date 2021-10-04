@@ -1,19 +1,17 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using DG.Tweening;
 using UnityEngine;
 using TCUtil;
 
 public class IngameManager : MonoSingleton<IngameManager>
 {
     #region Inspector
-    [SerializeField]
-    private Transform _mapRoot;
-
-    [SerializeField]
-    private Transform _characterRoot;
-
-    [SerializeField]
-    private Camera _ingameCamera;
+    [SerializeField] private Transform _mapRoot;
+    [SerializeField] private Transform _characterRoot;
+    [SerializeField] private Camera _ingameCamera;
+    [SerializeField] private IngameCameraMove _cameraMove;
     #endregion
 
     #region Property
@@ -79,8 +77,50 @@ public class IngameManager : MonoSingleton<IngameManager>
         _stateMachine.OnUpdate();
     }
 
+    public List<CharacterBase> GetCharacterInRange(CharacterBase source, float range, CharacterType findType = CharacterType.None)
+    {
+        var sourcePos = source.CachedTransform.position;
+        var list = new List<CharacterBase>();
+        switch (findType)
+        {
+            case CharacterType.Enemy:
+                var enemyList = _waveController.GetActivateEnemyList();
+                for (int i = 0; i < enemyList.Count; ++i)
+                {
+                    if(Func.InRange(sourcePos, enemyList[i].CachedTransform.position, range))
+                        list.Add(enemyList[i]);
+                }
+                break;
+            case CharacterType.Player:
+                var playerList = _charController.GetPlayerCharacterList();
+                for (int i = 0; i < playerList.Count; ++i)
+                {
+                    if(Func.InRange(sourcePos, playerList[i].CachedTransform.position, range))
+                        list.Add(playerList[i]);
+                }
+                break;
+            case CharacterType.None:
+                var allList = _waveController.GetActivateEnemyList();
+                allList.AddRange(_charController.GetPlayerCharacterList());
+                for (int i = 0; i < allList.Count; ++i)
+                {
+                    if(Func.InRange(sourcePos, allList[i].CachedTransform.position, range))
+                        list.Add(allList[i]);
+                }
+                break;
+        }
+        return list;
+    }
+    
+    #region AIMethod
     public static bool CheckFindEnemy(IBehaviorTreeOwner owner)
     {
+        if (owner is EnemyCharacter)
+        {
+            var enemy = owner as EnemyCharacter;
+            return enemy.FindAttackTarget();
+        }
+        
         return false;
     }
     
@@ -93,4 +133,27 @@ public class IngameManager : MonoSingleton<IngameManager>
         }
         return false;
     }
+
+    public bool OnAIMove(IBehaviorTreeOwner owner, Action onMoveEnd)
+    {
+        if (owner is EnemyCharacter)
+        {
+            var enemy = owner as EnemyCharacter;
+            return enemy.MoveToSearchedPath(onMoveEnd);
+        }
+
+        return false;
+    }
+
+    public bool OnAIAttack(IBehaviorTreeOwner owner, Action onAttackEnd)
+    {
+        if (owner is EnemyCharacter)
+        {
+            var enemy = owner as EnemyCharacter;
+            return enemy.Attack(onAttackEnd);
+        }
+
+        return false;
+    }
+    #endregion
 }

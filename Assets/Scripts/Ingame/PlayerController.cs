@@ -14,6 +14,9 @@ public class PlayerController
         //Test
         _testCharacter = ObjectFactory.Instance.CreateObject<PlayerCharacter>("TestCharacter", IngameManager.Instance.CharacterRoot);
         _testCharacter.CachedTransform.position = new Vector3(1, 0, 1);
+        var initData = new CharacterBase.CharacterInitData();
+        initData.charData = DataManager.Instance.CreateCharacterData(1003);
+        _testCharacter.Init(initData);
     }
     
     public void OnUpdate()
@@ -38,7 +41,7 @@ public class PlayerController
                     if (path != null && path.Count > 0)
                     {
                         var firstNode = path.Peek();
-                        _testCharacter.MovePath(Func.NodeToVectorList(path), 2);
+                        _testCharacter.MovePath(Func.NodeToVectorList(path), 2, null);
                         //_testCharacter.MovePath(Func.NodeToVectorList(path), firstNode.F  * moveValue);
                     }
                 }
@@ -47,13 +50,11 @@ public class PlayerController
         _testCharacter.OnUpdate();
     }
 
-    public bool FindEnemy(IBehaviorTreeOwner owner)
+    public List<CharacterBase> GetPlayerCharacterList()
     {
-        return false;
-    }
-
-    public bool FindMoveTarget(IBehaviorTreeOwner owner)
-    {
-        return false;
+        var list = new List<CharacterBase>();
+        //Test
+        list.Add(_testCharacter);
+        return list;
     }
 }

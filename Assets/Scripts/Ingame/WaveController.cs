@@ -57,4 +57,10 @@ public class WaveController
             character.SetAIEnable(true);
         }
     }
+
+    public List<CharacterBase> GetActivateEnemyList()
+    {
+        var list = new List<CharacterBase>(_activateEnemyList);
+        return list;
+    }
 }

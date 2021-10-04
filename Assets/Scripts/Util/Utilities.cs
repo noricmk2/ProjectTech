@@ -205,6 +205,12 @@ namespace TCUtil
             return UnityEngine.Random.Range(0, 100001) <= percent;
         }
 
+        public static bool InRange(Vector3 src, Vector3 target, float range)
+        {
+            var diff = src - target;
+            return diff.sqrMagnitude <= (range * range);
+        }
+
         public static int GetInt(string value, int defaultVal = 0)
         {
             if (value == null || string.IsNullOrEmpty(value))

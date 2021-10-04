@@ -4,10 +4,23 @@ using UnityEngine;
 
 public class AttackNode : BehaviorTreeNode
 {
+    private bool _attackStart;
+    private bool _attackEnd;
+    
+    protected override void OnActivate()
+    {
+        base.OnActivate();
+        
+        _attackStart = true;
+        _attackEnd = false;
+    }
+
     public override BehaviorNodeState OnExecute()
     {
-        return base.OnExecute();
-        DebugEx.Log($"{_owner} is attack");
+        IngameManager.Instance.OnAIAttack(_owner, () => _attackEnd = true);
+        if (_attackEnd)
+            return BehaviorNodeState.Success;
+        return BehaviorNodeState.Running;
     }
 }
 
@@ -30,11 +43,7 @@ public class MoveNode : BehaviorTreeNode
         base.OnActivate();
         _moveStart = false;
         _moveEnd = false;
-        if (_owner is EnemyCharacter)
-        {
-            var enemy = _owner as EnemyCharacter;
-            _moveStart = enemy.MoveToSearchedPath();
-        }
+        _moveStart = IngameManager.Instance.OnAIMove(_owner, () => _moveEnd = true);
     }
 
     public override BehaviorNodeState OnExecute()

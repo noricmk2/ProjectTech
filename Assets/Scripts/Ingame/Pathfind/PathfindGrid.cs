@@ -48,7 +48,7 @@ public class PathfindGrid
         if (x < 0 || y < 0 ||
             _grid.GetLength(0) <= x || _grid.GetLength(1) <= y)
         {
-            DebugEx.Log("[Failed]not exist index - grid:" + _grid.GetLength(0) + "," + _grid.GetLength(1) + "/pos:" + x + "," + y);
+//            DebugEx.Log("[Failed]not exist index - grid:" + _grid.GetLength(0) + "," + _grid.GetLength(1) + "/pos:" + x + "," + y);
             return null;
         }
 

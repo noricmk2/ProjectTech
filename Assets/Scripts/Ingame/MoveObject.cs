@@ -27,6 +27,8 @@ public class MoveObject : ObjectBase
     protected Vector3 _prevWaypoint;
     protected int _curWaypointIndex;
     protected float _moveSpeed;
+    protected Action _onPathEnd;
+    protected int _segmentCount = 3;
 
     public virtual void MoveInit()
     {
@@ -63,22 +65,33 @@ public class MoveObject : ObjectBase
         CachedTransform.position = Vector3.SmoothDamp(CachedTransform.position, targetPos, ref _smoothDampVelocity, duration);
     }
 
-    public virtual void MovePath(List<Vector3> path, float speed)
+    public virtual void MovePath(List<Vector3> path, float speed, Action onPathEnd)
     {
+        if(path == null && path.Count == 0)
+            return;
+
+        _onPathEnd = onPathEnd;
         _moveSpeed = speed;
         _curWaypointIndex = 0;
         var array = path.ToArray();
         float sqrMagnitude = 0;
-        for (int i = 0; i < path.Count - 1; ++i)
+        if (path.Count == 1)
         {
-            sqrMagnitude += (path[i + 1] - path[i]).sqrMagnitude;
+            sqrMagnitude = (CachedTransform.position - path[0]).sqrMagnitude;
+            _wayPoints = new Vector3[path.Count];
+            _wayPoints[0] = path[0];
         }
-        int segment = (int)sqrMagnitude * 5;
-        _wayPoints = new Vector3[segment];
-        for (int i = 0; i < segment; ++i)
+        else
         {
-            Vector3 waypoint = CatmullRom.EasyInterp3D(array, i / (float)segment);
-            _wayPoints[i] = waypoint;
+            for (int i = 0; i < path.Count - 1; ++i)
+                sqrMagnitude += (path[i + 1] - path[i]).sqrMagnitude;
+            int segment = (int)sqrMagnitude * _segmentCount;
+            _wayPoints = new Vector3[segment];
+            for (int i = 0; i < segment; ++i)
+            {
+                Vector3 waypoint = CatmullRom.EasyInterp3D(array, i / (float)segment);
+                _wayPoints[i] = waypoint;
+            }
         }
         _curState = MoveState.MovePath;
         _prevWaypoint = CachedTransform.position;
@@ -100,7 +113,8 @@ public class MoveObject : ObjectBase
 
                 if (_curWaypointIndex >= _wayPoints.Length)
                 {
-                    DebugEx.Log("[Notify] move path end");
+                    DebugEx.Log($"[Notify] move path end : {this}");
+                    _onPathEnd?.Invoke();
                     _curState = MoveState.Stational;
                     return;
                 }

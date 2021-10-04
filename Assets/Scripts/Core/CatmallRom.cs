@@ -56,6 +56,11 @@ public class CatmullRom
         int currPt = Mathf.Min(Mathf.FloorToInt(t * (float)numSections), numSections - 1);
         float u = t * (float)numSections - (float)currPt;
 
+        if (currPt < 0 || currPt >= pts.Length)
+        {
+            DebugEx.Log("");
+        }
+        
         Vector3 a = pts[currPt];
         Vector3 b = pts[currPt + 1];
         Vector3 c = pts[currPt + 2];

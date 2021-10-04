@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using TCUtil;
@@ -6,6 +7,7 @@ using UnityEngine;
 public class EnemyCharacter : CharacterBase
 {
     private List<Vector3> _nextMovePath;
+    private CharacterBase _attackTarget;
     
     public override void Init(CharacterInitData data)
     {
@@ -18,6 +20,23 @@ public class EnemyCharacter : CharacterBase
             aiRootNode.SetOwner(this);
             _behaviorTree.Init(aiRootNode);
         }
+
+        _attackTarget = null;
+        gameObject.name = string.Concat(gameObject.name, GetInstanceID());
+    }
+
+    public override bool FindAttackTarget()
+    {
+        _attackTarget = null;
+        var attackRange = _characterStatus.GetStatus(StatusType.AtkRange);
+        var list = IngameManager.Instance.GetCharacterInRange(this, attackRange, CharacterType.Player);
+        for (int i = 0; i < list.Count; ++i)
+        {
+            //TODO: get attack target by method
+            _attackTarget = list[i];
+            break;
+        }
+        return _attackTarget != null;
     }
 
     public override bool FindMoveTarget()
@@ -33,18 +52,43 @@ public class EnemyCharacter : CharacterBase
             return false;
     }
 
-    public bool MoveToSearchedPath()
+    public bool MoveToSearchedPath(Action onMoveEnd)
     {
         if (_nextMovePath != null && _nextMovePath.Count > 0)
         {
-            MovePath(_nextMovePath, _characterStatus.GetStatus(StatusType.MoveSpeed));
+            MovePath(_nextMovePath, _characterStatus.GetStatus(StatusType.MoveSpeed), onMoveEnd);
             _nextMovePath = null;
             return true;
         }
         else
         {
             DebugEx.Log($"[Failed] there is no searched path");
+            onMoveEnd?.Invoke();
             return false;
+        }
+    }
+
+    public override bool Attack(Action onAttackEnd)
+    {
+        if (_attackTarget != null && _delayDeltaTime <= 0)
+        {
+            //TODO : do attack;
+            var damage = new DamageData();
+            damage.atkDamage = _characterStatus.GetStatus(StatusType.Atk);
+            _attackTarget.OnDamaged(damage);
+            onAttackEnd?.Invoke();
+            _delayDeltaTime = _defaultAttackTerm;
+            return true;
+        }
+        return false;
+    }
+
+    public override void OnUpdate()
+    {
+        base.OnUpdate();
+        if (_delayDeltaTime > 0)
+        {
+            _delayDeltaTime -= Time.deltaTime * _characterStatus.GetStatus(StatusType.AtkSpeed);
         }
     }
 }

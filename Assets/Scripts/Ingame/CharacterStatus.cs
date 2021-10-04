@@ -6,9 +6,11 @@ public class CharacterStatus
 {
     private StatusData _orgStatusData;
     private StatusData _curStatusData;
+    private CharacterBase _owner;
     
-    public void Init(StatusData data)
+    public void Init(CharacterBase owner, StatusData data)
     {
+        _owner = owner;
         _orgStatusData = data;
         _curStatusData = _orgStatusData;
     }
@@ -37,5 +39,10 @@ public class CharacterStatus
                 return _curStatusData.atkSpeed;
         }
         return 0;
+    }
+
+    public void CalDamage(DamageData data)
+    {
+        DebugEx.Log($"[Attacked] {_owner} is damaged {data.atkDamage}");
     }
 }

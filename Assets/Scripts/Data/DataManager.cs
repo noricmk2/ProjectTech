@@ -66,6 +66,11 @@ public class SpawnData
     public CharacterData spawnCharacter;
     public float spawnDelay;
 }
+
+public class DamageData
+{
+    public float atkDamage;
+}
 #endregion
 
 public class DataManager : Singleton<DataManager>
@@ -218,42 +223,55 @@ public class DataManager : Singleton<DataManager>
         var data = new CharacterBase.AIData();
         
         var rootNode = new SelectorNode();
-        var baseSequence = new SelectorNode();
-        rootNode.AddNode(baseSequence);
+        rootNode.SetName("root");
+        var baseSelector = new SelectorNode();
+        baseSelector.SetName("base selector");
+        rootNode.AddNode(baseSelector);
 
         var deadChcek = new ConditionNode();
+        deadChcek.SetName("dead check");
         deadChcek.ConditionCheckFunc = null;
-        baseSequence.AddNode(deadChcek);
+        baseSelector.AddNode(deadChcek);
 
         var dead = new DeadNode();
+        dead.SetName("dead");
         deadChcek.AddNode(dead);
 
         var findEnemyCheck = new ConditionNode();
+        findEnemyCheck.SetName("find enemy check");
         findEnemyCheck.ConditionCheckFunc = IngameManager.CheckFindEnemy;
-        baseSequence.AddNode(findEnemyCheck);
+        baseSelector.AddNode(findEnemyCheck);
 
         var attackSequence = new SequenceNode();
+        attackSequence.SetName("attack sequence");
         findEnemyCheck.AddNode(attackSequence);
 
         var attack = new AttackNode();
-        var skill = new ExcuteSkillNode();
+        attack.SetName("attack");
+        // var skill = new ExcuteSkillNode();
+        // skill.SetName("skill");
         attackSequence.AddNode(attack);
-        attackSequence.AddNode(skill);
+        //attackSequence.AddNode(skill);
 
         var findMoveCheck = new ConditionNode();
+        findMoveCheck.SetName("find move check");
         findMoveCheck.ConditionCheckFunc = IngameManager.CheckFindMove;
-        baseSequence.AddNode(findMoveCheck);
+        baseSelector.AddNode(findMoveCheck);
 
-        var moveSequence = new SelectorNode();
-        findMoveCheck.AddNode(moveSequence);
+        var moveSelector = new SelectorNode();
+        moveSelector.SetName("move selector");
+        findMoveCheck.AddNode(moveSelector);
 
         var move = new MoveNode();
+        move.SetName("move");
         var hide = new HideNode();
-        moveSequence.AddNode(move);
-        moveSequence.AddNode(hide);
+        hide.SetName("hide");
+        moveSelector.AddNode(move);
+        moveSelector.AddNode(hide);
 
         var idle = new IdleNode();
-        baseSequence.AddNode(idle);
+        idle.SetName("idle");
+        baseSelector.AddNode(idle);
 
         data.rootNode = rootNode;
         return data;

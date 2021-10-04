@@ -19,6 +19,12 @@ public class BehaviorTreeNode
     protected bool _isActivate;
     protected IBehaviorTreeOwner _owner;
     public IBehaviorTreeOwner Owner => _owner;
+    protected string _nodeName;
+
+    public virtual void SetName(string name)
+    {
+        _nodeName = name;
+    }
 
     public virtual void SetOwner(IBehaviorTreeOwner owner)
     {
@@ -40,6 +46,8 @@ public class BehaviorTreeNode
     {
         if (_isActivate)
             return;
+        
+        DebugEx.Log($"[AI] {_nodeName} node activate. owner: {_owner}");
         _isActivate = true;
         OnActivate();
     }
@@ -70,6 +78,8 @@ public class BehaviorTreeNode
     {
         if (!_isActivate)
             return;
+        
+        DebugEx.Log($"[AI] {_nodeName} node dactivate. owner: {_owner}");
         _isActivate = false;
         OnDeactivate();
     }
