@@ -8,15 +8,16 @@ public class IngameStageMachine
     public enum IngameState
     {
         IngameStateInit,
+        IngameStateStart,
         IngameStateUpdate,
         Length
     }
     private IngameStateBase _curState;
     private Dictionary<IngameState, IngameStateBase> _stateDict = new Dictionary<IngameState, IngameStateBase>();
 
-    public void AddState(IngameState type, IngameStateBase instance)
+    public void AddState(IngameStateBase instance)
     {
-        _stateDict[type] = instance;
+        _stateDict[instance.StateType] = instance;
     }
 
     public void ChangeState(IngameState state)
@@ -46,10 +47,16 @@ public class IngameStateBase
     private Action _onEnter;
     private Action _onExit;
     private Action _onUpdate;
-    public IngameStageMachine.IngameState StateType { get; set; }
+    public IngameStageMachine.IngameState StateType { get; }
     public Action EnterAction { set { _onEnter = value; } }
     public Action ExitAction { set { _onExit = value; } }
     public Action UpdateAction { set { _onUpdate = value; } }
+
+    public IngameStateBase(IngameStageMachine.IngameState state)
+    {
+        StateType = state;
+    }
+
     public void OnStateEnter()
     {
         DebugEx.Log($"[Notify] on enter {StateType}");

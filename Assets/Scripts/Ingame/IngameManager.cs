@@ -18,14 +18,18 @@ public class IngameManager : MonoSingleton<IngameManager>
     private IngameStageMachine _stateMachine = new IngameStageMachine();
     private PlayerController _charController = new PlayerController();
     private WaveController _waveController = new WaveController();
+    public IngameCameraMove CameraMove => _cameraMove;
     public Camera IngameCamera => _ingameCamera;
     public Transform CharacterRoot => _characterRoot;
+
+    private bool _initComplete;
     #endregion
 
     public void Init()
     {
         InitCamera();
         InitIngameState();
+        _initComplete = false;
        
         //Test
         var stageData = DataManager.Instance.GetStageDataByIndex(1);
@@ -38,14 +42,33 @@ public class IngameManager : MonoSingleton<IngameManager>
 
     private void InitIngameState()
     {
-        var initState = new IngameStateBase();
+        var initState = new IngameStateBase(IngameStageMachine.IngameState.IngameStateInit);
         initState.UpdateAction = InitCheck;
-        initState.StateType = IngameStageMachine.IngameState.IngameStateInit;
-        var updateState = new IngameStateBase();
+        var startState = new IngameStateBase(IngameStageMachine.IngameState.IngameStateStart);
+        startState.UpdateAction = IngameStart;
+        var updateState = new IngameStateBase(IngameStageMachine.IngameState.IngameStateUpdate);
         updateState.UpdateAction = ControllerUpdate;
-        updateState.StateType = IngameStageMachine.IngameState.IngameStateUpdate;
-        _stateMachine.AddState(IngameStageMachine.IngameState.IngameStateInit, initState);
-        _stateMachine.AddState(IngameStageMachine.IngameState.IngameStateUpdate, updateState);
+        _stateMachine.AddState(initState);
+        _stateMachine.AddState(startState);
+        _stateMachine.AddState(updateState);
+    }
+
+    private void IngameStart()
+    {
+        var followData = new IngameCameraMove.FollowMoveData();
+        followData.followTargets = new List<Transform>();
+        var charList = _charController.GetPlayerCharacterList();
+        for (int i = 0; i < charList.Count; ++i)
+        {
+            followData.followTargets.Add(charList[i].transform);
+        }
+
+        followData.lerpValue = 0.1f;
+        followData.maxZoomValue = 10f;
+        followData.minZoomValue = 5f;
+        _cameraMove.SetFollowData(followData);
+        _cameraMove.StartFollow();
+        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateUpdate);
     }
 
     private List<CharacterBase.CharacterInitData> CreateCharacterInitData()
@@ -63,7 +86,8 @@ public class IngameManager : MonoSingleton<IngameManager>
     private void InitCheck()
     {
         //Test
-        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateUpdate);
+        //if(_initComplete)
+        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateStart);
     }
 
     private void ControllerUpdate()

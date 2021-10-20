@@ -1,3 +1,10 @@
+public enum CameraState
+{
+    Stational,
+    FollowTarget,
+    Animation,
+    Shake,
+}
 
 public enum CharacterType
 {
