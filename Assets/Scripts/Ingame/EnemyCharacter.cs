@@ -28,7 +28,7 @@ public class EnemyCharacter : CharacterBase
     public override bool FindAttackTarget()
     {
         _attackTarget = null;
-        var attackRange = _characterStatus.GetStatus(StatusType.AtkRange);
+        var attackRange = _characterStatus.GetStatusValueByType(StatusType.AtkRange);
         var list = IngameManager.Instance.GetCharacterInRange(this, attackRange, CharacterType.Player);
         for (int i = 0; i < list.Count; ++i)
         {
@@ -41,7 +41,7 @@ public class EnemyCharacter : CharacterBase
 
     public override bool FindMoveTarget()
     {
-        var moveRange = _characterStatus.GetStatus(StatusType.MoveRange);
+        var moveRange = _characterStatus.GetStatusValueByType(StatusType.MoveRange);
         var path = MapManager.Instance.GetRandomPathByRange(Func.GetTilePos(CachedTransform.position), moveRange);
         if (path != null && path.Count > 0)
         {
@@ -56,7 +56,7 @@ public class EnemyCharacter : CharacterBase
     {
         if (_nextMovePath != null && _nextMovePath.Count > 0)
         {
-            MovePath(_nextMovePath, _characterStatus.GetStatus(StatusType.MoveSpeed), onMoveEnd);
+            MovePath(_nextMovePath, _characterStatus.GetStatusValueByType(StatusType.MoveSpeed), onMoveEnd);
             _nextMovePath = null;
             return true;
         }
@@ -68,17 +68,35 @@ public class EnemyCharacter : CharacterBase
         }
     }
 
+    public override void Fire(int launcherIndex = 0, int slotIndex = 0)
+    {
+        base.Fire(launcherIndex, slotIndex);
+        var launcher = _laucherList[launcherIndex];
+        var slot = GetLaucherSlot(slotIndex);
+        launcher.Fire(slot, _attackTarget);
+    }
+
     public override bool Attack(Action onAttackEnd)
     {
-        if (_attackTarget != null && _delayDeltaTime <= 0)
+        if (_attackTarget == null)
+            return false;
+        
+        var dir = _attackTarget.transform.position - CachedTransform.position;
+        var radian = Vector3.Dot(dir.normalized, CachedTransform.forward);
+        if (radian > 0.05f)
         {
-            //TODO : do attack;
-            var damage = new DamageData();
-            damage.atkDamage = _characterStatus.GetStatus(StatusType.Atk);
-            _attackTarget.OnDamaged(damage);
-            onAttackEnd?.Invoke();
-            _delayDeltaTime = _defaultAttackTerm;
-            return true;
+            LookAt(_attackTarget.transform);
+        }
+        else
+        {
+            if (_delayDeltaTime <= 0)
+            {
+                // TODO : do attack;
+                Fire();
+                onAttackEnd?.Invoke();
+                _delayDeltaTime = _defaultAttackTerm;
+                return true;
+            }          
         }
         return false;
     }
@@ -88,7 +106,7 @@ public class EnemyCharacter : CharacterBase
         base.OnUpdate();
         if (_delayDeltaTime > 0)
         {
-            _delayDeltaTime -= Time.deltaTime * _characterStatus.GetStatus(StatusType.AtkSpeed);
+            _delayDeltaTime -= Time.deltaTime * _characterStatus.GetStatusValueByType(StatusType.AtkSpeed);
         }
     }
 }

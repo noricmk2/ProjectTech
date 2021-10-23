@@ -34,11 +34,16 @@ public class WaveController
         {
             if (_activateEnemyList.Count == 0)
             {
-                
+                var gameData = new IngameManager.GameEndData();
+                gameData.victory = true;
+                IngameManager.Instance.SetIngameEnd(gameData);
             }
             else
             {
-                
+                for (int i = 0; i < _activateEnemyList.Count; ++i)
+                {
+                    _activateEnemyList[i].OnUpdate();
+                }
             }
         }
     }

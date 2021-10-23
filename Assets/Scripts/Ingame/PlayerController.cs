@@ -16,6 +16,8 @@ public class PlayerController
         _testCharacter.CachedTransform.position = new Vector3(1, 0, 1);
         var initData = new CharacterBase.CharacterInitData();
         initData.charData = DataManager.Instance.CreateCharacterData(1003);
+        initData.launcherTableList = new List<LauncherTable>();
+        initData.launcherTableList.Add(DataManager.Instance.GetRecord<LauncherTable>(10101));
         _testCharacter.Init(initData);
     }
     

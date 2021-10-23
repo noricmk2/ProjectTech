@@ -25,6 +25,7 @@ public enum TableType
     Wave,
     Character,
     Status,
+    Launcher,
     Length
 }
 
@@ -46,4 +47,24 @@ public enum StatusType
     AtkRange,
     MoveSpeed,
     AtkSpeed,
+}
+
+public enum ProtocolType
+{
+    IngameStart,
+    IngameEnd,
+}
+
+public enum AttackType
+{
+    Immediate,
+    Projectile,
+}
+
+public enum ProjectileMoveType
+{
+    None = -1,
+    ToTargetDirect = 0,
+    RotationDirect = 1,
+    Curved = 2,
 }

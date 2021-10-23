@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TCUtil;
 using UnityEngine;
 
@@ -276,7 +277,13 @@ public class DataManager : Singleton<DataManager>
         data.rootNode = rootNode;
         return data;
     }
-    
+
+    public List<LauncherTable> GetLauncherTableList(int charIdx)
+    {
+        var charTable = GetRecord<CharacterTable>(charIdx);
+        return charTable.LanucherIndexes.Select(x => GetRecord<LauncherTable>(x)).ToList();
+    }
+
     private List<int> GetNodeListByRawMapData(string text)
     {
         var result = new List<int>();

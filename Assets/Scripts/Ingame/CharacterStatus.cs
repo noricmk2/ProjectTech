@@ -15,7 +15,7 @@ public class CharacterStatus
         _curStatusData = _orgStatusData;
     }
 
-    public float GetStatus(StatusType type)
+    public float GetStatusValueByType(StatusType type)
     {
         switch (type)
         {

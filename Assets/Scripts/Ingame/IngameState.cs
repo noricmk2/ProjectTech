@@ -10,6 +10,7 @@ public class IngameStageMachine
         IngameStateInit,
         IngameStateStart,
         IngameStateUpdate,
+        IngameStateEnd,
         Length
     }
     private IngameStateBase _curState;

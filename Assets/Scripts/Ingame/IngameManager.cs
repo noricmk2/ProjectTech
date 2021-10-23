@@ -7,9 +7,17 @@ using TCUtil;
 
 public class IngameManager : MonoSingleton<IngameManager>
 {
+    #region Define
+    public class GameEndData
+    {
+        public bool victory;
+    }
+    #endregion
+    
     #region Inspector
     [SerializeField] private Transform _mapRoot;
     [SerializeField] private Transform _characterRoot;
+    [SerializeField] private Transform _proejctileRoot;
     [SerializeField] private Camera _ingameCamera;
     [SerializeField] private IngameCameraMove _cameraMove;
     #endregion
@@ -17,27 +25,36 @@ public class IngameManager : MonoSingleton<IngameManager>
     #region Property
     private IngameStageMachine _stateMachine = new IngameStageMachine();
     private PlayerController _charController = new PlayerController();
+    private ProjectileController _projectileController = new ProjectileController();
     private WaveController _waveController = new WaveController();
     public IngameCameraMove CameraMove => _cameraMove;
     public Camera IngameCamera => _ingameCamera;
     public Transform CharacterRoot => _characterRoot;
+    public Transform ProjectileRoot => _proejctileRoot;
 
     private bool _initComplete;
     #endregion
 
     public void Init()
     {
+        _initComplete = false;
+
         InitCamera();
         InitIngameState();
-        _initComplete = false;
-       
+        InitController();
+    }
+
+    private void InitController()
+    {
         //Test
         var stageData = DataManager.Instance.GetStageDataByIndex(1);
         var mapData = stageData.mapData;
         MapManager.Instance.Init(mapData);
         _charController.Init();
         _waveController.Init(stageData.waveList);
-        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit);
+        _projectileController.Init();
+        
+        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit); 
     }
 
     private void InitIngameState()
@@ -48,6 +65,9 @@ public class IngameManager : MonoSingleton<IngameManager>
         startState.UpdateAction = IngameStart;
         var updateState = new IngameStateBase(IngameStageMachine.IngameState.IngameStateUpdate);
         updateState.UpdateAction = ControllerUpdate;
+        var endState = new IngameStateBase(IngameStageMachine.IngameState.IngameStateEnd);
+        endState.UpdateAction = OnEnd;
+        
         _stateMachine.AddState(initState);
         _stateMachine.AddState(startState);
         _stateMachine.AddState(updateState);
@@ -94,11 +114,25 @@ public class IngameManager : MonoSingleton<IngameManager>
     {
         _charController.OnUpdate();
         _waveController.OnUpdate();
+        _projectileController.OnUpdate();
+    }
+
+    private void OnEnd()
+    {
+        
     }
 
     private void Update()
     {
         _stateMachine.OnUpdate();
+    }
+
+    public void SetIngameEnd(GameEndData data)
+    {
+        HttpRequest.SendEndIngame(data.victory, res =>
+        {
+            _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateEnd);
+        });
     }
 
     public List<CharacterBase> GetCharacterInRange(CharacterBase source, float range, CharacterType findType = CharacterType.None)
@@ -135,7 +169,12 @@ public class IngameManager : MonoSingleton<IngameManager>
         }
         return list;
     }
-    
+
+    public void RegistProjectile(ProjectileObject obj)
+    {
+        _projectileController.AddProjectile(obj);
+    }
+
     #region AIMethod
     public static bool CheckFindEnemy(IBehaviorTreeOwner owner)
     {

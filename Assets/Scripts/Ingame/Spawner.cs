@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using TCUtil;
 using UnityEngine;
 
 public class Spawner : MonoBehaviour
@@ -38,10 +39,13 @@ public class Spawner : MonoBehaviour
             if (_curSpawnData.spawnCharacter.characterType == CharacterType.Enemy)
             {
                 var charData = _curSpawnData.spawnCharacter;
-                var enemy = ObjectFactory.Instance.CreateObject<EnemyCharacter>(charData.resourceName, IngameManager.Instance.CharacterRoot);
+                //var enemy = ObjectFactory.Instance.CreateObject<EnemyCharacter>(charData.resourceName, IngameManager.Instance.CharacterRoot);
+                var enemy = ObjectFactory.Instance.GetPoolObject<EnemyCharacter>(charData.resourceName);
+                enemy.transform.Init(IngameManager.Instance.CharacterRoot);
                 enemy.CachedTransform.position = new Vector3(transform.position.x, 0, transform.position.z);
                 var initData = new CharacterBase.CharacterInitData();
                 initData.charData = _curSpawnData.spawnCharacter;
+                initData.launcherTableList = DataManager.Instance.GetLauncherTableList(initData.charData.index);
                 //TODO:ai인덱스 연결
                 initData.aiData = DataManager.Instance.CreateAIData(-1);
                 enemy.Init(initData);

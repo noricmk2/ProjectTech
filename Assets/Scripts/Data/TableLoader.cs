@@ -12,6 +12,7 @@ public class TableLoader : MonoBehaviour
         {TableType.Wave, "1388325185"},
         {TableType.Character, "1303884673"},
         {TableType.Status, "451083748"},
+        {TableType.Launcher, "1073827763"},
     };
 
     private bool _isFinished;
@@ -72,6 +73,8 @@ public class TableLoader : MonoBehaviour
                 return new WaveTable();
             case TableType.Status:
                 return new StatusTable();
+            case TableType.Launcher:
+                return new LauncherTable();
         }
         return null;
     }
