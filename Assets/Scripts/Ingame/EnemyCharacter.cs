@@ -83,7 +83,9 @@ public class EnemyCharacter : CharacterBase
         
         var dir = _attackTarget.transform.position - CachedTransform.position;
         var radian = Vector3.Dot(dir.normalized, CachedTransform.forward);
-        if (radian > 0.05f)
+        float sight = Mathf.Cos(5f * Mathf.Deg2Rad);
+        
+        if (radian < sight)
         {
             LookAt(_attackTarget.transform);
         }

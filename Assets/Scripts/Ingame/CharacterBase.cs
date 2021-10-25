@@ -150,8 +150,8 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
 
     public void LookAt(Transform target, Action endAction = null)
     {
-        var dir = target.position - CachedTransform.position;
-        CachedTransform.DOLookAt(dir, 0.3f).OnComplete((() => endAction?.Invoke()));
+        var targetRot = Quaternion.LookRotation(target.position - CachedTransform.position);
+        CachedTransform.rotation = Quaternion.Slerp(CachedTransform.rotation, targetRot, Time.deltaTime * 2);
     }
 }
 
