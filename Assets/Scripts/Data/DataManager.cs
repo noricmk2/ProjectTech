@@ -11,6 +11,7 @@ public class MapRawData
     public int width;
     public int height;
     public List<JPSNode> nodeList;
+    public int[,] mapDetailData;
 }
 
 public class StageData
@@ -147,17 +148,24 @@ public class DataManager : Singleton<DataManager>
     {
         var table = GetRecord<StageTable>(index);
         var rawMapData = AddressableManager.Instance.LoadAssetSync<TextAsset>(table.MapData);
+        var rawMapDetail = AddressableManager.Instance.LoadAssetSync<TextAsset>(table.MapDetail);
         var result = new StageData();
         var mapData = new MapRawData();
         mapData.width = (int)table.MapSize.x;
         mapData.height = (int)table.MapSize.y;
         mapData.nodeList = new List<JPSNode>();
+        mapData.mapDetailData = new int[mapData.width, mapData.height];
         var mapNodeList = GetNodeListByRawMapData(rawMapData.text);
+        var mapDetailList = GetNodeListByRawMapData(rawMapDetail.text);
         for (int i = 0; i < mapNodeList.Count; ++i)
         {
-            var node = new JPSNode(i % mapData.width, i / mapData.width, mapNodeList[i]);
+            int x = i % mapData.width;
+            int y = i / mapData.width;
+            var node = new JPSNode(x, y, mapNodeList[i]);
             mapData.nodeList.Add(node);
+            mapData.mapDetailData[x, y] = mapDetailList[i];
         }
+        
         result.mapData = mapData;
         result.waveList = CreateWaveListByStageIdx(index);
         return result;
@@ -287,12 +295,13 @@ public class DataManager : Singleton<DataManager>
     private List<int> GetNodeListByRawMapData(string text)
     {
         var result = new List<int>();
-        for (int i = 0; i < text.Length; ++i)
+        string trim = text.Replace("\r", "");
+        trim = trim.Replace("\n", "");
+        var split = trim.Split(',');
+
+        for (int i = 0; i < split.Length; ++i)
         {
-            if (text[i] == ',' || text[i] == '\r' || text[i] == '\n')
-                continue;
-            
-            int nodeValue = (int)Char.GetNumericValue(text[i]);
+            int nodeValue = int.Parse(split[i]);
             result.Add(nodeValue);
         }
         return result;

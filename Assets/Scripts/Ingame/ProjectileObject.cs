@@ -37,8 +37,17 @@ public class ProjectileObject : MoveObject, IPoolObjectBase
     public void OnCollisionEnter(Collision other)
     {
         DebugEx.Log($"[Collision] {this} : {other}");
-        if (other.gameObject != _owner.gameObject)
-            _waitRemove = true;
+        var character = other.transform.GetComponent<CharacterBase>();
+        if (character != null)
+        {
+            if (character.GetCharacterType() != _owner.GetCharacterType())
+            {
+                var damage = new DamageData();
+                damage.atkDamage = _owner.GetStatus().GetStatusValueByType(StatusType.Atk);
+                character.OnDamaged(damage);
+                _waitRemove = true;
+            }
+        }
     }
 
     public override void OnUpdate()

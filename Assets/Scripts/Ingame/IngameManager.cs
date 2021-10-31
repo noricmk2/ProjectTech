@@ -27,6 +27,7 @@ public class IngameManager : MonoSingleton<IngameManager>
     private PlayerController _charController = new PlayerController();
     private ProjectileController _projectileController = new ProjectileController();
     private WaveController _waveController = new WaveController();
+    private QuadTreeController _quadTreeController = new QuadTreeController();
     public IngameCameraMove CameraMove => _cameraMove;
     public Camera IngameCamera => _ingameCamera;
     public Transform CharacterRoot => _characterRoot;
@@ -53,6 +54,7 @@ public class IngameManager : MonoSingleton<IngameManager>
         _charController.Init();
         _waveController.Init(stageData.waveList);
         _projectileController.Init();
+        _quadTreeController.Init();;
         
         _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit); 
     }
@@ -91,11 +93,6 @@ public class IngameManager : MonoSingleton<IngameManager>
         _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateUpdate);
     }
 
-    private List<CharacterBase.CharacterInitData> CreateCharacterInitData()
-    {
-        return null;
-    }
-
     private void InitCamera()
     {
         var cameraData = AddressableManager.Instance.LoadAssetSync<CameraData>("CameraData");
@@ -115,6 +112,7 @@ public class IngameManager : MonoSingleton<IngameManager>
         _charController.OnUpdate();
         _waveController.OnUpdate();
         _projectileController.OnUpdate();
+        _quadTreeController.OnUpdate();
     }
 
     private void OnEnd()
@@ -133,6 +131,11 @@ public class IngameManager : MonoSingleton<IngameManager>
         {
             _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateEnd);
         });
+    }
+
+    public List<IQuadTreeObject> QueryRectCollision(Rect rect)
+    {
+        return _quadTreeController.QueryRect(rect);
     }
 
     public List<CharacterBase> GetCharacterInRange(CharacterBase source, float range, CharacterType findType = CharacterType.None)

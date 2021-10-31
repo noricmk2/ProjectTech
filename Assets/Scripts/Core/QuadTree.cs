@@ -7,7 +7,7 @@ public interface IQuadTreeObject
 {
     Guid ID { get; }
     Rect rect { get; }
-    Collider2D Collider { get; }
+    Collider OwnCollider { get; }
     void OnQuadQuery(List<IQuadTreeObject> colList);
 }
 
@@ -148,9 +148,9 @@ class QuadTree<T> where T : IQuadTreeObject
     }
 
 
-    private List<IQuadTreeObject> QueryObject(IQuadTreeObject target)
+    private List<IQuadTreeObject> QueryObject(Rect targetRect)
     {
-        Rect searchingArea = target.rect;
+        Rect searchingArea = targetRect;
         var founded = new List<IQuadTreeObject>();
 
         if (_curLevel == _maxLevel)
@@ -175,9 +175,6 @@ class QuadTree<T> where T : IQuadTreeObject
         {
             for (int i = 0; i < _numberOfNodesInserted; i++)
             {
-                if (_nodes[i].ID == target.ID)
-                    continue;
-
                 if (searchingArea.Overlaps(_nodes[i].rect))
                     founded.Add(_nodes[i]);
             }
@@ -185,18 +182,18 @@ class QuadTree<T> where T : IQuadTreeObject
         }
         else if (_root && _numberOfNodesInserted == 0)
         {
-            founded.AddRange(_northEast.QueryObject(target));
-            founded.AddRange(_northWest.QueryObject(target));
-            founded.AddRange(_southEast.QueryObject(target));
-            founded.AddRange(_southWest.QueryObject(target));
+            founded.AddRange(_northEast.QueryObject(targetRect));
+            founded.AddRange(_northWest.QueryObject(targetRect));
+            founded.AddRange(_southEast.QueryObject(targetRect));
+            founded.AddRange(_southWest.QueryObject(targetRect));
         }
 
         return founded;
     }
 
-    public List<IQuadTreeObject> Query(IQuadTreeObject targetNode)
+    public List<IQuadTreeObject> Query(Rect targetRect)
     {
-        var foundList = QueryObject(targetNode);
+        var foundList = QueryObject(targetRect);
         var distinctList = foundList.Distinct().ToList();
         return distinctList;
     }
@@ -229,10 +226,10 @@ class QuadTree<T> where T : IQuadTreeObject
 		float w = _boundry.width;
 		float h = _boundry.height;
 
-		Vector2 bottomLeftPoint = new Vector2(x, y);
-		Vector2 bottomRightPoint = new Vector2(x + w, y);
-		Vector2 topRightPoint = new Vector2(x + w, y + h);
-		Vector2 topLeftPoint = new Vector2(x, y + h);
+		Vector3 bottomLeftPoint = new Vector3(x, 0, y);
+		Vector3 bottomRightPoint = new Vector3(x + w, 0, y);
+		Vector3 topRightPoint = new Vector3(x + w, 0, y + h);
+		Vector3 topLeftPoint = new Vector3(x, 0, y + h);
 		
 		Debug.DrawLine(bottomLeftPoint, bottomRightPoint, col);	//bottomLine
 		Debug.DrawLine(bottomLeftPoint, topLeftPoint, col);		//leftLine

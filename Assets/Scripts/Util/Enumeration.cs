@@ -26,6 +26,7 @@ public enum TableType
     Character,
     Status,
     Launcher,
+    MapDetail,
     Length
 }
 
@@ -33,6 +34,8 @@ public enum MapNodeType
 {
     Block = 0,
     Road = 1,
+    PassableObstacle = 2,
+    UnpassObstacle = 3,
     Spanwer = 9
 }
 
@@ -67,4 +70,11 @@ public enum ProjectileMoveType
     ToTargetDirect = 0,
     RotationDirect = 1,
     Curved = 2,
+}
+
+public enum MapDetailValueType
+{
+    None = -1,
+    StatusIndex = 0,
+    SpawnerName = 1,
 }

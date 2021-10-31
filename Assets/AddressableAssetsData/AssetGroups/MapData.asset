@@ -25,6 +25,10 @@ MonoBehaviour:
     m_Address: test_map_1
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 1bcc104b4c979614fac54a2622fb6649
+    m_Address: test_map_detail_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 26a9d6b7bd67ec0428730bae9199c281, type: 2}
   m_SchemaSet:

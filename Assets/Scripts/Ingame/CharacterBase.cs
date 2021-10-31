@@ -32,6 +32,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     protected float _delayDeltaTime;
     protected List<ActiveSkillBase> _ownSkillList = new List<ActiveSkillBase>();
     protected List<Launcher> _laucherList = new List<Launcher>();
+    protected CharacterType _curCharType;
 
     protected readonly float _defaultAttackTerm = 1f;
 
@@ -42,6 +43,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
 
     public virtual void Init(CharacterInitData data)
     {
+        _curCharType = data.charData.characterType;
         _waitRemove = false;
         _enableAI = false;
         _characterStatus = new CharacterStatus();
@@ -148,10 +150,15 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     {
     }
 
-    public void LookAt(Transform target, Action endAction = null)
+    public virtual void LookAt(Transform target, Action endAction = null)
     {
         var targetRot = Quaternion.LookRotation(target.position - CachedTransform.position);
         CachedTransform.rotation = Quaternion.Slerp(CachedTransform.rotation, targetRot, Time.deltaTime * 2);
+    }
+
+    public virtual CharacterType GetCharacterType()
+    {
+        return _curCharType;
     }
 }
 

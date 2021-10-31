@@ -13,6 +13,7 @@ public class TableLoader : MonoBehaviour
         {TableType.Character, "1303884673"},
         {TableType.Status, "451083748"},
         {TableType.Launcher, "1073827763"},
+        {TableType.MapDetail, "555637367"},
     };
 
     private bool _isFinished;
@@ -75,6 +76,8 @@ public class TableLoader : MonoBehaviour
                 return new StatusTable();
             case TableType.Launcher:
                 return new LauncherTable();
+            case TableType.MapDetail:
+                return new MapDetailTable();
         }
         return null;
     }

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Playables;
 
 public class TileBase : ObjectBase
 {
@@ -18,6 +19,7 @@ public class TileBase : ObjectBase
     private TileInfo _curInfo;
     public TileInfo Info => _curInfo;
     public Spawner CharacterSpanwer => _spawner;
+    public Vector3 TileSize => renderer.bounds.size;
     #endregion
 
     public void Init(TileInfo info)

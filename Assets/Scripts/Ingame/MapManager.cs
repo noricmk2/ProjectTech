@@ -1,5 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
+using TCUtil;
 using UnityEditor;
 using UnityEngine;
 
@@ -7,7 +9,10 @@ public class MapManager : MonoSingleton<MapManager>
 {
     public class MapPlayData
     {
+        public int widthCount;
+        public int heightCount;
         public List<TileBase> tileList;
+        public List<ObstacleObject> obstacleList;
     }
 
     #region Inspector
@@ -30,19 +35,33 @@ public class MapManager : MonoSingleton<MapManager>
         grid.Init(data.width, data.height, data.nodeList);
         _pathfindController.Init(grid);
         _pathfindController.SetDiagonalMovement(DiagonalMovement.IfAtLeastOneWalkable);
-        GenerateMap();
+        GenerateMap(data.width, data.height);
     }
 
     //TODO: 맵 프리팹 로드 및 데이터 세팅
-    public void GenerateMap()
+    public void GenerateMap(int width, int height)
     {
         _curMapData = new MapPlayData();
+        _curMapData.widthCount = width;
+        _curMapData.heightCount = height;
         _curMapData.tileList = new List<TileBase>();
+        _curMapData.obstacleList = new List<ObstacleObject>();
         int tempSpanwerCount = 1;
         for (int i = 0; i < _curRawData.nodeList.Count; ++i)
         {
             var node = _curRawData.nodeList[i];
-            var tile = ObjectFactory.Instance.CreateObject<TileBase>("TestTile", _mapRoot);
+
+            MapDetailTable detailRecord = null;
+            var detailIndex = _curRawData.mapDetailData[node.X, node.Y];
+            if (detailIndex > 0)
+                detailRecord = DataManager.Instance.GetRecord<MapDetailTable>(detailIndex);
+            else
+            {
+                DebugEx.LogError($"[Failed] not exist map detail data : {node.X}, {node.Y}");
+                continue;
+            }
+
+            var tile = ObjectFactory.Instance.CreateObject<TileBase>(detailRecord.TileResourceName, _mapRoot);
             var tilePos = _tileStartPos;
             tilePos.x += node.X;
             tilePos.z += node.Y;
@@ -51,14 +70,54 @@ public class MapManager : MonoSingleton<MapManager>
             var tileInfo = new TileBase.TileInfo();
             tileInfo.nodeInfo = node;
             tileInfo.nodeType = (MapNodeType) node.state;
-            if (tileInfo.nodeType == MapNodeType.Spanwer)
+
+            switch (tileInfo.nodeType)
             {
-                tileInfo.spanwerName = $"Spawner{tempSpanwerCount}";
-                ++tempSpanwerCount;
+                case MapNodeType.Block:
+                    break;
+                case MapNodeType.Road:
+                    break;
+                case MapNodeType.Spanwer:
+                    tileInfo.spanwerName = detailRecord.StringValue;
+                    ++tempSpanwerCount;
+                    break;
+                case MapNodeType.PassableObstacle:
+                {
+                    var initData = new ObstacleObject.ObstacleInitData();
+                    initData.passableObstacle = true;
+                    initData.rectSize = Vector2.one;
+                    initData.tilePos = node.pos;
+                    initData.statusData = DataManager.Instance.CreateStatusData(detailRecord.NumberValue);
+                    initData.resourceName = detailRecord.SubResourceName;
+                    var obj = CreateObstacle(tilePos, initData);
+                    _curMapData.obstacleList.Add(obj);
+                }
+                    break;
+                case MapNodeType.UnpassObstacle:
+                {
+                    var initData = new ObstacleObject.ObstacleInitData();
+                    initData.passableObstacle = false;
+                    initData.rectSize = Vector2.one;
+                    initData.tilePos = node.pos;
+                    initData.resourceName = detailRecord.SubResourceName;
+                    var obj = CreateObstacle(tilePos, initData);
+                    _curMapData.obstacleList.Add(obj);
+                }
+                    break;
             }
+
             tile.Init(tileInfo);
             _curMapData.tileList.Add(tile);
         }
+    }
+
+    private ObstacleObject CreateObstacle(Vector3 pos, ObstacleObject.ObstacleInitData data)
+    {
+        var obj = ObjectFactory.Instance.GetPoolObject<ObstacleObject>(data.resourceName);
+        obj.CachedTransform.Init(_mapRoot);
+        obj.CachedTransform.position = pos;
+        obj.Init(data);
+        return obj;
     }
 
     public Spawner GetSpawnerByName(string name)
@@ -74,6 +133,12 @@ public class MapManager : MonoSingleton<MapManager>
         {
             return targetTile.CharacterSpanwer;
         }
+    }
+
+    //TODO:엄폐우선 길찾기
+    public List<Vector3> GetPathPositionListWithCover(Vector2Int start, Vector2Int dest)
+    {
+        return null;
     }
 
     public List<Vector3> GetPathPositionList(Vector2Int start, Vector2Int dest)
@@ -114,5 +179,14 @@ public class MapManager : MonoSingleton<MapManager>
             list.Add(new Vector3(nodeList[i].X, 0, nodeList[i].Y));
         }
         return list;
+    }
+
+    public Rect GetQuadTreeBoundry()
+    {
+        var tile = _curMapData.tileList.First();
+        var size = tile.TileSize;
+        var rect = new Rect(_tileStartPos.x - (size.x * 0.5f), _tileStartPos.z - (size.z * 0.5f),
+            _curMapData.widthCount * size.x, _curMapData.heightCount * size.z);
+        return rect;
     }
 }

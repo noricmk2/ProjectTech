@@ -5,23 +5,19 @@ using UnityEditor;
 using System.Linq;
 using TCUtil;
 
-public class ProjectUFSettings : EditorWindow
+public class ProjectTechSettings : EditorWindow
 {
     #region Property
-    public bool LoadFromResources
-    {
-        get { return EditorPrefsEx.GetBool("LoadFromResources"); }
-        set { EditorPrefsEx.SetBool("LoadFromResources", value); }
-    }
-    public bool UseLocalSave
-    {
-        get { return EditorPrefsEx.GetBool("UseLocalSave"); }
-        set { EditorPrefsEx.SetBool("UseLocalSave", value); }
-    }
     public bool UseDebugLog
     {
         get { return EditorPrefsEx.GetBool("UseDebugLog"); }
         set { EditorPrefsEx.SetBool("UseDebugLog", value); }
+    }
+
+    public bool ShowQuadTree
+    {
+        get { return EditorPrefsEx.GetBool("ShowQuadTree"); }
+        set { EditorPrefsEx.SetBool("ShowQuadTree", value); }   
     }
 
     private GUIStyle _clientVersionStyle;
@@ -30,7 +26,7 @@ public class ProjectUFSettings : EditorWindow
     [MenuItem("ProjectTech/Settings")]
     public static void ShowWindow()
     {
-        ProjectUFSettings window = (ProjectUFSettings)EditorWindow.GetWindow(typeof(ProjectUFSettings));
+        ProjectTechSettings window = (ProjectTechSettings)EditorWindow.GetWindow(typeof(ProjectTechSettings));
         window.Init();
     }
 
@@ -41,7 +37,8 @@ public class ProjectUFSettings : EditorWindow
 
     private void OnGUI()
     {
-        LoadFromResources = EditorGUILayout.Toggle("Asset LoadFromResources: ", LoadFromResources);
+        UseDebugLog = EditorGUILayout.Toggle("UseDebugEx", UseDebugLog);
+        ShowQuadTree = EditorGUILayout.Toggle("ShowQuadTree ", ShowQuadTree);
 
         UpdateDefineOption();
     }
@@ -50,20 +47,24 @@ public class ProjectUFSettings : EditorWindow
     {
         List<string> options = GetCurrentDefineOption();
 
-        if (LoadFromResources)
-        {
-            options.Add("LOAD_FROM_RESOURCES");
-        }
-        if (UseLocalSave)
-        {
-            options.Add("LOCAL_SAVE");
-        }
         if (UseDebugLog)
         {
             options.Add("ENABLE_LOG");
         }
-
-        options.Add("MADORCA");
+        else
+        {
+            if (options.Contains("ENABLE_LOG"))
+                options.Remove("ENABLE_LOG");
+        }
+        if (ShowQuadTree)
+        {
+            options.Add("SHOW_BOUNDRY");
+        }
+        else
+        {
+            if (options.Contains("SHOW_BOUNDRY"))
+                options.Remove("SHOW_BOUNDRY");
+        }
 
         BuildTargetGroup buildTargetGroup = EditorUserBuildSettings.selectedBuildTargetGroup;
         options = options.Distinct().ToList();
