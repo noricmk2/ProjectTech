@@ -56,7 +56,12 @@ public class EnemyCharacter : CharacterBase
     {
         if (_nextMovePath != null && _nextMovePath.Count > 0)
         {
-            MovePath(_nextMovePath, _characterStatus.GetStatusValueByType(StatusType.MoveSpeed), onMoveEnd);
+            MovePath(_nextMovePath, _characterStatus.GetStatusValueByType(StatusType.MoveSpeed), obj =>
+                {
+                    FindCover(obj);
+                    onMoveEnd?.Invoke();
+                }
+            );
             _nextMovePath = null;
             return true;
         }
@@ -66,6 +71,10 @@ public class EnemyCharacter : CharacterBase
             onMoveEnd?.Invoke();
             return false;
         }
+    }
+
+    private void FindCover(MoveObject obj)
+    {
     }
 
     public override void Fire(int launcherIndex = 0, int slotIndex = 0)

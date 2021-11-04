@@ -49,12 +49,17 @@ public class IngameManager : MonoSingleton<IngameManager>
     {
         //Test
         var stageData = DataManager.Instance.GetStageDataByIndex(1);
+        //TODO:타일사이즈 및 맵크기 계산
         var mapData = stageData.mapData;
+        var size = Vector3.one;
+        var tileStartPos = Vector3.zero;
+        var rect = new Rect(tileStartPos.x - (size.x * 0.5f), tileStartPos.z - (size.z * 0.5f),
+            mapData.width * size.x, mapData.height * size.z);
+        _quadTreeController.Init(rect);
         MapManager.Instance.Init(mapData);
         _charController.Init();
         _waveController.Init(stageData.waveList);
         _projectileController.Init();
-        _quadTreeController.Init();;
         
         _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit); 
     }
@@ -131,6 +136,11 @@ public class IngameManager : MonoSingleton<IngameManager>
         {
             _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateEnd);
         });
+    }
+
+    public void RegistQuadTreeObject(IQuadTreeObject obj)
+    {
+        _quadTreeController.RegisterQuadTreeObject(obj);
     }
 
     public List<IQuadTreeObject> QueryRectCollision(Rect rect)

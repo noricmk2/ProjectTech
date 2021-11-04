@@ -16,6 +16,7 @@ public enum MoveState
 
 public class MoveObject : ObjectBase
 {
+    #region Property
     protected readonly float nearWaypointValue = 1f;
 
     protected Vector3 _smoothDampVelocity = Vector3.zero;
@@ -27,9 +28,10 @@ public class MoveObject : ObjectBase
     protected Vector3 _prevWaypoint;
     protected int _curWaypointIndex;
     protected float _moveSpeed;
-    protected Action _onPathEnd;
+    protected Action<MoveObject> _onPathEnd;
     protected int _segmentCount = 3;
-
+    #endregion
+    
     public virtual void MoveInit()
     {
         _curState = MoveState.Stational;
@@ -65,7 +67,7 @@ public class MoveObject : ObjectBase
         CachedTransform.position = Vector3.SmoothDamp(CachedTransform.position, targetPos, ref _smoothDampVelocity, duration);
     }
 
-    public virtual void MovePath(List<Vector3> path, float speed, Action onPathEnd)
+    public virtual void MovePath(List<Vector3> path, float speed, Action<MoveObject> onPathEnd)
     {
         if(path == null && path.Count == 0)
             return;
@@ -114,7 +116,7 @@ public class MoveObject : ObjectBase
                 if (_curWaypointIndex >= _wayPoints.Length)
                 {
                     DebugEx.Log($"[Notify] move path end : {this}");
-                    _onPathEnd?.Invoke();
+                    _onPathEnd?.Invoke(this);
                     _curState = MoveState.Stational;
                     return;
                 }

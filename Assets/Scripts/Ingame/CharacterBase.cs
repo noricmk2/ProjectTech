@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using DG.Tweening;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
 {
@@ -156,9 +157,19 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
         CachedTransform.rotation = Quaternion.Slerp(CachedTransform.rotation, targetRot, Time.deltaTime * 2);
     }
 
+    public virtual void OnCover()
+    {
+        DebugEx.Log($"[Debug] {this} on cover");
+    }
+    
     public virtual CharacterType GetCharacterType()
     {
         return _curCharType;
+    }
+
+    public virtual Vector2 GetCharacterSize()
+    {
+        return Vector2.one;
     }
 }
 

@@ -117,6 +117,7 @@ public class MapManager : MonoSingleton<MapManager>
         obj.CachedTransform.Init(_mapRoot);
         obj.CachedTransform.position = pos;
         obj.Init(data);
+        IngameManager.Instance.RegistQuadTreeObject(obj);
         return obj;
     }
 

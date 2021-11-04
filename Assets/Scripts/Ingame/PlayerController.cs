@@ -43,13 +43,26 @@ public class PlayerController
                     if (path != null && path.Count > 0)
                     {
                         var firstNode = path.Peek();
-                        _testCharacter.MovePath(Func.NodeToVectorList(path), 2, null);
+                        _testCharacter.MovePath(Func.NodeToVectorList(path), 2, FindCover);
                         //_testCharacter.MovePath(Func.NodeToVectorList(path), firstNode.F  * moveValue);
                     }
                 }
             }
         }
         _testCharacter.OnUpdate();
+    }
+
+    private void FindCover(MoveObject moveObj)
+    {
+        var character = moveObj as CharacterBase;
+        var size = character.GetCharacterSize();
+        var rect = new Rect(moveObj.CachedTransform.position.x - size.x * 0.5f,
+            moveObj.CachedTransform.position.y - size.y * 0.5f, size.x, size.y);
+        var collisionList = IngameManager.Instance.QueryRectCollision(rect);
+        var obstacleList = collisionList.FindAll(x => x is ObstacleObject);
+        
+        if(obstacleList.Count > 0)
+            character.OnCover();
     }
 
     public List<CharacterBase> GetPlayerCharacterList()

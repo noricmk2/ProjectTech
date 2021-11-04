@@ -49,6 +49,7 @@ public class Spawner : MonoBehaviour
                 //TODO:ai인덱스 연결
                 initData.aiData = DataManager.Instance.CreateAIData(-1);
                 enemy.Init(initData);
+                enemy.CachedTransform.rotation = Quaternion.Euler(0, -180, 0);
                 return enemy;
             }
             else

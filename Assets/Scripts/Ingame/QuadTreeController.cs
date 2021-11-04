@@ -8,9 +8,9 @@ public class QuadTreeController
     private QuadTree<IQuadTreeObject> _quadTree;
     private List<IQuadTreeObject> _nodeObjList = new List<IQuadTreeObject>();
 
-    public void Init()
+    public void Init(Rect rect)
     {
-        _quadTree = new QuadTree<IQuadTreeObject>(MapManager.Instance.GetQuadTreeBoundry(), _treeNodeCount, 5, 0);
+        _quadTree = new QuadTree<IQuadTreeObject>(rect, _treeNodeCount, 5, 0);
         _nodeObjList.Clear();
     }
 
