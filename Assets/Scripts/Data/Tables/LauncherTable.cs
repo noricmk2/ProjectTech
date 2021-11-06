@@ -12,6 +12,8 @@ public class LauncherTable : TableData
     private float _rotation;
     private float _autoFireDelay;
     private float _launcherValue;
+    private int _bulletCount;
+    private float _reloadTime;
 
     public AttackType AttackType => (AttackType)_attackType;
     public string ResourceName => _resourceName;
@@ -21,6 +23,8 @@ public class LauncherTable : TableData
     public float Rotation => _rotation;
     public float AutoFireDelay => _autoFireDelay;
     public float LauncherValue => _launcherValue;
+    public int BulletCount => _bulletCount;
+    public float ReloadTime => _reloadTime;
 
     public override void ParsingData(string line)
     {
@@ -33,5 +37,7 @@ public class LauncherTable : TableData
         _rotation = ReadFloat(_tabs[6]);
         _autoFireDelay = ReadFloat(_tabs[7]);
         _launcherValue = ReadFloat(_tabs[8]);
+        _bulletCount = ReadInt(_tabs[9]);
+        _reloadTime = ReadFloat(_tabs[10]);
     }
 }

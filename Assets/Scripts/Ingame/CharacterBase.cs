@@ -35,7 +35,8 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     protected List<Launcher> _laucherList = new List<Launcher>();
     protected CharacterType _curCharType;
 
-    protected readonly float _defaultAttackTerm = 1f;
+    protected readonly float defaultAttackTerm = 1f;
+    protected readonly float rotateSpeed = 3f;
 
     public bool WaitRemove
     {
@@ -154,7 +155,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     public virtual void LookAt(Transform target, Action endAction = null)
     {
         var targetRot = Quaternion.LookRotation(target.position - CachedTransform.position);
-        CachedTransform.rotation = Quaternion.Slerp(CachedTransform.rotation, targetRot, Time.deltaTime * 2);
+        CachedTransform.rotation = Quaternion.Slerp(CachedTransform.rotation, targetRot, Time.deltaTime * rotateSpeed);
     }
 
     public virtual void OnCover()

@@ -18,6 +18,7 @@ public class MoveObject : ObjectBase
 {
     #region Property
     protected readonly float nearWaypointValue = 1f;
+    protected readonly float rotateSpeed = 3f;
 
     protected Vector3 _smoothDampVelocity = Vector3.zero;
     protected Vector3 _accelVelocity = Vector3.zero;
@@ -30,6 +31,7 @@ public class MoveObject : ObjectBase
     protected float _moveSpeed;
     protected Action<MoveObject> _onPathEnd;
     protected int _segmentCount = 3;
+    protected bool _movePathWithRotate;
     #endregion
     
     public virtual void MoveInit()
@@ -67,12 +69,13 @@ public class MoveObject : ObjectBase
         CachedTransform.position = Vector3.SmoothDamp(CachedTransform.position, targetPos, ref _smoothDampVelocity, duration);
     }
 
-    public virtual void MovePath(List<Vector3> path, float speed, Action<MoveObject> onPathEnd)
+    public virtual void MovePath(List<Vector3> path, float speed, Action<MoveObject> onPathEnd, bool withRotate = true)
     {
         if(path == null && path.Count == 0)
             return;
 
         _onPathEnd = onPathEnd;
+        _movePathWithRotate = withRotate;
         _moveSpeed = speed;
         _curWaypointIndex = 0;
         var array = path.ToArray();
@@ -122,6 +125,13 @@ public class MoveObject : ObjectBase
                 }
 
                 Vector3 targetPoint = _wayPoints[_curWaypointIndex];
+                
+                if (_movePathWithRotate)
+                {
+                    var targetRot = Quaternion.LookRotation(targetPoint - CachedTransform.position);
+                    CachedTransform.rotation = Quaternion.Slerp(CachedTransform.rotation, targetRot, Time.deltaTime * rotateSpeed);
+                }
+                
                 var curPos = CachedTransform.position;
                 var lerpVal = Func.InverseLerp(_prevWaypoint, targetPoint, curPos);
                 if (lerpVal > 0.99f)

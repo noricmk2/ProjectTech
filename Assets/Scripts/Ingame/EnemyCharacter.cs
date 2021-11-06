@@ -105,7 +105,7 @@ public class EnemyCharacter : CharacterBase
                 // TODO : do attack;
                 Fire();
                 onAttackEnd?.Invoke();
-                _delayDeltaTime = _defaultAttackTerm;
+                _delayDeltaTime = defaultAttackTerm;
                 return true;
             }          
         }
