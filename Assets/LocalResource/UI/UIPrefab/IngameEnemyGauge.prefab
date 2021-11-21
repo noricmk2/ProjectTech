@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 2240845076087732794}
   m_Layer: 5
-  m_Name: IngamePlayerGauge
+  m_Name: IngameEnemyGauge
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -253,7 +253,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: fd97d99349722f54fbe9c690d9cd97af, type: 3}
+  m_Sprite: {fileID: 21300000, guid: bda088b69e7ee6a45910260c355debdd, type: 3}
   m_Type: 3
   m_PreserveAspect: 0
   m_FillCenter: 1
