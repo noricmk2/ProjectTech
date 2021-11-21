@@ -21,7 +21,7 @@ public class Launcher
 
     private CharacterBase _owner;
     private LauncherTable _tableData;
-    private float _deltaTime;
+    private float _autoFireDeltaTime;
     private float _reloadDeltaTime;
     private int _createCount;
     private int _maxBulletCount;
@@ -32,7 +32,7 @@ public class Launcher
     
     public void Init(LauncherInitData data)
     {
-        _deltaTime = 0;
+        _autoFireDeltaTime = 0;
         _reloadDeltaTime = 0;
         _createCount = 0;
         _curLaunchCount = 0;
@@ -87,28 +87,7 @@ public class Launcher
             case LaunchState.Stational:
                 break;
             case LaunchState.StartFire:
-                
-                CreateProjectile(_launcherSlot);
-                while (_createCount < _tableData.AutoFireCount)
-                {
-                    if (_deltaTime < _tableData.AutoFireDelay)
-                    {
-                        _deltaTime += Time.deltaTime;
-                    }
-                    else
-                    {
-                        _deltaTime = 0;
-                        CreateProjectile(_launcherSlot);
-                    }
-                }
-                _deltaTime = 0;
-                _createCount = 0;
-                _launchState = LaunchState.Stational;
-                _launcherSlot = null;
-                if (_curLaunchCount >= _maxBulletCount)
-                    _launchState = LaunchState.Reload;
-                else
-                    _launchState = LaunchState.Stational;
+                Launch();
                 break;
             case LaunchState.Reload:
                 Reload();
@@ -118,6 +97,31 @@ public class Launcher
         }
     }
 
+    private void Launch()
+    {
+        CreateProjectile(_launcherSlot);
+        while (_createCount < _tableData.AutoFireCount)
+        {
+            if (_autoFireDeltaTime < _tableData.AutoFireDelay)
+            {
+                _autoFireDeltaTime += Time.deltaTime;
+            }
+            else
+            {
+                _autoFireDeltaTime = 0;
+                CreateProjectile(_launcherSlot);
+            }
+        }
+        ++_curLaunchCount;
+        _autoFireDeltaTime = 0;
+        _createCount = 0;
+        _launcherSlot = null;
+        if (_curLaunchCount >= _maxBulletCount)
+            _launchState = LaunchState.Reload;
+        else
+            _launchState = LaunchState.Stational;
+    }
+    
     private void CreateProjectile(Transform launcherSlot)
     {
         var projectile = ObjectFactory.Instance.GetPoolObject<ProjectileObject>(_tableData.ResourceName);
@@ -131,6 +135,5 @@ public class Launcher
         projectile.Init(initData);
         IngameManager.Instance.RegistProjectile(projectile);
         ++_createCount;
-        ++_curLaunchCount;
     }
 }

@@ -36,6 +36,7 @@ class QuadTree<T> where T : IQuadTreeObject
         }
         return result;
     }
+    
     public QuadTree(Rect boundry, int size, int maxLevel, int curLevel)
     {
         if (boundry.width == 0 || boundry.height == 0)

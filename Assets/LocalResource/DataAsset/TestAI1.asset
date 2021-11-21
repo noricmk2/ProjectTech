@@ -1,0 +1,99 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0ef098ac93664f4da4615617c700a17, type: 3}
+  m_Name: TestAI1
+  m_EditorClassIdentifier: 
+  treeDataList:
+  - NodeType: 0
+    NodeName: Root
+    IsRoot: 1
+    ParentName: 
+    Level: 0
+    Order: 0
+    ActionName: 
+  - NodeType: 0
+    NodeName: BaseSelector
+    IsRoot: 0
+    ParentName: Root
+    Level: 1
+    Order: 0
+    ActionName: 
+  - NodeType: 1
+    NodeName: DeadCheck
+    IsRoot: 0
+    ParentName: BaseSelector
+    Level: 2
+    Order: 0
+    ActionName: 
+  - NodeType: 1
+    NodeName: FindEnemyCheck
+    IsRoot: 0
+    ParentName: BaseSelector
+    Level: 2
+    Order: 1
+    ActionName: CheckFindEnemy
+  - NodeType: 1
+    NodeName: FindMoveCheck
+    IsRoot: 0
+    ParentName: BaseSelector
+    Level: 2
+    Order: 2
+    ActionName: CheckFindMove
+  - NodeType: 10
+    NodeName: Idle
+    IsRoot: 0
+    ParentName: BaseSelector
+    Level: 2
+    Order: 3
+    ActionName: 
+  - NodeType: 7
+    NodeName: Dead
+    IsRoot: 0
+    ParentName: DeadCheck
+    Level: 3
+    Order: 0
+    ActionName: 
+  - NodeType: 5
+    NodeName: AttackSequence
+    IsRoot: 0
+    ParentName: FindEnemyCheck
+    Level: 3
+    Order: 0
+    ActionName: 
+  - NodeType: 0
+    NodeName: MoveSelector
+    IsRoot: 0
+    ParentName: FindMoveCheck
+    Level: 3
+    Order: 0
+    ActionName: 
+  - NodeType: 6
+    NodeName: Attack
+    IsRoot: 0
+    ParentName: AttackSequence
+    Level: 4
+    Order: 0
+    ActionName: 
+  - NodeType: 11
+    NodeName: Move
+    IsRoot: 0
+    ParentName: MoveSelector
+    Level: 4
+    Order: 0
+    ActionName: 
+  - NodeType: 9
+    NodeName: Hide
+    IsRoot: 0
+    ParentName: MoveSelector
+    Level: 4
+    Order: 1
+    ActionName: 

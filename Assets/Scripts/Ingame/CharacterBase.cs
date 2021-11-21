@@ -17,7 +17,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
 
     public class AIData
     {
-        public CompositeNode rootNode;
+        public BehaviorTree behaviorTree;
     }
     #endregion
 
@@ -27,7 +27,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     #endregion
     
     protected CharacterStatus _characterStatus;
-    protected BehaviorTree _behaviorTree = new BehaviorTree();
+    protected BehaviorTree _behaviorTree;
     protected bool _enableAI = false;
     protected bool _waitRemove;
     protected float _delayDeltaTime;

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Reflection;
 using UnityEditor;
 using UnityEngine;
 
@@ -317,6 +318,38 @@ namespace TCUtil
             }
             return vectorList;
         }
+        
+        public static Type GetType(string typeName)
+        {
+            var type = Type.GetType(typeName);
+            if (type != null) 
+                return type;
+
+            var currentAssembly = Assembly.GetExecutingAssembly();
+            var referencedAssemblies = currentAssembly.GetReferencedAssemblies();
+            foreach (var assemblyName in referencedAssemblies)
+            {
+                var assembly = Assembly.Load(assemblyName);
+                if (assembly != null)
+                {
+                    DebugEx.Log($"[referenced]{assembly.FullName}");
+                    type = assembly.GetType(typeName);
+                    if (type != null)
+                        return type;
+                }
+            }
+            
+            foreach (var a in AppDomain.CurrentDomain.GetAssemblies())
+            {
+                DebugEx.Log($"[currentDomain]{a.FullName}");
+                type = a.GetType(typeName);
+                if (type != null)
+                    return type;
+            }
+            DebugEx.LogError($"[Failed] cannot found type:{typeName}");
+            return null;
+        }
+
     }
     #endregion
 

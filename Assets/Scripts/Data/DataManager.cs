@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using System.Linq;
 using TCUtil;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 #region Define
 public class MapRawData
@@ -24,6 +25,7 @@ public class CharacterData
 {
     public int index;
     public string resourceName;
+    public string aiDataName;
     public CharacterType characterType;
     public StatusData statusData;
 }
@@ -206,6 +208,7 @@ public class DataManager : Singleton<DataManager>
         data.index = index;
         data.statusData = CreateStatusData(table.StatusIndex);
         data.resourceName = table.ResourceName;
+        data.aiDataName = table.AIData;
         data.characterType = table.CharacterType;
         return data;
     }
@@ -226,66 +229,109 @@ public class DataManager : Singleton<DataManager>
         return result;
     }
     
-    public CharacterBase.AIData CreateAIData(int index)
+    public CharacterBase.AIData CreateAIData(string aiDataName)
     {
-        //TODO: ai데이터 생성 구조화
+        var aiRawData = AddressableManager.Instance.LoadAssetSync<AIRawData>(aiDataName);
+        Assert.IsNotNull(aiRawData, $"[Failed] ai asset is null : {aiDataName}");
+        var tree = new BehaviorTree();
+        
+        aiRawData.treeDataList.Sort((x, y) =>
+        {
+            if (x.IsRoot)
+                return -1;
+            else if (y.IsRoot)
+                return 1;
+
+            if (x.Level < y.Level)
+                return -1;
+            else if (x.Level > y.Level)
+                return 1;
+
+            if (x.Order < y.Order)
+                return -1;
+            else if (x.Order > y.Order)
+                return 1;
+            
+            return 0;
+        });
+
+        for (int i = 0; i < aiRawData.treeDataList.Count; ++i)
+        {
+            var nodeData = aiRawData.treeDataList[i];
+            if (nodeData.IsRoot)
+            {
+                var rootNode = new SelectorNode();
+                rootNode.SetName(nodeData.NodeName);
+                tree.Init(rootNode);
+            }
+            else
+            {
+                Type type = Func.GetType(nodeData.NodeType.ToString());
+                var targetNode = Activator.CreateInstance(type) as BehaviorTreeNode;
+                Assert.IsNotNull(targetNode, $"[Failed] node create failed {nodeData.NodeType}/{nodeData.NodeName}");
+                targetNode.SetName(nodeData.NodeName);
+                if (!string.IsNullOrEmpty(nodeData.ActionName))
+                    targetNode.SetNodeAction(nodeData.ActionName);
+                tree.AddNode(nodeData.ParentName, targetNode);
+            }
+        }
+
         var data = new CharacterBase.AIData();
         
-        var rootNode = new SelectorNode();
-        rootNode.SetName("root");
-        var baseSelector = new SelectorNode();
-        baseSelector.SetName("base selector");
-        rootNode.AddNode(baseSelector);
-
-        var deadChcek = new ConditionNode();
-        deadChcek.SetName("dead check");
-        deadChcek.ConditionCheckFunc = null;
-        baseSelector.AddNode(deadChcek);
-
-        var dead = new DeadNode();
-        dead.SetName("dead");
-        deadChcek.AddNode(dead);
-
-        var findEnemyCheck = new ConditionNode();
-        findEnemyCheck.SetName("find enemy check");
-        findEnemyCheck.ConditionCheckFunc = IngameManager.CheckFindEnemy;
-        baseSelector.AddNode(findEnemyCheck);
-
-        var attackSequence = new SequenceNode();
-        attackSequence.SetName("attack sequence");
-        findEnemyCheck.AddNode(attackSequence);
-
-        var attack = new AttackNode();
-        attack.SetName("attack");
-        // var skill = new ExcuteSkillNode();
-        // skill.SetName("skill");
-        attackSequence.AddNode(attack);
-        //attackSequence.AddNode(skill);
-
-        var findMoveCheck = new ConditionNode();
-        findMoveCheck.SetName("find move check");
-        findMoveCheck.ConditionCheckFunc = IngameManager.CheckFindMove;
-        baseSelector.AddNode(findMoveCheck);
-
-        var moveSelector = new SelectorNode();
-        moveSelector.SetName("move selector");
-        findMoveCheck.AddNode(moveSelector);
-
-        var move = new MoveNode();
-        move.SetName("move");
-        var hide = new HideNode();
-        hide.SetName("hide");
-        moveSelector.AddNode(move);
-        moveSelector.AddNode(hide);
-
-        var idle = new IdleNode();
-        idle.SetName("idle");
-        baseSelector.AddNode(idle);
-
-        data.rootNode = rootNode;
+        // var rootNode = new SelectorNode();
+        // rootNode.SetName("root");
+        // var baseSelector = new SelectorNode();
+        // baseSelector.SetName("base selector");
+        // rootNode.AddNode(baseSelector);
+        //
+        // var deadCheck = new ConditionNode();
+        // deadCheck.SetName("dead check");
+        // deadCheck.ConditionCheckFunc = null;
+        // baseSelector.AddNode(deadCheck);
+        //
+        // var dead = new DeadNode();
+        // dead.SetName("dead");
+        // deadCheck.AddNode(dead);
+        //
+        // var findEnemyCheck = new ConditionNode();
+        // findEnemyCheck.SetName("find enemy check");
+        // findEnemyCheck.ConditionCheckFunc = IngameManager.CheckFindEnemy;
+        // baseSelector.AddNode(findEnemyCheck);
+        //
+        // var attackSequence = new SequenceNode();
+        // attackSequence.SetName("attack sequence");
+        // findEnemyCheck.AddNode(attackSequence);
+        //
+        // var attack = new AttackNode();
+        // attack.SetName("attack");
+        // // var skill = new ExcuteSkillNode();
+        // // skill.SetName("skill");
+        // attackSequence.AddNode(attack);
+        // //attackSequence.AddNode(skill);
+        //
+        // var findMoveCheck = new ConditionNode();
+        // findMoveCheck.SetName("find move check");
+        // findMoveCheck.ConditionCheckFunc = IngameManager.CheckFindMove;
+        // baseSelector.AddNode(findMoveCheck);
+        //
+        // var moveSelector = new SelectorNode();
+        // moveSelector.SetName("move selector");
+        // findMoveCheck.AddNode(moveSelector);
+        //
+        // var move = new MoveNode();
+        // move.SetName("move");
+        // var hide = new HideNode();
+        // hide.SetName("hide");
+        // moveSelector.AddNode(move);
+        // moveSelector.AddNode(hide);
+        //
+        // var idle = new IdleNode();
+        // idle.SetName("idle");
+        // baseSelector.AddNode(idle)
+        data.behaviorTree = tree;
         return data;
     }
-
+    
     public List<LauncherTable> GetLauncherTableList(int charIdx)
     {
         var charTable = GetRecord<CharacterTable>(charIdx);

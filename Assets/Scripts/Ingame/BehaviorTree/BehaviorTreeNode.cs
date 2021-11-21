@@ -21,6 +21,18 @@ public class BehaviorTreeNode
     public IBehaviorTreeOwner Owner => _owner;
     protected string _nodeName;
 
+    public virtual BehaviorTreeNode FindNode(string name)
+    {
+        if(_nodeName == name)
+            return this;
+        else
+            return null;
+    }
+
+    public virtual void SetNodeAction(string actionName)
+    {
+    }
+
     public virtual void SetName(string name)
     {
         _nodeName = name;
@@ -102,6 +114,21 @@ public class CompositeNode : BehaviorTreeNode
     protected int _curStep;
     protected BehaviorTreeNode _curNode;
     protected List<BehaviorTreeNode> _childList = new List<BehaviorTreeNode>();
+
+    public override BehaviorTreeNode FindNode(string name)
+    {
+        var result = base.FindNode(name);
+        if (result == null)
+        {
+            for (int i = 0; i < _childList.Count; ++i)
+            {
+                result = _childList[i].FindNode(name);
+                if (result != null)
+                    return result;
+            }
+        }
+        return result;
+    }
 
     public override void SetOwner(IBehaviorTreeOwner owner)
     {
@@ -255,6 +282,14 @@ public class DecoratorNode : BehaviorTreeNode
 {
     protected BehaviorTreeNode _child;
 
+    public override BehaviorTreeNode FindNode(string name)
+    {
+        var result = base.FindNode(name);
+        if (result == null)
+            result = _child.FindNode(name);
+        return result;
+    }
+
     public override void SetOwner(IBehaviorTreeOwner owner)
     {
         base.SetOwner(owner);
@@ -341,6 +376,19 @@ public class ConditionNode : DecoratorNode
         }
         else
             return BehaviorNodeState.Fail;
+    }
+
+    public override void SetNodeAction(string actionName)
+    {
+        switch (actionName)
+        {
+            case "CheckFindEnemy":
+                ConditionCheckFunc = IngameManager.CheckFindEnemy;
+                break;
+            case "CheckFindMove":
+                ConditionCheckFunc = IngameManager.CheckFindMove;
+                break;
+        }
     }
 }
 #endregion

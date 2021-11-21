@@ -46,8 +46,7 @@ public class Spawner : MonoBehaviour
                 var initData = new CharacterBase.CharacterInitData();
                 initData.charData = _curSpawnData.spawnCharacter;
                 initData.launcherTableList = DataManager.Instance.GetLauncherTableList(initData.charData.index);
-                //TODO:ai인덱스 연결
-                initData.aiData = DataManager.Instance.CreateAIData(-1);
+                initData.aiData = DataManager.Instance.CreateAIData(_curSpawnData.spawnCharacter.aiDataName);
                 enemy.Init(initData);
                 enemy.CachedTransform.rotation = Quaternion.Euler(0, -180, 0);
                 return enemy;
