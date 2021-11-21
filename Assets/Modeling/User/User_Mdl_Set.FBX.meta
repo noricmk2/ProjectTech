@@ -1,8 +1,11 @@
 fileFormatVersion: 2
-guid: 576875cbd1977834594ac37ad524369b
+guid: d82fc7c02d6e1f645be9ba10a1b4fd91
 ModelImporter:
   serializedVersion: 20200
-  internalIDToNameTable: []
+  internalIDToNameTable:
+  - first:
+      74: -634878154616825411
+    second: User_Mdl_Set
   externalObjects: {}
   materials:
     materialImportMode: 0
@@ -40,7 +43,7 @@ ModelImporter:
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
     importVisibility: 0
-    importBlendShapes: 0
+    importBlendShapes: 1
     importCameras: 0
     importLights: 0
     fileIdsGeneration: 2
@@ -94,7 +97,7 @@ ModelImporter:
   autoGenerateAvatarMappingIfUnspecified: 1
   animationType: 2
   humanoidOversampling: 1
-  avatarSetup: 0
+  avatarSetup: 1
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
   additionalBone: 0
   userData: 
