@@ -78,3 +78,19 @@ public enum MapDetailValueType
     StatusIndex = 0,
     SpawnerName = 1,
 }
+
+public enum BehaviorNodeType
+{
+    SelectorNode,
+    ConditionNode,
+    DecoratorNode,
+    RandomSelector,
+    Repeater,
+    SequenceNode,
+    AttackNode,
+    DeadNode,
+    ExcuteSkillNode,
+    HideNode,
+    IdleNode,
+    MoveNode,
+}

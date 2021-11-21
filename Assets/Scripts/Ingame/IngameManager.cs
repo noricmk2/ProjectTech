@@ -78,6 +78,7 @@ public class IngameManager : MonoSingleton<IngameManager>
         _stateMachine.AddState(initState);
         _stateMachine.AddState(startState);
         _stateMachine.AddState(updateState);
+        _stateMachine.AddState(endState);
     }
 
     private void IngameStart()

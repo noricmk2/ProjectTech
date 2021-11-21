@@ -1,0 +1,18 @@
+<linker>
+  <assembly fullname="Assembly-CSharp">
+    <type fullname="BehaviorTreeNode" preserve="all"/>
+    <type fullname="CompositeNode" preserve="all"/>
+    <type fullname="ConditionNode" preserve="all"/>
+    <type fullname="DecoratorNode" preserve="all"/>
+    <type fullname="RandomSelector" preserve="all"/>
+    <type fullname="Repeater" preserve="all"/>
+    <type fullname="SelectorNode" preserve="all"/>
+    <type fullname="SequenceNode" preserve="all"/>
+    <type fullname="AttackNode" preserve="all"/>
+    <type fullname="DeadNode" preserve="all"/>
+    <type fullname="ExcuteSkillNode" preserve="all"/>
+    <type fullname="HideNode" preserve="all"/>
+    <type fullname="IdleNode" preserve="all"/>
+    <type fullname="MoveNode" preserve="all"/>
+  </assembly>
+</linker>

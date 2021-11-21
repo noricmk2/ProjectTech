@@ -9,12 +9,14 @@ public class CharacterTable : TableData
     private int[] _skillIndexes;
     private int _characterType;
     private int[] _launcherIndexes;
+    private string _aiData;
 
     public string ResourceName => _resourceName;
     public int StatusIndex => _statusIndex;
     public int[] SkillIndexes => _skillIndexes;
     public CharacterType CharacterType => (CharacterType)_characterType;
     public int[] LanucherIndexes => _launcherIndexes;
+    public string AIData => _aiData;
 
     public override void ParsingData(string line)
     {
@@ -24,5 +26,6 @@ public class CharacterTable : TableData
         _skillIndexes = ReadIntArray(_tabs[3]);
         _characterType = ReadInt(_tabs[4]);
         _launcherIndexes = ReadIntArray(_tabs[5]);
+        _aiData = _tabs[6];
     }
 }

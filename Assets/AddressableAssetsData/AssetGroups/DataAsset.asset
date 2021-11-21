@@ -25,6 +25,10 @@ MonoBehaviour:
     m_Address: CameraData
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 6efa1f669e5b5b246a084e2a6da58e5c
+    m_Address: TestAI1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 26a9d6b7bd67ec0428730bae9199c281, type: 2}
   m_SchemaSet:

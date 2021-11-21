@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class PlayerCharacter : CharacterBase
 {
@@ -10,14 +11,9 @@ public class PlayerCharacter : CharacterBase
         base.Init(data);
         if (data.aiData != null)
         {
-            var aiRootNode = data.aiData.rootNode;
-            if (aiRootNode == null)
-                DebugEx.LogError($"[Failed] {data.charData.index} has no aiData");
-            else
-            {
-                aiRootNode.SetOwner(this);
-                _behaviorTree.Init(aiRootNode);
-            }   
+            _behaviorTree = data.aiData.behaviorTree;
+            Assert.IsNotNull(_behaviorTree, $"[Failed] {data.charData.index} has no aiData");
+            _behaviorTree.SetOwner(this);
         }
     }
 }

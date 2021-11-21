@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TCUtil;
 using UnityEngine;
+using UnityEngine.Assertions;
 
 public class EnemyCharacter : CharacterBase
 {
@@ -12,15 +13,9 @@ public class EnemyCharacter : CharacterBase
     public override void Init(CharacterInitData data)
     {
         base.Init(data);
-        var aiRootNode = data.aiData.rootNode;
-        if (aiRootNode == null)
-            DebugEx.LogError($"[Failed] {data.charData.index} has no aiData");
-        else
-        {
-            aiRootNode.SetOwner(this);
-            _behaviorTree.Init(aiRootNode);
-        }
-
+        _behaviorTree = data.aiData.behaviorTree;
+        Assert.IsNotNull(_behaviorTree, $"[Failed] {data.charData.index} has no aiData");
+        _behaviorTree.SetOwner(this);
         _attackTarget = null;
         gameObject.name = string.Concat(gameObject.name, GetInstanceID());
     }
