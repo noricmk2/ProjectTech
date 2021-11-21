@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,8 +8,7 @@ using System.Linq;
 public class CustomTileMapEditor : Editor
 {
     int _lastHandleID = -1;
-
-
+    
     public CustomTileMap _tileMap;
     public class SceneViewEditorWindow
     {
@@ -49,7 +49,7 @@ public class CustomTileMapEditor : Editor
 
         private Vector2 _pos = new Vector2(20, 20);
         private Vector2 _size = new Vector2(1200, 900);
-        private Vector2 _hideSize = new Vector2(10, 10);
+        private Vector2 _hideSize = new Vector2(10, 5);
         private Vector2 _tileSize = new Vector2(50, 50);
         private int _anchor = 0;
         private int _bottomBaseOffset = 50;
@@ -63,6 +63,12 @@ public class CustomTileMapEditor : Editor
         private readonly string _spritePathPlayerPrefsKey = "SpritePath";
         private int _curIndex = 0;
         bool _isHide = false;
+        #region BuildVariable
+        private int _xBuildSize;
+        private int _yBuildSize;
+        #endregion
+        
+   
         public void Init(float x, float y, float width, float height, int anchor = 0)
         {
             _spritesPath = PlayerPrefs.GetString(_spritePathPlayerPrefsKey, Application.dataPath + "/Resources/TileSample");
@@ -115,8 +121,7 @@ public class CustomTileMapEditor : Editor
              
                 GUILayout.Window(controlId, CreateRect(scn, _pos, _size, _anchor, _tileMap), OnDisplay, "TileMap");
                 int id = GUIUtility.GetControlID("CustomTileMapEditor".GetHashCode(), FocusType.Passive);
-
-
+                
                 switch (Event.current.GetTypeForControl(id))
                 {
                     case EventType.MouseDown:
@@ -127,16 +132,10 @@ public class CustomTileMapEditor : Editor
                             {
                                 CreateTileOnClick();
                             }
-                    
-                            
-
                         }
                         break;
 
                 }
-
-               
-
             }
         }
         
@@ -154,8 +153,6 @@ public class CustomTileMapEditor : Editor
 
         void CreateTileOnClick()
         {
-         
-
             var p = new Plane(_tileMap.transform.TransformDirection(Vector3.forward), Vector3.zero);
             Ray worldRay = HandleUtility.GUIPointToWorldRay(Event.current.mousePosition);
             RaycastHit hitInfo;
@@ -183,9 +180,6 @@ public class CustomTileMapEditor : Editor
                 var x = Mathf.Floor(invHitPos.x / tileSize) * tileSize;
                 var y = Mathf.Floor(invHitPos.y / tileSize) * tileSize;
                 var spawnPos = new Vector3(x, y, _tileMap.transform.position.z);
-
-
-
                 if (_tileMap.GetTileCount() == 0)
                 {
                     GameObject obj = GameObject.Instantiate(selectObject);
@@ -208,7 +202,6 @@ public class CustomTileMapEditor : Editor
                     var selectObj = Selection.activeGameObject;
                     if (selectObj != null)
                     {
-                        Debug.Log("dwdw");
                         if (selectObj.GetComponent<ChildTile>() != null)
                             CreateChildNodes(selectObj);
                         else
@@ -216,10 +209,14 @@ public class CustomTileMapEditor : Editor
 
                         }
                     }
-            }
+                }
             }
         }
 
+        void CreateMapWithSize(int x, int y)
+        {
+            
+        }
         void CreateChildNodes(GameObject baseObj)
         {
             var meshFil = baseObj.GetComponent<MeshFilter>().sharedMesh.bounds;
@@ -280,17 +277,25 @@ public class CustomTileMapEditor : Editor
             _tileMap.RegisterTileItem(new Vector2Int(x, y), copy);
         }
 
-         void OnDisplay(int id)
+        #region Display
+        void GeneralDisPlay()
         {
-            toolMode = (ToolModes)GUI.Toolbar(new Rect(10, 10, 200, 30), (int)toolMode, new[] { "Move", "Build", "Paint" });
-            _isHide = EditorGUILayout.Toggle(_isHide,"Hide");
+            _isHide= GUILayout.Toggle(_isHide,"hide");
+            toolMode= (ToolModes) GUILayout.Toolbar((int)toolMode, new[] {"Move", "Build", "Paint"});
+        }
+
+        void BuildDisplay()
+        {
+            _xBuildSize = EditorGUILayout.IntField("Build X Size",_xBuildSize);
+            _yBuildSize = EditorGUILayout.IntField("Build Y Size",_yBuildSize);
+        }
+        void PaintModeDisplay()
+        {
             EditorGUILayout.TextArea("CurSpritePath : " + _spritesPath);
         
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
 
-               
-
-            if (GUILayout.Button("Set Sprite Folder Directory(Ω∫«¡∂Û¿Ã∆Æ ∆˙¥ı ∞Ê∑Œ º≥¡§)"))
+            if (GUILayout.Button("Set Sprite Folder Directory(Ïä§ÌîÑÎùºÏù¥Ìä∏ Ìè¥Îçî Í≤ΩÎ°ú ÏÑ§Ï†ï)"))
             {
                 string  setPath = EditorUtility.OpenFolderPanel("Set Sprite Folder", _spritesPath, "");
                 if (string.IsNullOrEmpty(setPath) == false)
@@ -303,21 +308,37 @@ public class CustomTileMapEditor : Editor
             if (GUILayout.Button("Clear Tiles"))
             {
                 _tileMap.DestroyAllTiles();
-
                 _tileList.Clear();
-
-               
             }
 
-            if (GUILayout.Button("Open Sprite Folder (Ω∫«¡∂Û¿Ã∆Æ ∆˙¥ı ø¿«¬)"))
+            if (GUILayout.Button("Open Sprite Folder (Ïä§ÌîÑÎùºÏù¥Ìä∏ Ìè¥Îçî Ïò§Ìîà)"))
             {
                 Application.OpenURL(_spritesPath);
             }
-
-
             DisplayAllPrefabs();
             DisplayCurrentSelect();
             GUILayout.EndScrollView();
+        }
+         void OnDisplay(int id)
+         {
+             GeneralDisPlay();
+             if(_isHide)
+                 return;
+
+             switch (toolMode)
+             {
+                 case ToolModes.Transform:
+                     break;
+                 case ToolModes.Building:
+                     BuildDisplay();
+                     break;
+                 case ToolModes.Painting:
+                     PaintModeDisplay();
+                     break;
+                 default:
+                     throw new ArgumentOutOfRangeException();
+             }
+           
         }
 
         void DisplayAllPrefabs()
@@ -336,7 +357,7 @@ public class CustomTileMapEditor : Editor
                 GUILayout.Box(_selectTexture);
             }
         }
-
+        #endregion
         private void SelectTile(GameObject selectObj)
         {
             if (_selectPrefab != selectObj)
@@ -371,6 +392,6 @@ public class CustomTileMapEditor : Editor
     private void OnEnable()
     {
         SceneViewEditorWindow.Instance.TileMap = (CustomTileMap)target;
-        SceneViewEditorWindow.Instance.Init(20, 20, 500, 500,0);
+        SceneViewEditorWindow.Instance.Init(20, 20, 500, 250,0);
     }
 }

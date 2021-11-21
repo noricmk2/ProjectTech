@@ -1,39 +1,16 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class CustomTileMap : MonoBehaviour
 {
-    public class Tile : IEqualityComparer<Tile>
+    [System.Serializable]
+    public class Tile
     {
-        private int _id;
-        private int _x;
-        private int _y;
-
-        public override bool Equals(object obj)
-        {
-            return false;
-        }
-
-        public bool Equals(Tile x, Tile y)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override int GetHashCode()
-        {
-            return _id;
-        }
-
-        public int GetHashCode(Tile obj)
-        {
-            throw new System.NotImplementedException();
-        }
-
-        public override string ToString()
-        {
-            return _id.ToString();
-        }
+        public int x;
+        public int y;
+        public int tileIndex;
     }
 
 
@@ -51,6 +28,7 @@ public class CustomTileMap : MonoBehaviour
     Dictionary<Vector2Int,List<GameObject>> _spawnablePostions = new Dictionary<Vector2Int, List<GameObject>>();
 
     List<ChildTile> _childTiles = new List<ChildTile>();
+    
     public Material CopyObjMaterial { get => _copyObjMaterial; }
   //  public Dictionary<Vector2Int,GameObject> SpawnablePostions { get => _spawnablePostions; set => _spawnablePostions = value; }
     public Material OriginMaterial { get => _originMaterial; set => _originMaterial = value; }
@@ -75,8 +53,9 @@ public class CustomTileMap : MonoBehaviour
     {
         List<GameObject> itemList = null;
         if(_spawnablePostions.TryGetValue(pos , out itemList) == false)
-        {
+        { 
             itemList = new List<GameObject>();
+            _spawnablePostions.Add(pos,itemList);
         }
 
         itemList.Add(obj);
