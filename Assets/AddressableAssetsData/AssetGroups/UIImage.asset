@@ -1,0 +1,33 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: bbb281ee3bf0b054c82ac2347e9e782c, type: 3}
+  m_Name: UIImage
+  m_EditorClassIdentifier: 
+  m_GroupName: UIImage
+  m_Data:
+    m_SerializedData: []
+  m_GUID: aa8acb2fa40d1604581a5c19c47ea796
+  m_SerializeEntries:
+  - m_GUID: c0f31de405e54ea408b4c15887849973
+    m_Address: UIImage
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 7df2ea8ef2fc53c45bf2783987f1da10
+    m_Address: AtlasIngame
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  m_ReadOnly: 0
+  m_Settings: {fileID: 11400000, guid: 26a9d6b7bd67ec0428730bae9199c281, type: 2}
+  m_SchemaSet:
+    m_Schemas:
+    - {fileID: 11400000, guid: 36854afdc049ca94e92d177146518439, type: 2}
+    - {fileID: 11400000, guid: c6cb1a7f3ee775643af182151b7f2217, type: 2}
