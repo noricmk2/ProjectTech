@@ -277,57 +277,6 @@ public class DataManager : Singleton<DataManager>
         }
 
         var data = new CharacterBase.AIData();
-        
-        // var rootNode = new SelectorNode();
-        // rootNode.SetName("root");
-        // var baseSelector = new SelectorNode();
-        // baseSelector.SetName("base selector");
-        // rootNode.AddNode(baseSelector);
-        //
-        // var deadCheck = new ConditionNode();
-        // deadCheck.SetName("dead check");
-        // deadCheck.ConditionCheckFunc = null;
-        // baseSelector.AddNode(deadCheck);
-        //
-        // var dead = new DeadNode();
-        // dead.SetName("dead");
-        // deadCheck.AddNode(dead);
-        //
-        // var findEnemyCheck = new ConditionNode();
-        // findEnemyCheck.SetName("find enemy check");
-        // findEnemyCheck.ConditionCheckFunc = IngameManager.CheckFindEnemy;
-        // baseSelector.AddNode(findEnemyCheck);
-        //
-        // var attackSequence = new SequenceNode();
-        // attackSequence.SetName("attack sequence");
-        // findEnemyCheck.AddNode(attackSequence);
-        //
-        // var attack = new AttackNode();
-        // attack.SetName("attack");
-        // // var skill = new ExcuteSkillNode();
-        // // skill.SetName("skill");
-        // attackSequence.AddNode(attack);
-        // //attackSequence.AddNode(skill);
-        //
-        // var findMoveCheck = new ConditionNode();
-        // findMoveCheck.SetName("find move check");
-        // findMoveCheck.ConditionCheckFunc = IngameManager.CheckFindMove;
-        // baseSelector.AddNode(findMoveCheck);
-        //
-        // var moveSelector = new SelectorNode();
-        // moveSelector.SetName("move selector");
-        // findMoveCheck.AddNode(moveSelector);
-        //
-        // var move = new MoveNode();
-        // move.SetName("move");
-        // var hide = new HideNode();
-        // hide.SetName("hide");
-        // moveSelector.AddNode(move);
-        // moveSelector.AddNode(hide);
-        //
-        // var idle = new IdleNode();
-        // idle.SetName("idle");
-        // baseSelector.AddNode(idle)
         data.behaviorTree = tree;
         return data;
     }

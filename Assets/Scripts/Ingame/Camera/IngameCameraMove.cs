@@ -34,7 +34,8 @@ public class IngameCameraMove : MonoBehaviour
     {
         _curCameraState = CameraState.Stational;
     }
-
+    
+    //TODO:타겟 삭제시 처리
     public void SetFollowData(FollowMoveData data)
     {
         _followData = data;
@@ -50,6 +51,7 @@ public class IngameCameraMove : MonoBehaviour
         }
     }
 
+    //쉐이크 구현
     public void SetShakeData(ShakeData data)
     {
         _shakeData = data;

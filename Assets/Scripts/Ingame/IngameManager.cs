@@ -20,6 +20,7 @@ public class IngameManager : MonoSingleton<IngameManager>
     [SerializeField] private Transform _proejctileRoot;
     [SerializeField] private Camera _ingameCamera;
     [SerializeField] private IngameCameraMove _cameraMove;
+    [SerializeField] private Canvas _ingameCanvas;
     #endregion
 
     #region Property
@@ -28,10 +29,12 @@ public class IngameManager : MonoSingleton<IngameManager>
     private ProjectileController _projectileController = new ProjectileController();
     private WaveController _waveController = new WaveController();
     private QuadTreeController _quadTreeController = new QuadTreeController();
+    private IngameUIController _ingameUIController = new IngameUIController();
     public IngameCameraMove CameraMove => _cameraMove;
     public Camera IngameCamera => _ingameCamera;
     public Transform CharacterRoot => _characterRoot;
     public Transform ProjectileRoot => _proejctileRoot;
+    public Canvas IngameCanvas => _ingameCanvas;
 
     private bool _initComplete;
     #endregion
@@ -60,6 +63,9 @@ public class IngameManager : MonoSingleton<IngameManager>
         _charController.Init();
         _waveController.Init(stageData.waveList);
         _projectileController.Init();
+        var uiData = new IngameUIController.InitData();
+        uiData.ingameCanvas = _ingameCanvas;
+        _ingameUIController.Init(uiData);
         
         _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit); 
     }

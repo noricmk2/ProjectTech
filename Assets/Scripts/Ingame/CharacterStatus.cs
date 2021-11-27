@@ -7,6 +7,7 @@ public class CharacterStatus
     private StatusData _orgStatusData;
     private StatusData _curStatusData;
     private CharacterBase _owner;
+    public float MaxHP => _orgStatusData.hp;
     
     public void Init(CharacterBase owner, StatusData data)
     {
