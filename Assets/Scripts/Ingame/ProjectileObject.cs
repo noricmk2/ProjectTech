@@ -32,7 +32,6 @@ public class ProjectileObject : MoveObject, IPoolObjectBase
         _dir = _target.position - CachedTransform.position;
         _dir.y = 0;
         _dir = _dir.normalized;
-        SetRotate(_dir);
     }
 
     public void OnCollisionEnter(Collision other)
@@ -54,6 +53,8 @@ public class ProjectileObject : MoveObject, IPoolObjectBase
     public override void OnUpdate()
     {
         base.OnUpdate();
+        SetRotate(_dir);
+
         switch (_moveType)
         {
             case ProjectileMoveType.Curved:
