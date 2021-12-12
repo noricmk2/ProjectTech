@@ -32,6 +32,7 @@ public class ProjectileObject : MoveObject, IPoolObjectBase
         _dir = _target.position - CachedTransform.position;
         _dir.y = 0;
         _dir = _dir.normalized;
+        SetRotate(_dir);
     }
 
     public void OnCollisionEnter(Collision other)

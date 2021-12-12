@@ -42,6 +42,7 @@ GameObject:
   - component: {fileID: 602544629001463724}
   - component: {fileID: 6826480605577772502}
   - component: {fileID: 1229675784530377285}
+  - component: {fileID: -4812505768797155983}
   m_Layer: 0
   m_Name: PlayerCharacter1
   m_TagString: Untagged
@@ -100,6 +101,20 @@ MonoBehaviour:
   _animator: {fileID: 6826480605577772502}
   _laucherSlots:
   - {fileID: 3343986295251202916}
+--- !u!136 &-4812505768797155983
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 222782536366161174}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &256784502109627494
 GameObject:
   m_ObjectHideFlags: 0

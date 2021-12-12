@@ -38,7 +38,7 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 8500c93efda601e4caf1ba034174aaf9
-    m_Address: TestProjectile
+    m_Address: EnemyBullet1
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 3a709b9749013a34b8a2b2a44736e30e

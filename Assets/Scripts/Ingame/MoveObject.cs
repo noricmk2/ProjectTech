@@ -39,6 +39,11 @@ public class MoveObject : ObjectBase
         _curState = MoveState.Stational;
     }
 
+    public virtual void SetRotate(Vector3 dir)
+    {
+        CachedTransform.rotation = Quaternion.LookRotation(dir);
+    }
+
     public virtual void MoveDirection(Vector3 direction, float speed, bool moveLocal = true)
     {
         var velocity = direction * Time.deltaTime * speed;
