@@ -5,7 +5,7 @@ namespace UnityEditor.TreeViewExamples
 {
 	
 	[CreateAssetMenu (fileName = "TreeDataAsset", menuName = "Tree Asset", order = 1)]
-	public class MyTreeAsset : ScriptableObject
+	public class BehaviorTreeAsset : ScriptableObject
 	{
 		[SerializeField] List<BehaviorTreeElement> m_TreeElements = new List<BehaviorTreeElement> ();
 

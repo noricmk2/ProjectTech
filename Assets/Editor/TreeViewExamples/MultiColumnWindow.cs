@@ -15,13 +15,16 @@ namespace UnityEditor.TreeViewExamples
 		[SerializeField] MultiColumnHeaderState m_MultiColumnHeaderState;
 		SearchField m_SearchField;
 		MultiColumnTreeView m_TreeView;
-		MyTreeAsset m_MyTreeAsset;
+		BehaviorTreeAsset _behaviorTreeAsset;
+		List<BehaviorTreeElement> _editorTreeList = new List<BehaviorTreeElement>();
+		int _allowDepth = 0;
+		string _assetName = String.Empty;
 
-		[MenuItem("TreeView Examples/Multi Columns")]
+		[MenuItem("ProjectTech/BehaviorTreeEditor")]
 		public static MultiColumnWindow GetWindow ()
 		{
 			var window = GetWindow<MultiColumnWindow>();
-			window.titleContent = new GUIContent("Multi Columns");
+			window.titleContent = new GUIContent("Tree Editor");
 			window.Focus();
 			window.Repaint();
 			return window;
@@ -30,7 +33,7 @@ namespace UnityEditor.TreeViewExamples
 		[OnOpenAsset]
 		public static bool OnOpenAsset (int instanceID, int line)
 		{
-			var myTreeAsset = EditorUtility.InstanceIDToObject (instanceID) as MyTreeAsset;
+			var myTreeAsset = EditorUtility.InstanceIDToObject (instanceID) as BehaviorTreeAsset;
 			if (myTreeAsset != null)
 			{
 				var window = GetWindow ();
@@ -40,9 +43,9 @@ namespace UnityEditor.TreeViewExamples
 			return false; // we did not handle the open
 		}
 
-		void SetTreeAsset (MyTreeAsset myTreeAsset)
+		void SetTreeAsset (BehaviorTreeAsset behaviorTreeAsset)
 		{
-			m_MyTreeAsset = myTreeAsset;
+			_behaviorTreeAsset = behaviorTreeAsset;
 			m_Initialized = false;
 		}
 
@@ -97,11 +100,24 @@ namespace UnityEditor.TreeViewExamples
 		
 		IList<BehaviorTreeElement> GetData ()
 		{
-			if (m_MyTreeAsset != null && m_MyTreeAsset.treeElements != null && m_MyTreeAsset.treeElements.Count > 0)
-				return m_MyTreeAsset.treeElements;
+			if (_behaviorTreeAsset != null && _behaviorTreeAsset.treeElements != null && _behaviorTreeAsset.treeElements.Count > 0)
+				return _behaviorTreeAsset.treeElements;
+			else
+			{
+				if (_editorTreeList.Count == 0)
+				{
+					var root = new BehaviorTreeElement(BehaviorNodeType.SelectorNode, "Root", true, String.Empty, -1, 0, String.Empty, 0);
+					_editorTreeList.Add(root);
+					MyTreeElementGenerator.AddChildrenRecursive(root, 1, true, _editorTreeList.Count + 1, ref _allowDepth, _editorTreeList);
+				}
 
-			// generate some test data
-			return MyTreeElementGenerator.GenerateRandomTree(130); 
+				return _editorTreeList;
+			}
+		}
+
+		public void AddNewElement(BehaviorTreeElement parent)
+		{
+			MyTreeElementGenerator.AddChildrenRecursive(parent, 1, true, _editorTreeList.Count + 1, ref _allowDepth, _editorTreeList);
 		}
 
 		void OnSelectionChange ()
@@ -109,10 +125,10 @@ namespace UnityEditor.TreeViewExamples
 			if (!m_Initialized)
 				return;
 
-			var myTreeAsset = Selection.activeObject as MyTreeAsset;
-			if (myTreeAsset != null && myTreeAsset != m_MyTreeAsset)
+			var myTreeAsset = Selection.activeObject as BehaviorTreeAsset;
+			if (myTreeAsset != null && myTreeAsset != _behaviorTreeAsset)
 			{
-				m_MyTreeAsset = myTreeAsset;
+				_behaviorTreeAsset = myTreeAsset;
 				m_TreeView.treeModel.SetData (GetData ());
 				m_TreeView.Reload ();
 			}
@@ -143,7 +159,6 @@ namespace UnityEditor.TreeViewExamples
 
 			using (new EditorGUILayout.HorizontalScope ())
 			{
-
 				var style = "miniButton";
 				if (GUILayout.Button("Expand All", style))
 				{
@@ -154,47 +169,43 @@ namespace UnityEditor.TreeViewExamples
 				{
 					treeView.CollapseAll ();
 				}
-
-				GUILayout.FlexibleSpace();
-
-				GUILayout.Label (m_MyTreeAsset != null ? AssetDatabase.GetAssetPath (m_MyTreeAsset) : string.Empty);
-
-				GUILayout.FlexibleSpace ();
-
-				if (GUILayout.Button("Set sorting", style))
-				{
-					var myColumnHeader = (MyMultiColumnHeader)treeView.multiColumnHeader;
-					myColumnHeader.SetSortingColumns (new int[] {4, 3, 2}, new[] {true, false, true});
-					myColumnHeader.mode = MyMultiColumnHeader.Mode.LargeHeader;
-				}
-
-
-				GUILayout.Label ("Header: ", "minilabel");
-				if (GUILayout.Button("Large", style))
-				{
-					var myColumnHeader = (MyMultiColumnHeader) treeView.multiColumnHeader;
-					myColumnHeader.mode = MyMultiColumnHeader.Mode.LargeHeader;
-				}
-				if (GUILayout.Button("Default", style))
-				{
-					var myColumnHeader = (MyMultiColumnHeader)treeView.multiColumnHeader;
-					myColumnHeader.mode = MyMultiColumnHeader.Mode.DefaultHeader;
-				}
-				if (GUILayout.Button("No sort", style))
-				{
-					var myColumnHeader = (MyMultiColumnHeader)treeView.multiColumnHeader;
-					myColumnHeader.mode = MyMultiColumnHeader.Mode.MinimumHeaderWithoutSorting;
-				}
-
-				GUILayout.Space (10);
 				
-				if (GUILayout.Button("values <-> controls", style))
+				if(GUILayout.Button("Save", style))
 				{
-					treeView.showControls = !treeView.showControls;
+					SaveCurrent();
 				}
+
+				_assetName = GUILayout.TextField(_assetName);
 			}
 
 			GUILayout.EndArea();
+		}
+
+		private readonly string savePath = "Assets/LocalResource/DataAsset/";
+		private readonly string extension = ".asset";
+		
+		private void SaveCurrent()
+		{
+			var saveData = new AIRawData();
+			saveData.treeDataList = new List<BehaviorTreeData>();
+			var treeModel = treeView.treeModel;
+			
+			TreeElementUtility.TreeToList(treeModel.root, _editorTreeList);
+			
+			for (int i = 0; i < _editorTreeList.Count; ++i)
+			{
+				var data = new BehaviorTreeData();
+				data.Level = _editorTreeList[i].Level;
+				data.Order = _editorTreeList[i].Order;
+				data.ActionName = _editorTreeList[i].ActionName;
+				data.IsRoot = _editorTreeList[i].IsRoot;
+				data.NodeName = _editorTreeList[i].NodeName;
+				data.ParentName = _editorTreeList[i].ParentName;
+				data.NodeType = _editorTreeList[i].NodeType;
+				saveData.treeDataList.Add(data);
+			}
+			AssetDatabase.CreateAsset(saveData, string.Concat(savePath, _assetName, extension));
+			AssetDatabase.SaveAssets();
 		}
 	}
 

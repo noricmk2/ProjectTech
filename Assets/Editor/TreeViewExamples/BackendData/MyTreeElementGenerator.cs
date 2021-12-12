@@ -29,7 +29,7 @@ namespace UnityEditor.TreeViewExamples
 
 			return treeElements;
 		}
-		static void AddChildrenRecursive(TreeElement element, int numChildren, bool force, int numTotalElements, ref int allowedDepth, List<BehaviorTreeElement> treeElements)
+		public static void AddChildrenRecursive(TreeElement element, int numChildren, bool force, int numTotalElements, ref int allowedDepth, List<BehaviorTreeElement> treeElements)
 		{
 			if (element.depth >= allowedDepth)
 			{

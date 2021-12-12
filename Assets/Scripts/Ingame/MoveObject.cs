@@ -120,6 +120,12 @@ public class MoveObject : ObjectBase
                 {
                     DebugEx.Log($"[Notify] move path end : {this}");
                     _onPathEnd?.Invoke(this);
+                    if (this is CharacterBase)
+                    {
+                        var character = this as CharacterBase;
+                        character.OnMoveEnd();
+                    }
+
                     _curState = MoveState.Stational;
                     return;
                 }

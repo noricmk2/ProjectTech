@@ -69,7 +69,7 @@ public class Launcher
 
     private void Reload()
     {
-        DebugEx.Log($"[Reload] {_owner}");
+        //DebugEx.Log($"[Reload] {_owner}");
         if (_reloadDeltaTime < _tableData.ReloadTime)
             _reloadDeltaTime += Time.deltaTime;
         else

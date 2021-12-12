@@ -7,16 +7,16 @@ using UnityEditor.IMGUI.Controls;
 namespace UnityEditor.TreeViewExamples
 {
 
-	[CustomEditor (typeof(MyTreeAsset))]
+	[CustomEditor (typeof(BehaviorTreeAsset))]
 	public class MyTreeAssetEditor : Editor
 	{
 		MyTreeView m_TreeView;
 		SearchField m_SearchField;
 		const string kSessionStateKeyPrefix = "TVS";
 
-		MyTreeAsset asset
+		BehaviorTreeAsset asset
 		{
-			get { return (MyTreeAsset) target; }
+			get { return (BehaviorTreeAsset) target; }
 		}
 
 		void OnEnable ()

@@ -34,9 +34,11 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     protected List<ActiveSkillBase> _ownSkillList = new List<ActiveSkillBase>();
     protected List<Launcher> _laucherList = new List<Launcher>();
     protected CharacterType _curCharType;
+    private string _prevTrigger;
 
     protected readonly float defaultAttackTerm = 1f;
     protected readonly float rotateSpeed = 3f;
+    protected readonly string ingameAnimatorSuffix = "_Ingame_Controller";
 
     public bool WaitRemove
     {
@@ -45,6 +47,13 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
 
     public virtual void Init(CharacterInitData data)
     {
+        if (_animator != null)
+        {
+            _animator.runtimeAnimatorController =
+                AddressableManager.Instance.LoadAssetSync<RuntimeAnimatorController>(
+                    string.Concat(data.charData.resourceName, ingameAnimatorSuffix));
+        }
+
         _curCharType = data.charData.characterType;
         _waitRemove = false;
         _enableAI = false;
@@ -58,6 +67,29 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
             initData.tableData = data.launcherTableList[i];
             launcher.Init(initData);
             _laucherList.Add(launcher);
+        }
+    }
+
+    public override void MovePath(List<Vector3> path, float speed, Action<MoveObject> onPathEnd, bool withRotate = true)
+    {
+        base.MovePath(path, speed, onPathEnd, withRotate);
+        SetAnimatorTrigger("Run");
+    }
+
+    public virtual void OnMoveEnd()
+    {
+        SetAnimatorTrigger("Idle");
+    }
+
+    public virtual void SetAnimatorTrigger(string trigger)
+    {
+        if (_animator)
+        {
+            DebugEx.Log($"[Animator] Set Trigger {trigger}");
+            if(!string.IsNullOrEmpty(_prevTrigger))
+                _animator.ResetTrigger(_prevTrigger);
+            _animator.SetTrigger(trigger);
+            _prevTrigger = trigger;
         }
     }
 
@@ -118,6 +150,12 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     public virtual void Release()
     {
         _delayDeltaTime = 0;
+        if (_animator)
+        {
+            _animator.Rebind();
+            _animator.Update(0);
+            _animator.runtimeAnimatorController = null;
+        }
     }
 
     public void PushAction()

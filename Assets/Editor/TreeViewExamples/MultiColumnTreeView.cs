@@ -31,7 +31,8 @@ namespace UnityEditor.TreeViewExamples
 			ParentName,
 			Level,
 			Order,
-			ActionName
+			ActionName,
+			AddBtn,
 		}
 
 		public enum SortOption
@@ -94,66 +95,14 @@ namespace UnityEditor.TreeViewExamples
 			Reload();
 		}
 
-
 		// Note we We only build the visible rows, only the backend has the full tree information. 
 		// The treeview only creates info for the row list.
 		protected override IList<TreeViewItem> BuildRows(TreeViewItem root)
 		{
 			var rows = base.BuildRows (root);
-			SortIfNeeded (root, rows);
 			return rows;
 		}
-
-		void OnSortingChanged (MultiColumnHeader multiColumnHeader)
-		{
-			SortIfNeeded (rootItem, GetRows());
-		}
-
-		void SortIfNeeded (TreeViewItem root, IList<TreeViewItem> rows)
-		{
-			return;
-			if (rows.Count <= 1)
-				return;
-			
-			if (multiColumnHeader.sortedColumnIndex == -1)
-			{
-				return; // No column to sort for (just use the order the data are in)
-			}
-			
-			// Sort the roots of the existing tree items
-			SortByMultipleColumns ();
-			TreeToList(root, rows);
-			Repaint();
-		}
-
-		void SortByMultipleColumns ()
-		{
-			var sortedColumns = multiColumnHeader.state.sortedColumns;
-
-			if (sortedColumns.Length == 0)
-				return;
-
-			var myTypes = rootItem.children.Cast<TreeViewItem<BehaviorTreeElement> >();
-			var orderedQuery = InitialOrder (myTypes, sortedColumns);
-			for (int i=1; i<sortedColumns.Length; i++)
-			{
-				SortOption sortOption = m_SortOptions[sortedColumns[i]];
-				bool ascending = multiColumnHeader.IsSortedAscending(sortedColumns[i]);
-
-				switch (sortOption)
-				{
-					case SortOption.Level:
-						orderedQuery = orderedQuery.ThenBy(l => l.data.Level, ascending);
-						break;
-					case SortOption.Order:
-						orderedQuery = orderedQuery.ThenBy(l => l.data.Order, ascending);
-						break;
-				}
-			}
-
-			rootItem.children = orderedQuery.Cast<TreeViewItem> ().ToList ();
-		}
-
+		
 		IOrderedEnumerable<TreeViewItem<BehaviorTreeElement>> InitialOrder(IEnumerable<TreeViewItem<BehaviorTreeElement>> myTypes, int[] history)
 		{
 			SortOption sortOption = m_SortOptions[history[0]];
@@ -195,7 +144,7 @@ namespace UnityEditor.TreeViewExamples
 					Rect popupRect = cellRect;
 					popupRect.x += GetContentIndent(item);
 					popupRect.width = 180;
-					item.data.NodeType = (BehaviorNodeType)EditorGUI.EnumPopup(popupRect, BehaviorNodeType.SelectorNode);
+					item.data.NodeType = (BehaviorNodeType)EditorGUI.EnumPopup(popupRect, item.data.NodeType);
 				}
 					break;
 				case BehaviorTreeColumns.Level:
@@ -222,6 +171,22 @@ namespace UnityEditor.TreeViewExamples
 						if (column == BehaviorTreeColumns.ParentName)
 							item.data.ParentName = GUI.TextField(cellRect, item.data.ParentName);
 					}
+					break;
+				case BehaviorTreeColumns.AddBtn:
+				{
+					cellRect.xMin += 5f; // When showing controls make some extr
+					if (GUI.Button(cellRect, "Add"))
+					{
+						TreeElement parent = item.data;
+						int depth = parent.depth + 1;
+						int id = treeModel.GenerateUniqueID();
+						int order = 0;
+						if (parent.hasChildren)
+							order = parent.children.Count;
+						var element = new BehaviorTreeElement (BehaviorNodeType.SelectorNode, String.Empty, false, parent.name, depth, order, String.Empty, id);
+						treeModel.AddElement(element, parent, order);
+					}
+				}
 					break;
 			}
 		}
@@ -324,6 +289,15 @@ namespace UnityEditor.TreeViewExamples
 					sortingArrowAlignment = TextAlignment.Left,
 					width = 180,
 					minWidth = 180,
+					autoResize = false
+				},
+				new MultiColumnHeaderState.Column()
+				{
+					headerTextAlignment = TextAlignment.Right,
+					sortedAscending = true,
+					sortingArrowAlignment = TextAlignment.Left,
+					width = 50,
+					minWidth = 50,
 					autoResize = false
 				}
 			};

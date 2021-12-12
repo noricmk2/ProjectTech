@@ -59,3 +59,12 @@ MonoBehaviour:
     groupTemplateApplicationMode: 0
     simplified: 1
     addressReplacement: 
+  - path: Assets/LocalResource/Animator
+    matchType: 0
+    groupName: Animator
+    LabelMode: 0
+    labelRefs: []
+    groupTemplate: {fileID: 11400000, guid: d5f9116ba386ec5488fe3a6ca30e4805, type: 2}
+    groupTemplateApplicationMode: 0
+    simplified: 1
+    addressReplacement: 
