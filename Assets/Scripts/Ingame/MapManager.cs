@@ -73,7 +73,7 @@ public class MapManager : MonoSingleton<MapManager>
             if(node == null)
                 continue;
             var tileInfo = new TileBase.TileInfo();
-            var tilePos = _tileStartPos;
+            var tilePos = Vector3.zero;
             MapDetailTable detailRecord = null;
             tileInfo.nodeInfo = node;
             tileInfo.nodeType = (MapNodeType) node.state;
