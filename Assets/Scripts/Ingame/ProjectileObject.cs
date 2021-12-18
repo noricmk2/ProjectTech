@@ -53,6 +53,8 @@ public class ProjectileObject : MoveObject, IPoolObjectBase
     public override void OnUpdate()
     {
         base.OnUpdate();
+        SetRotate(_dir);
+
         switch (_moveType)
         {
             case ProjectileMoveType.Curved:
