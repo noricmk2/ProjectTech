@@ -36,8 +36,96 @@ public class MapManager : MonoSingleton<MapManager>
         _pathfindController.Init(grid);
         _pathfindController.SetDiagonalMovement(DiagonalMovement.IfAtLeastOneWalkable);
         GenerateMap(data.width, data.height);
+        // GenerateMapWithPrefabName(data.prefabName, data.width, data.height);
     }
 
+    public void GenerateMapWithPrefabName(string prefabName,int width,int height)
+    {
+        _curMapData = new MapPlayData();
+        _curMapData.widthCount = width;
+        _curMapData.heightCount = height;
+        _curMapData.tileList = new List<TileBase>();
+        _curMapData.obstacleList = new List<ObstacleObject>();
+        int tempSpanwerCount = 1;
+        
+        var mapBase = ObjectFactory.Instance.CreateObject<MapBase>(prefabName, _mapRoot);
+        mapBase.transform.localPosition = Vector3.zero;
+        mapBase.transform.localRotation = Quaternion.identity;
+        var enumator = _curRawData.nodeList.GetEnumerator();
+        enumator.MoveNext();
+        foreach (Transform childItem in mapBase.TileBaseObj.transform)
+        {
+          //  var tileItem = childItem.GetComponent<TileBase>();
+            var tileItem = childItem.GetComponent<MapEditorTile>();
+            if(tileItem == null)
+                continue;
+            
+            
+            var node = enumator.Current;
+            if(node == null)
+                continue;
+            var tileInfo = new TileBase.TileInfo();
+            var tilePos = _tileStartPos;
+            MapDetailTable detailRecord = null;
+            tileInfo.nodeInfo = node;
+            tileInfo.nodeType = (MapNodeType) node.state;
+      
+            tilePos.x += node.X;
+            tilePos.z += node.Y;
+            // tileItem.CachedTransform.position = tilePos;
+
+
+            var detailIndex = tileItem.tileIndex;
+            if (detailIndex > 0)
+                detailRecord = DataManager.Instance.GetRecord<MapDetailTable>(detailIndex);
+            else
+            {
+                DebugEx.LogError($"[Failed] not exist map detail data : {node.X}, {node.Y}");
+                continue;
+            }
+            
+            switch (tileInfo.nodeType)
+            {
+                case MapNodeType.Block:
+                    break;
+                case MapNodeType.Road:
+                    break;
+                case MapNodeType.Spanwer:
+                    tileInfo.spanwerName = detailRecord.StringValue;
+                    ++tempSpanwerCount;
+                    break;
+                case MapNodeType.PassableObstacle:
+                {
+                    var initData = new ObstacleObject.ObstacleInitData();
+                    initData.passableObstacle = true;
+                    initData.rectSize = Vector2.one;
+                    initData.tilePos = node.pos;
+                    initData.statusData = DataManager.Instance.CreateStatusData(detailRecord.NumberValue);
+                    initData.resourceName = detailRecord.SubResourceName;
+                    var obj = CreateObstacle(tilePos, initData);
+                    _curMapData.obstacleList.Add(obj);
+                }
+                    break;
+                case MapNodeType.UnpassObstacle:
+                {
+                    var initData = new ObstacleObject.ObstacleInitData();
+                    initData.passableObstacle = false;
+                    initData.rectSize = Vector2.one;
+                    initData.tilePos = node.pos;
+                    initData.resourceName = detailRecord.SubResourceName;
+                    var obj = CreateObstacle(tilePos, initData);
+                    _curMapData.obstacleList.Add(obj);
+                }
+                    break;
+            }
+
+            tileItem.Init(tileInfo);
+            _curMapData.tileList.Add(tileItem);  
+
+            enumator.MoveNext();
+        }
+
+    }
     //TODO: 맵 프리팹 로드 및 데이터 세팅
     public void GenerateMap(int width, int height)
     {

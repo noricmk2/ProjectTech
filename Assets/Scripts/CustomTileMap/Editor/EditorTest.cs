@@ -1,67 +1,11 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
-using UnityEngine;
-using UnityEditor;
 using System.Linq;
-using System.Text;
-using DG.Tweening;
+using UnityEditor;
+using UnityEngine;
 
-[CustomEditor(typeof(CustomTileMap))]
-public class CustomTileMapEditor : Editor
-{
-    int _lastHandleID = -1;
-    
-    public CustomTileMap _tileMap;
-    public readonly static string MapPath = "/LocalResource/MapData/";
-    public readonly static string IngameDataPath ="/LocalResource/Ingame/";
-    public static void SaveMapAsFile(int xSize,string mapName,bool isPrefabSave ,GameObject target,List<MapEditorTile> tileDatas)
-    {
-        string detailSavePath = $"{Application.dataPath + MapPath}{mapName}_detail.txt";
-        string nodeSavePath = $"{Application.dataPath + MapPath}{mapName}_node.txt";
-        string prefabSavePath = $"{Application.dataPath + IngameDataPath}{mapName}.prefab";
-        StreamWriter detailWriter = File.CreateText(detailSavePath);
-        StreamWriter nodeWriter = File.CreateText(nodeSavePath);
-        int x = 0;
-        int y = 0;
-        StringBuilder detailLineBuilder = new StringBuilder("");
-        StringBuilder nodeLineBuilder = new StringBuilder("");
-        for (int i = 0; i < tileDatas.Count; i++,x++)
-        {
-            MapEditorTile tile = tileDatas[i];
-            if (x == xSize)
-            {
-                x = 0;
-                y++;
-                detailWriter.WriteLine(detailLineBuilder.ToString());
-                nodeWriter.WriteLine(nodeLineBuilder.ToString());
-                detailLineBuilder.Clear();
-                nodeLineBuilder.Clear();
-            }
-
-            if (i == tileDatas.Count - 1)
-            {
-                detailLineBuilder.Append(tile.tileIndex);
-                nodeLineBuilder.Append((int)tile.nodeType);
-            }
-            else
-            {
-                detailLineBuilder.Append($"{tile.tileIndex},");
-                nodeLineBuilder.Append($"{(int)tile.nodeType},");
-            }
-              
-        }
-        detailWriter.Close();
-        nodeWriter.Close();
-        target.transform.position = Vector3.zero;
-        if(isPrefabSave)
-            PrefabUtility.SaveAsPrefabAsset(target,prefabSavePath);
-        AssetDatabase.Refresh();
-
-    }
-    
-    public class SceneViewEditorWindow
+    public class EditorTest : EditorWindow
     {
         private CustomTileMap _tileMap;
         public enum EAnchor
@@ -80,13 +24,13 @@ public class CustomTileMapEditor : Editor
 
         private ToolModes toolMode = ToolModes.Building;
 
-        public static SceneViewEditorWindow Instance
+        public static CustomTileMapEditor.SceneViewEditorWindow Instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    _instance = new SceneViewEditorWindow();
+                    _instance = new CustomTileMapEditor.SceneViewEditorWindow();
                 }
                 return _instance;
             }
@@ -94,13 +38,13 @@ public class CustomTileMapEditor : Editor
 
         public CustomTileMap TileMap { get => _tileMap; set => _tileMap = value; }
 
-        public static SceneViewEditorWindow _instance;
+        public static CustomTileMapEditor.SceneViewEditorWindow _instance;
         public GameObject _prefabTest;
         public  Vector2 _scroll;
 
         private Vector2 _pos = new Vector2(20, 20);
         private Vector2 _size = new Vector2(1200, 900);
-        private Vector2 _hideSize = new Vector2(10, 5);
+        private Vector2 _hideSize = new Vector2(10, 10);
         private Vector2 _tileSize = new Vector2(50, 50);
         private int _anchor = 0;
         private int _bottomBaseOffset = 50;
@@ -112,17 +56,8 @@ public class CustomTileMapEditor : Editor
         private int _gridHei = 0;
         private string _spritesPath = ""; 
         private readonly string _spritePathPlayerPrefsKey = "SpritePath";
-
-        
         private int _curIndex = 0;
         bool _isHide = false;
-        #region BuildVariable
-        private int _xBuildSize;
-        private int _yBuildSize;
-        private string _mapName;
-        #endregion
-        
-   
         public void Init(float x, float y, float width, float height, int anchor = 0)
         {
             _spritesPath = PlayerPrefs.GetString(_spritePathPlayerPrefsKey, Application.dataPath + "/Resources/TileSample");
@@ -136,10 +71,13 @@ public class CustomTileMapEditor : Editor
 
             SetSpriteList();
             SelectTile(_prefabList[0]);
-            
-        
         }
-
+        [MenuItem("ProjectTech/ShowMapEditor")]
+        static void Init()
+        {
+            EditorTest window = (EditorTest)EditorWindow.GetWindow(typeof(EditorTest));
+            window.Show();
+        }
         private void SetSpriteList()
         {
             string resourceSubPath = "/Resources/";
@@ -192,6 +130,9 @@ public class CustomTileMapEditor : Editor
                         break;
 
                 }
+
+               
+
             }
         }
         
@@ -236,6 +177,9 @@ public class CustomTileMapEditor : Editor
                 var x = Mathf.Floor(invHitPos.x / tileSize) * tileSize;
                 var y = Mathf.Floor(invHitPos.y / tileSize) * tileSize;
                 var spawnPos = new Vector3(x, y, _tileMap.transform.position.z);
+
+
+
                 if (_tileMap.GetTileCount() == 0)
                 {
                     GameObject obj = GameObject.Instantiate(selectObject);
@@ -258,6 +202,7 @@ public class CustomTileMapEditor : Editor
                     var selectObj = Selection.activeGameObject;
                     if (selectObj != null)
                     {
+                        Debug.Log("dwdw");
                         if (selectObj.GetComponent<ChildTile>() != null)
                             CreateChildNodes(selectObj);
                         else
@@ -269,63 +214,6 @@ public class CustomTileMapEditor : Editor
             }
         }
 
-        private List<MapEditorTile> _tileDatas = new List<MapEditorTile>();
-        private GameObject _targetMapObj = null;
-        void CreateMapWithSize(int x, int y)
-        {
-            _tileMap.DestroyAllTiles();
-            _tileList.Clear();
-            MapDetailTable table = DataManager.Instance.GetRecord<MapDetailTable>(_baseTileIndex);
-            GameObject selectObject = Resources.Load("TileSample/"+table.TileResourceName) as GameObject;
-            if (selectObject != null)
-            {
-                Texture texture = selectObject.GetComponent<MeshRenderer>().sharedMaterial.mainTexture;
-                Debug.Log("TextureNAme  :" + texture.name);
-                float tileWid = (int)texture.width;
-                float tileHei = (int)texture.height;
-
-                var tileSize = 1;
-
-                Vector2 pos = GUIUtility.GUIToScreenPoint(Event.current.mousePosition);
-          
-                float spawnX =  tileSize;
-                float spawnY =  tileSize;
-                GameObject mapBaseObj = new GameObject("MapBase");
-                mapBaseObj.transform.SetParent(_tileMap.transform);
-                GameObject tileBaseObj = new GameObject("TileBase");
-                tileBaseObj.transform.SetParent(mapBaseObj.transform);
-               
-                _targetMapObj = mapBaseObj;
-                for(int i = 0; i < y; i++)
-                {
-                    for (int j = 0; j < x; j++)
-                    {
-                        GameObject obj = GameObject.Instantiate(selectObject);
-                        obj.transform.SetParent(tileBaseObj.transform);
-
-                        var row = spawnX / tileSize;
-                        var column = Mathf.Abs(spawnY / tileSize) - 1;
-
-                        spawnX = _tileMap.transform.position.x + (tileSize * i);
-                        spawnY = _tileMap.transform.position.y + (tileSize * j);
-
-                        // obj.transform.localPosition = spawnPos;
-                        obj.transform.position = new Vector3(spawnX, 0, spawnY);
-                        _tileDatas.Add(_tileMap.RegisterTileItem(new Vector2Int(j,i), obj,_baseTileIndex,_baseNodeType));
-                        _tileList.Add(obj);
-                        
-                    }
-                }
-
-                MapBase.MapBaseData mapBaseData = new MapBase.MapBaseData();
-                mapBaseData.mapName = _mapName;
-                mapBaseData.buildXSize = _xBuildSize;
-                mapBaseData.buildYSize = _yBuildSize;
-                mapBaseObj.AddComponent<MapBase>().SetDatas(tileBaseObj, mapBaseObj,_tileDatas,mapBaseData);
-            }
-        }
-
-        
         void CreateChildNodes(GameObject baseObj)
         {
             var meshFil = baseObj.GetComponent<MeshFilter>().sharedMesh.bounds;
@@ -386,47 +274,21 @@ public class CustomTileMapEditor : Editor
             _tileMap.RegisterTileItem(new Vector2Int(x, y), copy);
         }
 
-        #region Display
-        void GeneralDisPlay()
+        private void OnGUI()
         {
-            _isHide= GUILayout.Toggle(_isHide,"hide");
-            toolMode= (ToolModes) GUILayout.Toolbar((int)toolMode, new[] {"Move", "Build", "Paint"});
+            OnDisplay(0);
         }
 
-        private MapNodeType _baseNodeType = MapNodeType.Road;
-        private int _baseTileIndex = 1113;
-        private string _savePath;
-        void BuildDisplay()
+        void OnDisplay(int id)
         {
-            _mapName = EditorGUILayout.TextField("MapName",_mapName);
-            _xBuildSize = EditorGUILayout.IntField("Build X Size",_xBuildSize);
-            _yBuildSize = EditorGUILayout.IntField("Build Y Size",_yBuildSize);
-            _baseTileIndex = EditorGUILayout.IntField("Base Tile Index",_baseTileIndex);
-            _baseNodeType =(MapNodeType) EditorGUILayout.EnumPopup("Base Enum", _baseNodeType);
-            if (GUILayout.Button("Build"))
-            {
-                GameManager.Instance.LoadTable();
-                CreateMapWithSize(_xBuildSize,_yBuildSize);
-                SaveMapAsFile(_xBuildSize,_mapName,true,_targetMapObj,_tileDatas);
-            }
-
-            if (GUILayout.Button("Clear Tiles"))
-            {
-                _tileMap.DestroyAllTiles();
-                _tileList.Clear();
-            }
-
-            if (GUILayout.Button("Update"))
-            {
-                _savePath = EditorGUILayout.TextField("SavePath",_savePath);
-                SaveMapAsFile(_xBuildSize,_mapName,true,_targetMapObj,_tileDatas);
-            }
-        }
-        void PaintModeDisplay()
-        {
+           
+            toolMode = (ToolModes)GUI.Toolbar(new Rect(10, 10, 200, 30), (int)toolMode, new[] { "Move", "Build", "Paint" });
+            _isHide = EditorGUILayout.Toggle(_isHide,"Hide");
             EditorGUILayout.TextArea("CurSpritePath : " + _spritesPath);
         
             _scroll = EditorGUILayout.BeginScrollView(_scroll);
+
+               
 
             if (GUILayout.Button("Set Sprite Folder Directory(스프라이트 폴더 경로 설정)"))
             {
@@ -441,37 +303,21 @@ public class CustomTileMapEditor : Editor
             if (GUILayout.Button("Clear Tiles"))
             {
                 _tileMap.DestroyAllTiles();
+
                 _tileList.Clear();
+
+               
             }
 
             if (GUILayout.Button("Open Sprite Folder (스프라이트 폴더 오픈)"))
             {
                 Application.OpenURL(_spritesPath);
             }
+
+
             DisplayAllPrefabs();
             DisplayCurrentSelect();
             GUILayout.EndScrollView();
-        }
-         void OnDisplay(int id)
-         {
-             GeneralDisPlay();
-             if(_isHide)
-                 return;
-
-             switch (toolMode)
-             {
-                 case ToolModes.Transform:
-                     break;
-                 case ToolModes.Building:
-                     BuildDisplay();
-                     break;
-                 case ToolModes.Painting:
-                     PaintModeDisplay();
-                     break;
-                 default:
-                     throw new ArgumentOutOfRangeException();
-             }
-           
         }
 
         void DisplayAllPrefabs()
@@ -490,7 +336,7 @@ public class CustomTileMapEditor : Editor
                 GUILayout.Box(_selectTexture);
             }
         }
-        #endregion
+
         private void SelectTile(GameObject selectObj)
         {
             if (_selectPrefab != selectObj)
@@ -518,13 +364,3 @@ public class CustomTileMapEditor : Editor
             return new Rect(rc.x, rc.y, size.x, size.y);
         }
     }
-    private void OnDisable()
-    {
-        SceneViewEditorWindow.Instance.Exit();
-    }
-    private void OnEnable()
-    {
-        SceneViewEditorWindow.Instance.TileMap = (CustomTileMap)target;
-        SceneViewEditorWindow.Instance.Init(20, 20, 500, 250,0);
-    }
-}

@@ -13,6 +13,7 @@ public class MapRawData
     public int height;
     public List<JPSNode> nodeList;
     public int[,] mapDetailData;
+    public string prefabName;
 }
 
 public class StageData
@@ -157,6 +158,7 @@ public class DataManager : Singleton<DataManager>
         mapData.height = (int)table.MapSize.y;
         mapData.nodeList = new List<JPSNode>();
         mapData.mapDetailData = new int[mapData.width, mapData.height];
+        mapData.prefabName = table.MapPrefab;
         var mapNodeList = GetNodeListByRawMapData(rawMapData.text);
         var mapDetailList = GetNodeListByRawMapData(rawMapDetail.text);
         for (int i = 0; i < mapNodeList.Count; ++i)

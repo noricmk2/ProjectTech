@@ -18,7 +18,14 @@ public class PathfindGrid
         for (int i = 0; i < width; ++i)
         {
             for (int j = 0; j < height; ++j)
-                _grid[i, j] = nodeList.Find(x => x.X == i && x.Y == j).Clone();
+            {
+                var findNode = nodeList.Find(x => x.X == i && x.Y == j);
+                if (findNode != null)
+                {
+                    _grid[i, j] = findNode.Clone();
+                }
+            }
+               
         }
     }
 

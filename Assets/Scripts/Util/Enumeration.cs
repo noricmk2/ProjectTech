@@ -36,6 +36,7 @@ public enum MapNodeType
     Road = 1,
     PassableObstacle = 2,
     UnpassObstacle = 3,
+    PlayerSpawner = 4,
     Spanwer = 9
 }
 

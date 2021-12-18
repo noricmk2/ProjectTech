@@ -1,20 +1,12 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Data.SqlTypes;
+using UnityEditor;
 using UnityEngine;
 
 public class CustomTileMap : MonoBehaviour
 {
-    [System.Serializable]
-    public class Tile
-    {
-        public int x;
-        public int y;
-        public int tileIndex;
-    }
-
-
-
     [SerializeField]
     Material _copyObjMaterial;
 
@@ -49,7 +41,7 @@ public class CustomTileMap : MonoBehaviour
         }
     }
 
-    public void RegisterTileItem(Vector2Int pos, GameObject obj)
+    public MapEditorTile RegisterTileItem(Vector2Int pos, GameObject obj,int index =-1, MapNodeType mapNodeType = MapNodeType.Block)
     {
         List<GameObject> itemList = null;
         if(_spawnablePostions.TryGetValue(pos , out itemList) == false)
@@ -58,8 +50,14 @@ public class CustomTileMap : MonoBehaviour
             _spawnablePostions.Add(pos,itemList);
         }
 
+        var tileComp = obj.AddComponent<MapEditorTile>().InitTile(pos.x,pos.y,index,mapNodeType);
+        var meshRen = obj.GetComponent<MeshRenderer>();
+        if (meshRen != null)
+        {
+            tileComp.renderer = meshRen;
+        }
         itemList.Add(obj);
-
+        return tileComp;
     }
 
     public bool IsRegisteredTile(Vector2Int pos, GameObject obj)
@@ -80,5 +78,6 @@ public class CustomTileMap : MonoBehaviour
             DestroyImmediate(child.gameObject);
         }
         _childTiles.Clear();
+        EditorUtility.SetDirty(this);
     }
 }
