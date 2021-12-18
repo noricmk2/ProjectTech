@@ -25,6 +25,10 @@ MonoBehaviour:
     m_Address: AtlasIngame
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 8f99f11dc51ca354b8f0cd42bf511c4c
+    m_Address: AtlasIngameResult
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 26a9d6b7bd67ec0428730bae9199c281, type: 2}
   m_SchemaSet:
