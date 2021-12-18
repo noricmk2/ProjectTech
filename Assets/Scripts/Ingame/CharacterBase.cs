@@ -37,7 +37,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     private string _prevTrigger;
 
     protected readonly float defaultAttackTerm = 1f;
-    protected readonly float rotateSpeed = 3f;
+    protected readonly float rotateSpeed = 5f;
     protected readonly string ingameAnimatorSuffix = "_Ingame_Controller";
 
     public bool WaitRemove
@@ -188,6 +188,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
 
     public virtual void Fire(int launcherIndex = 0, int slotIndex = 0)
     {
+        SetAnimatorTrigger("Attack");
     }
 
     public virtual void LookAt(Transform target, Action endAction = null)

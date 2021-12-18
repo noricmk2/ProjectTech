@@ -9,6 +9,7 @@ public class EnemyCharacter : CharacterBase
 {
     private List<Vector3> _nextMovePath;
     private CharacterBase _attackTarget;
+    private readonly Vector2Int direction = new Vector2Int(0, -1);
     
     public override void Init(CharacterInitData data)
     {
@@ -37,7 +38,16 @@ public class EnemyCharacter : CharacterBase
     public override bool FindMoveTarget()
     {
         var moveRange = _characterStatus.GetStatusValueByType(StatusType.MoveRange);
-        var path = MapManager.Instance.GetRandomPathByRange(Func.GetTilePos(CachedTransform.position), moveRange);
+        var startPos = Func.GetTilePos(CachedTransform.position);
+        var coverPoint =
+            MapManager.Instance.GetCoverPointInRange(startPos, direction, moveRange);
+
+        List<Vector3> path = null;
+        if (coverPoint == MapManager.NotExistPoint)
+            path = MapManager.Instance.GetPathByRange(MapManager.RangePathType.Straight, startPos, direction,
+                moveRange);
+        else
+            path = MapManager.Instance.GetPathPositionList(startPos, coverPoint);
         if (path != null && path.Count > 0)
         {
             _nextMovePath = path;

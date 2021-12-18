@@ -361,6 +361,27 @@ namespace TCUtil
 
             return anchoredPos;
         }
+        
+        public static bool IsInCamera(Vector3 worldPos, Camera cam, Vector2 margin)
+        {
+            Vector2 viewPortPos = cam.WorldToViewportPoint(worldPos);
+
+            margin.x = margin.x * (Screen.width / (float)Screen.width);
+            margin.y = margin.y * (Screen.height / (float)Screen.height);
+
+            margin.x /= (Screen.width * cam.rect.width);
+            margin.y /= Screen.height;
+
+            if ((viewPortPos.x - margin.x) <= 0)
+                return false;
+            if ((viewPortPos.x + margin.x) > 1)
+                return false;
+            if ((viewPortPos.y - margin.y) < 0)
+                return false;
+            if ((viewPortPos.y + margin.y) > 1)
+                return false;
+            return true;
+        }
     }
     #endregion
 

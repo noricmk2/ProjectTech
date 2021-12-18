@@ -84,6 +84,11 @@ public class PathfindController
         _grid.Reset();
     }
 
+    public bool IsWalkable(Vector2Int target)
+    {
+        return _grid.IsWalkable(target.x, target.y);
+    }
+
     public List<JPSNode> GetRandomPathInRange(Vector2Int start, int range)
     {
         var targetList = GetAllNodeInRange(start, range);
@@ -98,6 +103,18 @@ public class PathfindController
         }
 
         return null;
+    }
+
+    public List<JPSNode> GetStraightPathInRange(Vector2Int start, Vector2Int dir, int range)
+    {
+        Vector2Int dest = start + (dir * range);
+
+        while (!_grid.IsWalkable(dest.x, dest.y))
+        {
+            dest += dir;
+        }
+        var path = FindPath(start, dest);
+        return path;
     }
 
     public List<JPSNode> GetAllNodeInRange(Vector2Int start, int range)

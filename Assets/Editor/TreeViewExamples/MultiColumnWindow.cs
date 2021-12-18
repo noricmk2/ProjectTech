@@ -106,6 +106,7 @@ namespace UnityEditor.TreeViewExamples
 			{
 				if (_editorTreeList.Count == 0)
 				{
+					MyTreeElementGenerator.IDCounter = 0;
 					var root = new BehaviorTreeElement(BehaviorNodeType.SelectorNode, "Root", true, String.Empty, -1, 0, String.Empty, 0);
 					_editorTreeList.Add(root);
 					MyTreeElementGenerator.AddChildrenRecursive(root, 1, true, _editorTreeList.Count + 1, ref _allowDepth, _editorTreeList);

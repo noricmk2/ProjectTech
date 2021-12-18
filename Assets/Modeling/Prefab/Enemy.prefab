@@ -427,7 +427,7 @@ Transform:
   m_GameObject: {fileID: 2046415831360092704}
   m_LocalRotation: {x: 0.00000008146034, y: 0, z: -0, w: 1}
   m_LocalPosition: {x: -0, y: 0, z: -0.000000007653154}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_Children:
   - {fileID: 2628592751578666173}
   - {fileID: 9000748445924425760}
@@ -1658,7 +1658,7 @@ GameObject:
   m_Component:
   - component: {fileID: 5903409111517283037}
   m_Layer: 0
-  m_Name: Enemy_Mdl_Set
+  m_Name: Enemy
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
