@@ -214,6 +214,7 @@ public class IngameManager : MonoSingleton<IngameManager>
             var enemy = owner as EnemyCharacter;
             return enemy.FindMoveTarget();
         }
+        
         return false;
     }
 

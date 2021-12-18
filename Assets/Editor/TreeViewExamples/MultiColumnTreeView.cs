@@ -33,6 +33,7 @@ namespace UnityEditor.TreeViewExamples
 			Order,
 			ActionName,
 			AddBtn,
+			RemoveBtn,
 		}
 
 		public enum SortOption
@@ -188,6 +189,17 @@ namespace UnityEditor.TreeViewExamples
 					}
 				}
 					break;
+				case BehaviorTreeColumns.RemoveBtn:
+				{
+					cellRect.xMin += 5f; // When showing controls make some extr
+					if (GUI.Button(cellRect, "Remove"))
+					{
+						var list = new List<BehaviorTreeElement>();
+						list.Add(item.data);
+						treeModel.RemoveElements(list);
+					}
+				}
+					break;
 			}
 		}
 
@@ -297,6 +309,15 @@ namespace UnityEditor.TreeViewExamples
 					sortedAscending = true,
 					sortingArrowAlignment = TextAlignment.Left,
 					width = 50,
+					minWidth = 50,
+					autoResize = false
+				},
+				new MultiColumnHeaderState.Column()
+				{
+					headerTextAlignment = TextAlignment.Right,
+					sortedAscending = true,
+					sortingArrowAlignment = TextAlignment.Left,
+					width = 100,
 					minWidth = 50,
 					autoResize = false
 				}

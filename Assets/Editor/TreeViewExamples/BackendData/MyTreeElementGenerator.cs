@@ -8,7 +8,7 @@ namespace UnityEditor.TreeViewExamples
 
 	static class MyTreeElementGenerator
 	{
-		static int IDCounter;
+		public static int IDCounter;
 		static int minNumChildren = 5;
 		static int maxNumChildren = 10;
 		static float probabilityOfBeingLeaf = 0.5f;

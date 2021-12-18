@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +8,12 @@ using UnityEngine;
 
 public class MapManager : MonoSingleton<MapManager>
 {
+    public enum RangePathType
+    {
+        Random,
+        Straight
+    }
+
     public class MapPlayData
     {
         public int widthCount;
@@ -23,7 +30,8 @@ public class MapManager : MonoSingleton<MapManager>
     private PathfindController _pathfindController = new PathfindController();
     private MapRawData _curRawData = new MapRawData();
     private MapPlayData _curMapData = new MapPlayData();
-    private readonly Vector3 _tileStartPos = new Vector3(0, 0, 0);
+    private readonly Vector3 tileStartPos = new Vector3(0, 0, 0);
+    public static readonly Vector2Int NotExistPoint = new Vector2Int(-9999, -9999);
 
     public MapPlayData CurrentMapData => _curMapData;
     #endregion
@@ -62,7 +70,7 @@ public class MapManager : MonoSingleton<MapManager>
             }
 
             var tile = ObjectFactory.Instance.CreateObject<TileBase>(detailRecord.TileResourceName, _mapRoot);
-            var tilePos = _tileStartPos;
+            var tilePos = tileStartPos;
             tilePos.x += node.X;
             tilePos.z += node.Y;
             tile.CachedTransform.position = tilePos;
@@ -135,13 +143,7 @@ public class MapManager : MonoSingleton<MapManager>
             return targetTile.CharacterSpanwer;
         }
     }
-
-    //TODO:엄폐우선 길찾기
-    public List<Vector3> GetPathPositionListWithCover(Vector2Int start, Vector2Int dest)
-    {
-        return null;
-    }
-
+    
     public List<Vector3> GetPathPositionList(Vector2Int start, Vector2Int dest)
     {
         var list = new List<Vector3>();
@@ -165,10 +167,21 @@ public class MapManager : MonoSingleton<MapManager>
         return _pathfindController.FindPath(start, dest);
     }
 
-    public List<Vector3> GetRandomPathByRange(Vector2Int start, float range)
+    public List<Vector3> GetPathByRange(RangePathType type, Vector2Int start, Vector2Int dir, float range)
     {
         var list = new List<Vector3>();
-        var nodeList = _pathfindController.GetRandomPathInRange(start, (int)range);
+        List<JPSNode> nodeList = null;
+
+        switch (type)
+        {
+            case RangePathType.Random:
+                nodeList = _pathfindController.GetRandomPathInRange(start, (int)range);
+                break;
+            case RangePathType.Straight:
+                nodeList = _pathfindController.GetStraightPathInRange(start, dir, (int) range);
+                break;
+        }
+        
         if (nodeList == null)
         {
             DebugEx.Log("[Failed] no exist path");
@@ -182,11 +195,46 @@ public class MapManager : MonoSingleton<MapManager>
         return list;
     }
 
+    public Vector2Int GetCoverPointInRange(Vector2Int start, Vector2Int dir, float range)
+    {
+        var nodeList = _pathfindController.GetAllNodeInRange(start, (int)range);
+        var obstacleList = nodeList.FindAll(x =>
+            x.state == (int) MapNodeType.PassableObstacle || x.state == (int) MapNodeType.UnpassObstacle);
+
+        if (obstacleList == null || obstacleList.Count == 0)
+            return NotExistPoint;
+        
+        obstacleList.Sort((x, y) =>
+        {
+            var distX = (start - x.pos).sqrMagnitude;
+            var distY = (start - y.pos).sqrMagnitude;
+
+            if (distX < distY)
+                return -1;
+            else if (distY < distX)
+                return 1;
+
+            return 0;
+        });
+
+        int index = 0;
+        while (index < obstacleList.Count)
+        {
+            var nearestObj = obstacleList[index];
+            var dest = nearestObj.pos - dir;
+            if (_pathfindController.IsWalkable(dest))
+                return dest;
+            ++index;
+        }
+
+        return NotExistPoint;
+    }
+
     public Rect GetQuadTreeBoundry()
     {
         var tile = _curMapData.tileList.First();
         var size = tile.TileSize;
-        var rect = new Rect(_tileStartPos.x - (size.x * 0.5f), _tileStartPos.z - (size.z * 0.5f),
+        var rect = new Rect(tileStartPos.x - (size.x * 0.5f), tileStartPos.z - (size.z * 0.5f),
             _curMapData.widthCount * size.x, _curMapData.heightCount * size.z);
         return rect;
     }
