@@ -155,6 +155,18 @@ public class Launcher
         ++_createCount;
     }
 
+    public void Release()
+    {
+        _attackTarget = null;
+        _autoFireDeltaTime = 0;
+        _reloadDeltaTime = 0;
+        _startDeltaTime = 0;
+        _createCount = 0;
+        _curLaunchCount = 0;
+        _maxBulletCount = 0;
+        _launchState = LaunchState.Stational;
+    }
+
     public void Reset()
     {
         _attackTarget = null;

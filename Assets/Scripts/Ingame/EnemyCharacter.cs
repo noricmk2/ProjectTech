@@ -44,7 +44,8 @@ public class EnemyCharacter : CharacterBase
     {
         base.OnDead(onDead);
         for (int i = 0; i < _laucherList.Count; ++i)
-            _laucherList[i].Reset();
+            _laucherList[i].Release();
+        _laucherList.Clear();
 
         if (_hud != null)
         {
@@ -125,6 +126,9 @@ public class EnemyCharacter : CharacterBase
 
     public override void Fire(int launcherIndex = 0, int slotIndex = 0)
     {
+        if(_laucherList.Count <= launcherIndex)
+            return;
+        
         base.Fire(launcherIndex, slotIndex);
         var launcher = _laucherList[launcherIndex];
         var slot = GetLaucherSlot(slotIndex);
@@ -175,5 +179,9 @@ public class EnemyCharacter : CharacterBase
             ObjectFactory.Instance.DeactivePoolObject(_hud);
             _hud = null;
         }
+        
+        for (int i = 0; i < _laucherList.Count; ++i)
+            _laucherList[i].Release();
+        _laucherList.Clear();
     }
 }

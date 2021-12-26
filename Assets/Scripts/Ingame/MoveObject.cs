@@ -19,6 +19,7 @@ public class MoveObject : ObjectBase
     #region Property
     protected readonly float nearWaypointValue = 1f;
     protected readonly float rotateSpeed = 3f;
+    protected readonly float rotateEpsilon = 0.001f;
 
     protected Vector3 _smoothDampVelocity = Vector3.zero;
     protected Vector3 _accelVelocity = Vector3.zero;
@@ -139,8 +140,12 @@ public class MoveObject : ObjectBase
                 
                 if (_movePathWithRotate)
                 {
-                    var targetRot = Quaternion.LookRotation(targetPoint - CachedTransform.position);
-                    CachedTransform.rotation = Quaternion.Slerp(CachedTransform.rotation, targetRot, Time.deltaTime * rotateSpeed);
+                    var dir = targetPoint - CachedTransform.position;
+                    if (dir.sqrMagnitude > rotateEpsilon)
+                    {
+                        var targetRot = Quaternion.LookRotation(dir);
+                        CachedTransform.rotation = Quaternion.Slerp(CachedTransform.rotation, targetRot, Time.deltaTime * rotateSpeed);
+                    }
                 }
                 
                 var curPos = CachedTransform.position;
