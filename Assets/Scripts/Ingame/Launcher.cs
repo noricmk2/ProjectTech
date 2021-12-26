@@ -22,6 +22,7 @@ public class Launcher
     private CharacterBase _owner;
     private LauncherTable _tableData;
     private float _autoFireDeltaTime;
+    private float _startDeltaTime;
     private float _reloadDeltaTime;
     private int _createCount;
     private int _maxBulletCount;
@@ -34,6 +35,7 @@ public class Launcher
     {
         _autoFireDeltaTime = 0;
         _reloadDeltaTime = 0;
+        _startDeltaTime = 0;
         _createCount = 0;
         _curLaunchCount = 0;
         _maxBulletCount = data.tableData.BulletCount;
@@ -56,7 +58,6 @@ public class Launcher
             if (_curLaunchCount >= _maxBulletCount)
             {
                 _launchState = LaunchState.Reload;
-                _owner.SetAnimatorTrigger("Idle");
             }
         }
         else
@@ -103,8 +104,16 @@ public class Launcher
 
     private void Launch()
     {
-        if(_createCount == 0) 
+        if (_createCount == 0)
+        {
+            if (_startDeltaTime < _tableData.StartDelay)
+            {
+                _startDeltaTime += Time.deltaTime;
+                return;
+            }
             CreateProjectile(_launcherSlot);
+            _startDeltaTime = 0;
+        }
         
         if (_autoFireDeltaTime < _tableData.AutoFireDelay)
         {
@@ -127,7 +136,6 @@ public class Launcher
             _launchState = LaunchState.Reload;
         else
             _launchState = LaunchState.Stational;
-        _owner.SetAnimatorTrigger("Idle");
     }
     
     private void CreateProjectile(Transform launcherSlot)
@@ -141,6 +149,7 @@ public class Launcher
         initData.moveType = _tableData.ProjectileMoveType;
         initData.target = _attackTarget;
         initData.slot = launcherSlot;
+        initData.rotate = _tableData.Rotation;
         projectile.Init(initData);
         IngameManager.Instance.RegistProjectile(projectile);
         ++_createCount;
@@ -150,5 +159,6 @@ public class Launcher
     {
         _attackTarget = null;
         _launchState = LaunchState.Stational;
+        _startDeltaTime = 0;
     }
 }

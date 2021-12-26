@@ -109,7 +109,7 @@ public class PathfindController
     {
         Vector2Int dest = start + (dir * range);
 
-        while (!_grid.IsWalkable(dest.x, dest.y))
+        while (_grid.IsInMap(dest.x, dest.y) && !_grid.IsWalkable(dest.x, dest.y))
         {
             dest += dir;
         }

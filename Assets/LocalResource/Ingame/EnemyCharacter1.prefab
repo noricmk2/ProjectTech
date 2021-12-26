@@ -1770,6 +1770,7 @@ GameObject:
   - component: {fileID: 7192718012823908428}
   - component: {fileID: 3832992333189737014}
   - component: {fileID: -8827358168517343678}
+  - component: {fileID: -4765913555905797553}
   m_Layer: 0
   m_Name: EnemyCharacter1
   m_TagString: Untagged
@@ -1829,6 +1830,20 @@ MonoBehaviour:
   _animator: {fileID: 3832992333189737014}
   _laucherSlots:
   - {fileID: 388955107254841337}
+--- !u!136 &-4765913555905797553
+CapsuleCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7537471341945711350}
+  m_Material: {fileID: 0}
+  m_IsTrigger: 0
+  m_Enabled: 1
+  m_Radius: 0.5
+  m_Height: 2
+  m_Direction: 1
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!1 &7554592156091593029
 GameObject:
   m_ObjectHideFlags: 0

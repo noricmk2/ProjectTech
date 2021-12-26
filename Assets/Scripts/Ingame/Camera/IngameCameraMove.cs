@@ -73,6 +73,8 @@ public class IngameCameraMove : MonoBehaviour
             {
                 var centerPos = GetCenterPos(_followData.followTargets.Select(x=>x.position).ToList());
                 var targetPos = centerPos + _followOffset;
+                var prevPos = _mainCamera.transform.position;
+                targetPos.x = prevPos.x;
                 _mainCamera.transform.position = Vector3.Lerp(_mainCamera.transform.position, targetPos, _followData.lerpValue);
             }
                 break;

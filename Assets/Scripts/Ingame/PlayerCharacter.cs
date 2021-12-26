@@ -82,6 +82,17 @@ public class PlayerCharacter : CharacterBase
         _attackTarget = null;
         var attackRange = _characterStatus.GetStatusValueByType(StatusType.AtkRange);
         var list = IngameManager.Instance.GetCharacterInRange(this, attackRange, CharacterType.Enemy);
+        list.Sort((x, y) =>
+        {
+            var xDist = (CachedTransform.position - x.CachedTransform.position).sqrMagnitude;
+            var yDist = (CachedTransform.position - y.CachedTransform.position).sqrMagnitude;
+            if (xDist < yDist)
+                return -1;
+            else if (xDist > yDist)
+                return 1;
+            return 0;
+        });
+        
         for (int i = 0; i < list.Count; ++i)
         {
             //TODO: get attack target by method

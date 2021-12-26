@@ -38,10 +38,17 @@ public class PathfindGrid
         }
     }
 
-    public bool IsWalkable(int x, int y)
+    public bool IsInMap(int x, int y)
     {
         if (x < 0 || y < 0 ||
             _grid.GetLength(0) <= x || _grid.GetLength(1) <= y)
+            return false;
+        return true;
+    }
+
+    public bool IsWalkable(int x, int y)
+    {
+        if (!IsInMap(x, y))
             return false;
 
         if (_grid[x, y].state != (int) MapNodeType.Road && _grid[x, y].state != (int) MapNodeType.Spanwer)

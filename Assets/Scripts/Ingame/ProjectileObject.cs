@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TCUtil;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class ProjectileObject : MoveObject, IPoolObjectBase
 {
@@ -13,12 +14,14 @@ public class ProjectileObject : MoveObject, IPoolObjectBase
         public float moveSpeed;
         public Transform target;
         public Transform slot;
+        public float rotate;
     }
 
     private CharacterBase _owner;
     private ProjectileMoveType _moveType;
     private Transform _target;
     private Vector3 _dir;
+    private float _rotateDegree;
     
     private bool _waitRemove;
     public bool WaitRemove => _waitRemove;
@@ -34,6 +37,8 @@ public class ProjectileObject : MoveObject, IPoolObjectBase
         _dir = _target.position - data.slot.position;
         _dir.y = 0;
         _dir = _dir.normalized;
+        var rotate = Quaternion.AngleAxis(Random.Range(-data.rotate, data.rotate), Vector3.up);
+        _dir = rotate * _dir;
     }
 
     public void OnCollisionEnter(Collision other)
