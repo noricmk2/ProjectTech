@@ -34,6 +34,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     protected List<ActiveSkillBase> _ownSkillList = new List<ActiveSkillBase>();
     protected List<Launcher> _laucherList = new List<Launcher>();
     protected CharacterType _curCharType;
+    protected Action _deadCallback;
     private string _prevTrigger;
 
     protected readonly float defaultAttackTerm = 1f;
@@ -85,7 +86,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     {
         if (_animator)
         {
-            DebugEx.Log($"[Animator] Set Trigger {trigger}");
+            //DebugEx.Log($"[Animator] Set Trigger {trigger}");
             if(!string.IsNullOrEmpty(_prevTrigger))
                 _animator.ResetTrigger(_prevTrigger);
             _animator.SetTrigger(trigger);
@@ -139,6 +140,15 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     }
 
     public virtual void OnDead(Action onDead)
+    {
+    }
+
+    public virtual bool CheckDead()
+    {
+        return false;
+    }
+
+    public virtual void DeadAnimationEnd()
     {
     }
 

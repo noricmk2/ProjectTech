@@ -157,10 +157,6 @@ public class AddressableManager : MonoSingleton<AddressableManager>
         {
             onLoadDone?.Invoke(hdl);
         };
-
-        // var instatiateOper = new AddressableInstantiateOperation(parent);
-        // instatiateOper.Init(address, onLoadDone, onFailed);
-        // _operationQueue.Enqueue(instatiateOper);
     }
     
     public GameObject InstantiateSync(string address, Transform parent, bool inWorldSpace = false)

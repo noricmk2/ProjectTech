@@ -18,7 +18,32 @@ public class EnemyCharacter : CharacterBase
         Assert.IsNotNull(_behaviorTree, $"[Failed] {data.charData.index} has no aiData");
         _behaviorTree.SetOwner(this);
         _attackTarget = null;
-        gameObject.name = string.Concat(gameObject.name, GetInstanceID());
+    }
+
+    public override void OnDamaged(DamageData data)
+    {
+        base.OnDamaged(data);
+    }
+
+    public override bool CheckDead()
+    {
+        return _characterStatus.GetStatusValueByType(StatusType.Hp) <= 0;
+    }
+
+    public override void OnDead(Action onDead)
+    {
+        base.OnDead(onDead);
+        for (int i = 0; i < _laucherList.Count; ++i)
+            _laucherList[i].Reset();
+
+        SetAnimatorTrigger("Dead");
+        _deadCallback = onDead;
+    }
+
+    public override void DeadAnimationEnd()
+    {
+        _deadCallback?.Invoke();
+        _waitRemove = true;
     }
 
     public override bool FindAttackTarget()

@@ -38,8 +38,12 @@ public class PlayerCharacter : CharacterBase
     
     public override bool Attack(Action onAttackEnd)
     {
-        if (_attackTarget == null)
+        if (_attackTarget == null || _attackTarget.CheckDead())
+        {
+            for(int i=0; i<_laucherList.Count; ++i)
+                _laucherList[i].Reset();
             return false;
+        }
         
         var dir = _attackTarget.transform.position - CachedTransform.position;
         var radian = Vector3.Dot(dir.normalized, CachedTransform.forward);

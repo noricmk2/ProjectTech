@@ -17,7 +17,7 @@ public class AttackNode : BehaviorTreeNode
 
     public override BehaviorNodeState OnExecute()
     {
-        IngameManager.Instance.OnAIAttack(_owner, () => _attackEnd = true);
+        Blackboard.OnAIAttack(_owner, () => _attackEnd = true);
         if (_attackEnd)
             return BehaviorNodeState.Success;
         return BehaviorNodeState.Running;
@@ -43,7 +43,7 @@ public class MoveNode : BehaviorTreeNode
         base.OnActivate();
         _moveStart = false;
         _moveEnd = false;
-        _moveStart = IngameManager.Instance.OnAIMove(_owner, () => _moveEnd = true);
+        _moveStart = Blackboard.OnAIMove(_owner, () => _moveEnd = true);
     }
 
     public override BehaviorNodeState OnExecute()
@@ -63,17 +63,27 @@ public class HideNode : BehaviorTreeNode
 {
     public override BehaviorNodeState OnExecute()
     {
-        return base.OnExecute();
         DebugEx.Log($"{_owner} is hide");
+        return base.OnExecute();
     }
 }
 
 public class DeadNode : BehaviorTreeNode
 {
+    private bool _deadEnd;
     public override BehaviorNodeState OnExecute()
     {
-        return base.OnExecute();
         DebugEx.Log($"{_owner} is dead");
+        var character = _owner as CharacterBase;
+        if (character != null && !_deadEnd)
+        {
+            character.OnDead(()=>_deadEnd = true);
+            return BehaviorNodeState.Running;
+        }
+        else if (character != null && _deadEnd)
+            return BehaviorNodeState.Success;
+        else
+            return BehaviorNodeState.Fail;
     }
 }
 

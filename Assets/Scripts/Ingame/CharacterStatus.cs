@@ -13,7 +13,7 @@ public class CharacterStatus
     {
         _owner = owner;
         _orgStatusData = data;
-        _curStatusData = _orgStatusData;
+        _curStatusData = _orgStatusData.Clone();
     }
 
     public float GetStatusValueByType(StatusType type)
@@ -44,6 +44,8 @@ public class CharacterStatus
 
     public void CalDamage(DamageData data)
     {
-        DebugEx.Log($"[Attacked] {_owner} is damaged {data.atkDamage}");
+        //DebugEx.Log($"[Attacked] {_owner} is damaged {data.atkDamage}");
+        _curStatusData.hp -= data.atkDamage;
+        _curStatusData.hp = Mathf.Max(0, _curStatusData.hp);
     }
 }

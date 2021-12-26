@@ -114,9 +114,9 @@ public class ObjectFactory : MonoSingleton<ObjectFactory>
     {
         var pool = new ObjectPool<IPoolObjectBase>(count, () =>
             {
-                var handler = Addressables.InstantiateAsync(name, parent);
-                handler.WaitForCompletion();
-                var poolObj = handler.Result.GetComponent<IPoolObjectBase>();
+                var instance = AddressableManager.Instance.InstantiateSync(name, parent);
+                var poolObj = instance.GetComponent<IPoolObjectBase>();
+                
                 if (poolObj == null)
                 {
                     DebugEx.LogError("[Failed]pool object is null: " + name);

@@ -59,7 +59,7 @@ public class BehaviorTreeNode
         if (_isActivate)
             return;
         
-        //DebugEx.Log($"[AI] {_nodeName} node activate. owner: {_owner}");
+        DebugEx.Log($"[AI] {_nodeName} node activate. owner: {_owner}");
         _isActivate = true;
         OnActivate();
     }
@@ -383,10 +383,13 @@ public class ConditionNode : DecoratorNode
         switch (actionName)
         {
             case "CheckFindEnemy":
-                ConditionCheckFunc = IngameManager.CheckFindEnemy;
+                ConditionCheckFunc = Blackboard.CheckFindEnemy;
                 break;
             case "CheckFindMove":
-                ConditionCheckFunc = IngameManager.CheckFindMove;
+                ConditionCheckFunc = Blackboard.CheckFindMove;
+                break;
+            case "CheckDead":
+                ConditionCheckFunc = Blackboard.CheckDead;
                 break;
         }
     }

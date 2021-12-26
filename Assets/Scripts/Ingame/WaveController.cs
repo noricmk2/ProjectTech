@@ -24,9 +24,19 @@ public class WaveController
             }
             else
             {
-                for (int i = 0; i < _activateEnemyList.Count; ++i)
+                for (int i = 0; i < _activateEnemyList.Count;)
                 {
-                    _activateEnemyList[i].OnUpdate();
+                    if (_activateEnemyList[i].WaitRemove)
+                    {
+                        _activateEnemyList[i].Release();
+                        ObjectFactory.Instance.DeactivePoolObject(_activateEnemyList[i]);
+                        _activateEnemyList.Remove(_activateEnemyList[i]);
+                    }
+                    else
+                    {
+                        _activateEnemyList[i].OnUpdate();
+                        ++i;
+                    }
                 }
             }
         }
@@ -42,7 +52,17 @@ public class WaveController
             {
                 for (int i = 0; i < _activateEnemyList.Count; ++i)
                 {
-                    _activateEnemyList[i].OnUpdate();
+                    if (_activateEnemyList[i].WaitRemove)
+                    {
+                        _activateEnemyList[i].Release();
+                        ObjectFactory.Instance.DeactivePoolObject(_activateEnemyList[i]);
+                        _activateEnemyList.Remove(_activateEnemyList[i]);
+                    }
+                    else
+                    {
+                        _activateEnemyList[i].OnUpdate();
+                        ++i;
+                    }
                 }
             }
         }

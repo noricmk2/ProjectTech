@@ -33,7 +33,7 @@ MonoBehaviour:
     ParentName: BaseSelector
     Level: 2
     Order: 0
-    ActionName: 
+    ActionName: CheckDead
   - NodeType: 1
     NodeName: FindEnemyCheck
     IsRoot: 0
