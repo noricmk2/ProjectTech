@@ -194,4 +194,12 @@ public class IngameManager : MonoSingleton<IngameManager>
     {
         _projectileController.AddProjectile(obj);
     }
+
+    public ObjectHUD CreateHUD(CharacterStatus status, Transform target)
+    {
+        var obj = ObjectFactory.Instance.GetPoolObject<ObjectHUD>("ObjectHUD");
+        obj.transform.SetParent(_ingameCanvas.transform);
+        obj.Init(_ingameUIController, status, target);
+        return obj;
+    }
 }

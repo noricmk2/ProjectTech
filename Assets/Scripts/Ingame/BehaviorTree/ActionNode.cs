@@ -70,14 +70,16 @@ public class HideNode : BehaviorTreeNode
 
 public class DeadNode : BehaviorTreeNode
 {
+    private bool _deadStart;
     private bool _deadEnd;
     public override BehaviorNodeState OnExecute()
     {
-        DebugEx.Log($"{_owner} is dead");
         var character = _owner as CharacterBase;
-        if (character != null && !_deadEnd)
+        if (character != null && !_deadStart)
         {
+            DebugEx.Log($"{_owner} is dead");
             character.OnDead(()=>_deadEnd = true);
+            _deadStart = true;
             return BehaviorNodeState.Running;
         }
         else if (character != null && _deadEnd)

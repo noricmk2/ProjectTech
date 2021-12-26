@@ -25,13 +25,12 @@ public class ObjectHUD : UIItemBase, IPoolObjectBase
     public void Init(IngameUIController controller, CharacterStatus status, Transform target)
     {
         _controller = controller;
-        _rectTransform.SetSiblingIndex(1);
+        CachedRectTransform.SetSiblingIndex(1);
         _maxHp = status.MaxHP;
         _targetTrans = target;
-        _rectTransform.anchoredPosition = Func.GetAnchoredPosition(_controller.GetIngameCanvas(), IngameManager.Instance.IngameCamera, _targetTrans.position);
-        _rectTransform.SetAsFirstSibling();
+        CachedRectTransform.anchoredPosition = Func.GetAnchoredPosition(_controller.GetIngameCanvas(), IngameManager.Instance.IngameCamera, _targetTrans.position);
+        CachedRectTransform.SetAsFirstSibling();
         SetHP(_maxHp);
-        SetActive(false);
     }
     
     public void SetHP(float hp)

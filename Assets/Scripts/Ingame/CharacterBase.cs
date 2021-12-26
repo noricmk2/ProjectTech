@@ -86,7 +86,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     {
         if (_animator)
         {
-            //DebugEx.Log($"[Animator] Set Trigger {trigger}");
+            DebugEx.Log($"[Animator] Set Trigger {trigger}");
             if(!string.IsNullOrEmpty(_prevTrigger))
                 _animator.ResetTrigger(_prevTrigger);
             _animator.SetTrigger(trigger);
@@ -102,8 +102,12 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     public override void OnUpdate()
     {
         base.OnUpdate();
-        if(_enableAI) 
+        if (_enableAI)
+        {
+            DebugEx.Log($"[UpdateTime]");
             _behaviorTree.OnUpdate();
+        }
+
         for (int i = 0; i < _laucherList.Count; ++i)
         {
             _laucherList[i].OnUpdate();

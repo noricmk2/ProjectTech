@@ -7,9 +7,12 @@ using UnityEngine.Assertions;
 
 public class EnemyCharacter : CharacterBase
 {
+    [SerializeField] private Transform _hudSlot;
+    
     private List<Vector3> _nextMovePath;
     private CharacterBase _attackTarget;
     private readonly Vector2Int direction = new Vector2Int(0, -1);
+    private ObjectHUD _hud;
     
     public override void Init(CharacterInitData data)
     {
@@ -18,11 +21,18 @@ public class EnemyCharacter : CharacterBase
         Assert.IsNotNull(_behaviorTree, $"[Failed] {data.charData.index} has no aiData");
         _behaviorTree.SetOwner(this);
         _attackTarget = null;
+        _hud = IngameManager.Instance.CreateHUD(_characterStatus, _hudSlot);
     }
 
     public override void OnDamaged(DamageData data)
     {
         base.OnDamaged(data);
+        if (_characterStatus.GetStatusValueByType(StatusType.Hp) <= 0)
+        {
+            DebugEx.Log($"[Dead] hp is zero");
+            _behaviorTree.Reset();
+        }
+        _hud?.SetHP(_characterStatus.GetStatusValueByType(StatusType.Hp));
     }
 
     public override bool CheckDead()
@@ -35,6 +45,12 @@ public class EnemyCharacter : CharacterBase
         base.OnDead(onDead);
         for (int i = 0; i < _laucherList.Count; ++i)
             _laucherList[i].Reset();
+
+        if (_hud != null)
+        {
+            ObjectFactory.Instance.DeactivePoolObject(_hud);
+            _hud = null;
+        }
 
         SetAnimatorTrigger("Dead");
         _deadCallback = onDead;
@@ -148,6 +164,16 @@ public class EnemyCharacter : CharacterBase
         if (_delayDeltaTime > 0)
         {
             _delayDeltaTime -= Time.deltaTime * _characterStatus.GetStatusValueByType(StatusType.AtkSpeed);
+        }
+    }
+
+    public override void Release()
+    {
+        base.Release();
+        if (_hud != null)
+        {
+            ObjectFactory.Instance.DeactivePoolObject(_hud);
+            _hud = null;
         }
     }
 }

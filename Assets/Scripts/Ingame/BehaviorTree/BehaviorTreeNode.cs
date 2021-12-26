@@ -96,6 +96,11 @@ public class BehaviorTreeNode
         OnDeactivate();
     }
 
+    public virtual void Reset()
+    {
+        
+    }
+
     protected virtual void OnDeactivate()
     {
 
@@ -154,6 +159,19 @@ public class CompositeNode : BehaviorTreeNode
     {
         ClearChild();
         base.Release();
+    }
+
+    public void ResetChild()
+    {
+        for (int i = 0; i < _childList.Count; ++i)
+            _childList[i].Reset();
+    }
+
+    public override void Reset()
+    {
+        ResetChild();
+        _curStep = 0;
+        base.Reset();
     }
 
     protected override void OnDeactivate()

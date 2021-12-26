@@ -32,6 +32,11 @@ public class BehaviorTree
         return _root.FindNode(name);
     }
 
+    public void Reset()
+    {
+        _root.Reset();
+    }
+
     public BehaviorNodeState OnUpdate()
     {
         return _root.Execute();
