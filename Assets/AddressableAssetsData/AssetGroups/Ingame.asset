@@ -53,6 +53,10 @@ MonoBehaviour:
     m_Address: PlayerBullet1
     m_ReadOnly: 0
     m_SerializedLabels: []
+  - m_GUID: 30a9ed99933f56b42a9ecf00fde65535
+    m_Address: EnemyCharacter1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 26a9d6b7bd67ec0428730bae9199c281, type: 2}
   m_SchemaSet:

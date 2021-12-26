@@ -29,14 +29,6 @@ MonoBehaviour:
     m_Address: IngamePlayerGauge
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: f913010c45245d2439bbd3ee12775cca
-    m_Address: IngamePausePopup
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 1589a575ca18e26478fdf06a4999b191
-    m_Address: IngameResultPopup
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: c50daa1f999605341a21afb35a4253e2
     m_Address: IngameUI
     m_ReadOnly: 0

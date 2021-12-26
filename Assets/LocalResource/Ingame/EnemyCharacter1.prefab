@@ -1769,8 +1769,9 @@ GameObject:
   m_Component:
   - component: {fileID: 7192718012823908428}
   - component: {fileID: 3832992333189737014}
+  - component: {fileID: -8827358168517343678}
   m_Layer: 0
-  m_Name: Enemy
+  m_Name: EnemyCharacter1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1813,6 +1814,21 @@ Animator:
   m_HasTransformHierarchy: 1
   m_AllowConstantClipSamplingOptimization: 1
   m_KeepAnimatorControllerStateOnDisable: 0
+--- !u!114 &-8827358168517343678
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7537471341945711350}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ccb4cd26ba2c4444893d94dadda80c9e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _animator: {fileID: 3832992333189737014}
+  _laucherSlots:
+  - {fileID: 388955107254841337}
 --- !u!1 &7554592156091593029
 GameObject:
   m_ObjectHideFlags: 0

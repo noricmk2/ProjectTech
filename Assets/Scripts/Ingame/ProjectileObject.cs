@@ -54,7 +54,7 @@ public class ProjectileObject : MoveObject, IPoolObjectBase
 
     private void OnTriggerEnter(Collider other)
     {
-        DebugEx.Log($"[Collision] {this} : {other}");
+        //DebugEx.Log($"[Collision] {this} : {other}");
         var character = other.transform.GetComponent<CharacterBase>();
         if (character != null)
         {

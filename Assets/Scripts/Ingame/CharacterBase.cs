@@ -188,7 +188,6 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
 
     public virtual void Fire(int launcherIndex = 0, int slotIndex = 0)
     {
-        SetAnimatorTrigger("Attack");
     }
 
     public virtual void LookAt(Transform target, Action endAction = null)

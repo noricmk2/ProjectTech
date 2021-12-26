@@ -22,6 +22,10 @@ MonoBehaviour:
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 9ad6cbe0bb1fa1b40bd958ced052ae2c
+    m_Address: EnemyCharacter1_Ingame_Controller
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 8e73115fbc2a4f54bb709231ce3e8fc1
     m_Address: PlayerCharacter1_Ingame_Controller
     m_ReadOnly: 0
     m_SerializedLabels: []

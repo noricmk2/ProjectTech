@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Assertions;
@@ -24,7 +25,7 @@ public class PlayerCharacter : CharacterBase
     {
         base.OnUpdate();
 
-        if (FindAttackTarget())
+        if (_curState == MoveState.Stational && FindAttackTarget())
         {
             Attack(null);
         }
@@ -59,6 +60,13 @@ public class PlayerCharacter : CharacterBase
             }          
         }
         return false;
+    }
+
+    public override void MovePath(List<Vector3> path, float speed, Action<MoveObject> onPathEnd, bool withRotate = true)
+    {
+        for(int i=0; i<_laucherList.Count; ++i)
+            _laucherList[i].Reset();
+        base.MovePath(path, speed, onPathEnd, withRotate);
     }
 
     public override void Fire(int launcherIndex = 0, int slotIndex = 0)

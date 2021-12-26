@@ -54,7 +54,10 @@ public class Launcher
             attackTarget.OnDamaged(damage);
             ++_curLaunchCount;
             if (_curLaunchCount >= _maxBulletCount)
+            {
                 _launchState = LaunchState.Reload;
+                _owner.SetAnimatorTrigger("Idle");
+            }
         }
         else
         {
@@ -63,6 +66,7 @@ public class Launcher
                 _attackTarget = attackTarget.CachedTransform;
                 _launcherSlot = launcherSlot;
                 _launchState = LaunchState.StartFire;
+                _owner.SetAnimatorTrigger("Attack");
             }
         }
     }
@@ -120,12 +124,10 @@ public class Launcher
         _createCount = 0;
         _launcherSlot = null;
         if (_curLaunchCount >= _maxBulletCount)
-        {
             _launchState = LaunchState.Reload;
-            _owner.SetAnimatorTrigger("Idle");
-        }
         else
             _launchState = LaunchState.Stational;
+        _owner.SetAnimatorTrigger("Idle");
     }
     
     private void CreateProjectile(Transform launcherSlot)
@@ -142,5 +144,11 @@ public class Launcher
         projectile.Init(initData);
         IngameManager.Instance.RegistProjectile(projectile);
         ++_createCount;
+    }
+
+    public void Reset()
+    {
+        _attackTarget = null;
+        _launchState = LaunchState.Stational;
     }
 }
