@@ -113,6 +113,10 @@ public class PathfindController
         {
             dest += dir;
         }
+
+        if (!_grid.IsInMap(dest.x, dest.y))
+            return null;
+        
         var path = FindPath(start, dest);
         return path;
     }
