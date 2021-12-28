@@ -99,7 +99,7 @@ public class EnemyCharacter : CharacterBase
             return false;
     }
 
-    public bool MoveToSearchedPath(Action onMoveEnd)
+    public override bool MoveToSearchedPath(Action onMoveEnd)
     {
         if (_nextMovePath != null && _nextMovePath.Count > 0)
         {
@@ -120,7 +120,7 @@ public class EnemyCharacter : CharacterBase
         }
     }
 
-    private void FindCover(MoveObject obj)
+    protected override void FindCover(MoveObject obj)
     {
     }
 
