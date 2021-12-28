@@ -9,10 +9,10 @@ public class Blackboard : Singleton<Blackboard>
     #region AIMethod
     public static bool CheckFindEnemy(IBehaviorTreeOwner owner)
     {
-        if (owner is EnemyCharacter)
+        if (owner is CharacterBase)
         {
-            var enemy = owner as EnemyCharacter;
-            return enemy.FindAttackTarget();
+            var characterBase = owner as CharacterBase;
+            return characterBase.FindAttackTarget();
         }
         
         return false;
@@ -20,10 +20,10 @@ public class Blackboard : Singleton<Blackboard>
     
     public static bool CheckFindMove(IBehaviorTreeOwner owner)
     {
-        if (owner is EnemyCharacter)
+        if (owner is CharacterBase)
         {
-            var enemy = owner as EnemyCharacter;
-            return enemy.FindMoveTarget();
+            var character = owner as CharacterBase;
+            return character.FindMoveTarget();
         }
         
         return false;
@@ -42,21 +42,21 @@ public class Blackboard : Singleton<Blackboard>
 
     public static bool OnAIMove(IBehaviorTreeOwner owner, Action onMoveEnd)
     {
-        if (owner is EnemyCharacter)
+        if (owner is CharacterBase)
         {
-            var enemy = owner as EnemyCharacter;
-            return enemy.MoveToSearchedPath(onMoveEnd);
+            var character = owner as CharacterBase;
+            return character.MoveToSearchedPath(onMoveEnd);
         }
-
+        
         return false;
     }
 
     public static bool OnAIAttack(IBehaviorTreeOwner owner, Action onAttackEnd)
     {
-        if (owner is EnemyCharacter)
+        if (owner is CharacterBase)
         {
-            var enemy = owner as EnemyCharacter;
-            return enemy.Attack(onAttackEnd);
+            var character = owner as CharacterBase;
+            return character.Attack(onAttackEnd);
         }
 
         return false;

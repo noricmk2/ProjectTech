@@ -5,7 +5,7 @@ using TCUtil;
 
 public class PlayerController
 {
-    private CharacterBase _testCharacter;
+    private PlayerCharacter _testCharacter;
     private readonly float moveValue = 0.5f;
     private Dictionary<int, PlayerCharacter> _playerSqaud;
 
@@ -16,6 +16,7 @@ public class PlayerController
         initData.charData = DataManager.Instance.CreateCharacterData(1003);
         initData.launcherTableList = new List<LauncherTable>();
         initData.launcherTableList.Add(DataManager.Instance.GetRecord<LauncherTable>(10101));
+        initData.aiData = DataManager.Instance.CreateAIData("TestAI2");
         
         _testCharacter = ObjectFactory.Instance.CreateObject<PlayerCharacter>(initData.charData.resourceName, IngameManager.Instance.CharacterRoot);
         _testCharacter.CachedTransform.position = new Vector3(1, 0, 1);
@@ -43,6 +44,7 @@ public class PlayerController
 
                     if (path != null && path.Count > 0)
                     {
+                        _testCharacter.PauseAI(true);
                         var firstNode = path.Peek();
                         _testCharacter.MovePath(Func.NodeToVectorList(path), 2, FindCover);
                         //_testCharacter.MovePath(Func.NodeToVectorList(path), firstNode.F  * moveValue);
@@ -55,7 +57,7 @@ public class PlayerController
 
     private void FindCover(MoveObject moveObj)
     {
-        var character = moveObj as CharacterBase;
+        var character = moveObj as PlayerCharacter;
         var size = character.GetCharacterSize();
         var rect = new Rect(moveObj.CachedTransform.position.x - size.x * 0.5f,
             moveObj.CachedTransform.position.y - size.y * 0.5f, size.x, size.y);
@@ -64,6 +66,7 @@ public class PlayerController
         
         if(obstacleList.Count > 0)
             character.OnCover();
+        character.PauseAI(false);
     }
 
     public List<CharacterBase> GetPlayerCharacterList()

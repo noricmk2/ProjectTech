@@ -59,7 +59,8 @@ public class BehaviorTreeNode
         if (_isActivate)
             return;
         
-        //DebugEx.Log($"[AI] {_nodeName} node activate. owner: {_owner}");
+        if(_owner is PlayerCharacter) 
+            DebugEx.Log($"[AI] {_nodeName} node activate. owner: {_owner}");
         _isActivate = true;
         OnActivate();
     }

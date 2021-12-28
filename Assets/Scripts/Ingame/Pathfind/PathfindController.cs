@@ -624,12 +624,7 @@ public class PathfindController
         list.Reverse();
         return list;
     }
-
-    private JPSNode Jump()
-    {
-        return null;
-    }
-
+    
     private static readonly float sqrt_two = Mathf.Sqrt(2);
 
     public float CalHeuristic(float diffX, float diffY)
