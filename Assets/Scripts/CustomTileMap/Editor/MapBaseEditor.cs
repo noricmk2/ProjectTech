@@ -7,6 +7,8 @@ using UnityEngine;
 [CanEditMultipleObjects]
 public class MapBaseEditor : Editor
 {
+    private Dictionary<MapNodeType, bool> _typeDic = new Dictionary<MapNodeType, bool>();
+    
     public override void OnInspectorGUI()
     {
         base.OnInspectorGUI();
@@ -14,6 +16,22 @@ public class MapBaseEditor : Editor
         if(GUILayout.Button("Sync"))
         {
            SyncMap();
+        }
+
+        foreach (MapNodeType type in Enum.GetValues(typeof(MapNodeType)))
+        {
+            if (_typeDic.ContainsKey(type) == false)
+            {
+                _typeDic.Add(type,false);
+            }
+
+            _typeDic[type] = EditorGUILayout.Toggle(type.ToString(), _typeDic[type]);
+
+        }
+        if(GUILayout.Button("SetFilter"))
+        {
+            MapBase targetData = (MapBase) target;
+            targetData.SetFilterDic(_typeDic);
         }
 
     }
@@ -25,8 +43,5 @@ public class MapBaseEditor : Editor
         CustomTileMapEditor.SaveMapAsFile(targetData.Data.buildXSize,targetData.Data.buildYSize,targetData.Data.mapName,true,targetData.gameObject, targetData.MapTiles);
     }
     
-    private void OnValidate()
-    {
-        
-    }
+
 }

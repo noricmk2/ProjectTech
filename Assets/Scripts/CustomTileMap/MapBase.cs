@@ -18,10 +18,12 @@ public class MapBase : MonoBehaviour
     [SerializeField] private List<MapEditorTile> _mapTiles;
     [SerializeField] private GameObject _tileBase;
     [SerializeField] private GameObject _mapBase;
+    private Dictionary<MapNodeType, bool> _typeDic = new Dictionary<MapNodeType, bool>();
     public GameObject TileBaseObj => _tileBase;
     public GameObject MapBaseObj => _mapBase;
     public MapBaseData Data => _data;
     public List<MapEditorTile> MapTiles => _mapTiles;
+
     public void SetDatas(GameObject tileBase, GameObject mapBase,List<MapEditorTile> tiles,MapBaseData data)
     {
         _tileBase = tileBase;
@@ -30,5 +32,15 @@ public class MapBase : MonoBehaviour
         _data = data;
         
         _mapTiles = _mapTiles.OrderByDescending(x=>x.y).ThenBy(x=>x.x).ToList();
+    }
+
+    public void SetFilterDic(Dictionary<MapNodeType, bool> typeDic)
+    {
+        _typeDic = typeDic;
+
+        for (int i = 0; i < _mapTiles.Count; i++)
+        {
+            _mapTiles[i].SetShowGizmo(_typeDic[_mapTiles[i].nodeType]);
+        }
     }
 }

@@ -12,7 +12,12 @@ public class MapEditorTile : TileBase
     public int y;
     public int tileIndex;
     public MapNodeType nodeType;
+    private bool _isShowGizmo = false;
 
+    public void SetShowGizmo(bool isShow)
+    {
+        _isShowGizmo = isShow;
+    }
     public MapEditorTile InitTile(int x, int y, int index,MapNodeType nodeType)
     {
         this.x = x;
@@ -24,7 +29,7 @@ public class MapEditorTile : TileBase
 
     private void OnDrawGizmos()
     {
-        Handles.Label(transform.position, $"{nodeType.ToString()}\n{tileIndex}");
-
+        if(_isShowGizmo)
+            Handles.Label(transform.position, $"{nodeType.ToString()}\n{tileIndex}");
     }
 }
