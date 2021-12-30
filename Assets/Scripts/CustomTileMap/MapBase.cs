@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class MapBase : MonoBehaviour
@@ -27,5 +28,7 @@ public class MapBase : MonoBehaviour
         _mapBase = mapBase;
         _mapTiles = tiles;
         _data = data;
+        
+        _mapTiles = _mapTiles.OrderByDescending(x=>x.y).ThenBy(x=>x.x).ToList();
     }
 }

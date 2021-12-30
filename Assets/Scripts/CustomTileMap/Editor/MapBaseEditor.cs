@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEditor;
@@ -12,10 +13,20 @@ public class MapBaseEditor : Editor
         
         if(GUILayout.Button("Sync"))
         {
-            MapBase targetData = (MapBase) target;
-            CustomTileMapEditor.SaveMapAsFile(targetData.Data.buildXSize,targetData.Data.mapName,true,targetData.gameObject,targetData.MapTiles);
-            
+           SyncMap();
         }
 
+    }
+    
+    private void SyncMap()
+    {
+        
+        MapBase targetData = (MapBase) target;
+        CustomTileMapEditor.SaveMapAsFile(targetData.Data.buildXSize,targetData.Data.buildYSize,targetData.Data.mapName,true,targetData.gameObject, targetData.MapTiles);
+    }
+    
+    private void OnValidate()
+    {
+        
     }
 }

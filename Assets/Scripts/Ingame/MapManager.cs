@@ -30,6 +30,7 @@ public class MapManager : MonoSingleton<MapManager>
     private PathfindController _pathfindController = new PathfindController();
     private MapRawData _curRawData = new MapRawData();
     private MapPlayData _curMapData = new MapPlayData();
+    private Vector3 _playerStartPos = new Vector3();
     private readonly Vector3 tileStartPos = new Vector3(0, 0, 0);
     public static readonly Vector2Int NotExistPoint = new Vector2Int(-9999, -9999);
 
@@ -39,12 +40,13 @@ public class MapManager : MonoSingleton<MapManager>
     public void Init(MapRawData data)
     {
         _curRawData = data;
+        GenerateMapWithPrefabName(data.prefabName, data.width, data.height);
         var grid = new PathfindGrid();
         grid.Init(data.width, data.height, data.nodeList);
         _pathfindController.Init(grid);
         _pathfindController.SetDiagonalMovement(DiagonalMovement.IfAtLeastOneWalkable);
-        GenerateMap(data.width, data.height);
-        // GenerateMapWithPrefabName(data.prefabName, data.width, data.height);
+        GenerateMapWithPrefabName(data.prefabName, data.width, data.height);
+      
     }
 
     public void GenerateMapWithPrefabName(string prefabName,int width,int height)
@@ -59,36 +61,34 @@ public class MapManager : MonoSingleton<MapManager>
         var mapBase = ObjectFactory.Instance.CreateObject<MapBase>(prefabName, _mapRoot);
         mapBase.transform.localPosition = Vector3.zero;
         mapBase.transform.localRotation = Quaternion.identity;
-        var enumator = _curRawData.nodeList.GetEnumerator();
-        enumator.MoveNext();
+
         foreach (Transform childItem in mapBase.TileBaseObj.transform)
         {
           //  var tileItem = childItem.GetComponent<TileBase>();
             var tileItem = childItem.GetComponent<MapEditorTile>();
             if(tileItem == null)
                 continue;
-            
-            
-            var node = enumator.Current;
+
+            var node = tileItem;
             if(node == null)
                 continue;
             var tileInfo = new TileBase.TileInfo();
             var tilePos = Vector3.zero;
             MapDetailTable detailRecord = null;
-            tileInfo.nodeInfo = node;
-            tileInfo.nodeType = (MapNodeType) node.state;
+            tileInfo.nodeInfo = new JPSNode(node.x,node.y,(int)node.nodeType);
+            tileInfo.nodeType = (MapNodeType) node.nodeType;
       
-            tilePos.x += node.X;
-            tilePos.z += node.Y;
-            // tileItem.CachedTransform.position = tilePos;
+            tilePos.x += node.x;
+            tilePos.z += node.y;
+            tileItem.CachedTransform.position = tilePos;
 
-
+            
             var detailIndex = tileItem.tileIndex;
             if (detailIndex > 0)
                 detailRecord = DataManager.Instance.GetRecord<MapDetailTable>(detailIndex);
             else
             {
-                DebugEx.LogError($"[Failed] not exist map detail data : {node.X}, {node.Y}");
+              
                 continue;
             }
             
@@ -107,7 +107,7 @@ public class MapManager : MonoSingleton<MapManager>
                     var initData = new ObstacleObject.ObstacleInitData();
                     initData.passableObstacle = true;
                     initData.rectSize = Vector2.one;
-                    initData.tilePos = node.pos;
+                    initData.tilePos = tileInfo.nodeInfo.pos;
                     initData.statusData = DataManager.Instance.CreateStatusData(detailRecord.NumberValue);
                     initData.resourceName = detailRecord.SubResourceName;
                     var obj = CreateObstacle(tilePos, initData);
@@ -119,18 +119,23 @@ public class MapManager : MonoSingleton<MapManager>
                     var initData = new ObstacleObject.ObstacleInitData();
                     initData.passableObstacle = false;
                     initData.rectSize = Vector2.one;
-                    initData.tilePos = node.pos;
+                    initData.tilePos = tileInfo.nodeInfo.pos;
                     initData.resourceName = detailRecord.SubResourceName;
                     var obj = CreateObstacle(tilePos, initData);
                     _curMapData.obstacleList.Add(obj);
+                }
+                    break;
+                case MapNodeType.PlayerSpawner:
+                {
+                    _playerStartPos = tileItem.transform.position;
                 }
                     break;
             }
 
             tileItem.Init(tileInfo);
             _curMapData.tileList.Add(tileItem);  
-
-            enumator.MoveNext();
+            _curRawData.nodeList.Add(tileInfo.nodeInfo);
+            _curRawData.mapDetailData[tileItem.x, tileItem.y] = tileItem.tileIndex;
         }
 
     }
@@ -270,7 +275,7 @@ public class MapManager : MonoSingleton<MapManager>
                 break;
         }
         
-        if (nodeList == null || nodeList.Count < 1)
+        if (nodeList == null || nodeList.Count <= 1)
         {
             DebugEx.Log("[Failed] no exist path");
             return null;
@@ -326,4 +331,9 @@ public class MapManager : MonoSingleton<MapManager>
             _curMapData.widthCount * size.x, _curMapData.heightCount * size.z);
         return rect;
     }
+
+    public Vector3 GetPlayerStartPos()
+    {
+        return _playerStartPos;
+    } 
 }

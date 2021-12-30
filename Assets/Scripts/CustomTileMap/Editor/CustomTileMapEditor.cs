@@ -16,29 +16,25 @@ public class CustomTileMapEditor : Editor
     public CustomTileMap _tileMap;
     public readonly static string MapPath = "/LocalResource/MapData/";
     public readonly static string IngameDataPath ="/LocalResource/Ingame/";
-    public static void SaveMapAsFile(int xSize,string mapName,bool isPrefabSave ,GameObject target,List<MapEditorTile> tileDatas)
+    public static void SaveMapAsFile(int xSize,int ySize,string mapName,bool isPrefabSave ,GameObject target, List<MapEditorTile> tileDatas)
     {
         string detailSavePath = $"{Application.dataPath + MapPath}{mapName}_detail.txt";
         string nodeSavePath = $"{Application.dataPath + MapPath}{mapName}_node.txt";
         string prefabSavePath = $"{Application.dataPath + IngameDataPath}{mapName}.prefab";
+        File.Delete(detailSavePath);
+        File.Delete(nodeSavePath);
         StreamWriter detailWriter = File.CreateText(detailSavePath);
         StreamWriter nodeWriter = File.CreateText(nodeSavePath);
         int x = 0;
         int y = 0;
         StringBuilder detailLineBuilder = new StringBuilder("");
         StringBuilder nodeLineBuilder = new StringBuilder("");
-        for (int i = 0; i < tileDatas.Count; i++,x++)
+        
+        tileDatas = tileDatas.OrderByDescending(x=>x.y).ThenBy(x=>x.x).ToList();
+        
+        for (int i = 0; i < tileDatas.Count; i++)
         {
             MapEditorTile tile = tileDatas[i];
-            if (x == xSize)
-            {
-                x = 0;
-                y++;
-                detailWriter.WriteLine(detailLineBuilder.ToString());
-                nodeWriter.WriteLine(nodeLineBuilder.ToString());
-                detailLineBuilder.Clear();
-                nodeLineBuilder.Clear();
-            }
 
             if (i == tileDatas.Count - 1)
             {
@@ -50,6 +46,24 @@ public class CustomTileMapEditor : Editor
                 detailLineBuilder.Append($"{tile.tileIndex},");
                 nodeLineBuilder.Append($"{(int)tile.nodeType},");
             }
+  
+            x++;
+            
+            if (x == xSize)
+            {
+                x = 0;
+                y++;
+                detailWriter.WriteLine(detailLineBuilder.ToString());
+                nodeWriter.WriteLine(nodeLineBuilder.ToString());
+                detailLineBuilder.Clear();
+                nodeLineBuilder.Clear();
+            }
+            // if (i != tileDatas.Count - 1)
+            // {
+            //     detailLineBuilder.Append(',');
+            //     nodeLineBuilder.Append(',');
+            // }
+            
               
         }
         detailWriter.Close();
@@ -273,6 +287,7 @@ public class CustomTileMapEditor : Editor
         private GameObject _targetMapObj = null;
         void CreateMapWithSize(int x, int y)
         {
+            _tileDatas.Clear();
             _tileMap.DestroyAllTiles();
             _tileList.Clear();
             MapDetailTable table = DataManager.Instance.GetRecord<MapDetailTable>(_baseTileIndex);
@@ -296,9 +311,9 @@ public class CustomTileMapEditor : Editor
                 tileBaseObj.transform.SetParent(mapBaseObj.transform);
                
                 _targetMapObj = mapBaseObj;
-                for(int i = 0; i < y; i++)
+                for(int i = 0; i < x; i++)
                 {
-                    for (int j = 0; j < x; j++)
+                    for (int j = 0; j < y; j++)
                     {
                         GameObject obj = GameObject.Instantiate(selectObject);
                         obj.transform.SetParent(tileBaseObj.transform);
@@ -306,12 +321,12 @@ public class CustomTileMapEditor : Editor
                         var row = spawnX / tileSize;
                         var column = Mathf.Abs(spawnY / tileSize) - 1;
 
-                        spawnX = _tileMap.transform.position.x + (tileSize * i);
-                        spawnY = _tileMap.transform.position.y + (tileSize * j);
+                        spawnX = _tileMap.transform.position.x + (tileSize * ( j));
+                        spawnY = _tileMap.transform.position.y + (tileSize * (i));
 
                         // obj.transform.localPosition = spawnPos;
-                        obj.transform.position = new Vector3(spawnX, 0, spawnY);
-                        _tileDatas.Add(_tileMap.RegisterTileItem(new Vector2Int(j,i), obj,_baseTileIndex,_baseNodeType));
+                        obj.transform.position = new Vector3(spawnY, 0, spawnX);
+                        _tileDatas.Add(_tileMap.RegisterTileItem(new Vector2Int(  i,  j), obj,_baseTileIndex,_baseNodeType));
                         _tileList.Add(obj);
                         
                     }
@@ -407,7 +422,8 @@ public class CustomTileMapEditor : Editor
             {
                 GameManager.Instance.LoadTable();
                 CreateMapWithSize(_xBuildSize,_yBuildSize);
-                SaveMapAsFile(_xBuildSize,_mapName,true,_targetMapObj,_tileDatas);
+                SaveMapAsFile(_xBuildSize,_yBuildSize,_mapName,true,_targetMapObj,_tileDatas);
+                
             }
 
             if (GUILayout.Button("Clear Tiles"))
@@ -419,7 +435,7 @@ public class CustomTileMapEditor : Editor
             if (GUILayout.Button("Update"))
             {
                 _savePath = EditorGUILayout.TextField("SavePath",_savePath);
-                SaveMapAsFile(_xBuildSize,_mapName,true,_targetMapObj,_tileDatas);
+                SaveMapAsFile(_xBuildSize,_yBuildSize,_mapName,true,_targetMapObj,_tileDatas);
             }
         }
         void PaintModeDisplay()

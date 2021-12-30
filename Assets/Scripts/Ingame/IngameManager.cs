@@ -51,7 +51,7 @@ public class IngameManager : MonoSingleton<IngameManager>
     private void InitController()
     {
         //Test
-        var stageData = DataManager.Instance.GetStageDataByIndex(1);
+        var stageData = DataManager.Instance.GetStageDataByIndex(4);
         //TODO:타일사이즈 및 맵크기 계산
         var mapData = stageData.mapData;
         var size = Vector3.one;

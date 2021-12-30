@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 
@@ -21,5 +22,9 @@ public class MapEditorTile : TileBase
         return this;
     }
 
-   
+    private void OnDrawGizmos()
+    {
+        Handles.Label(transform.position, $"{nodeType.ToString()}\n{tileIndex}");
+
+    }
 }

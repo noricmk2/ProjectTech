@@ -49,13 +49,20 @@ public class CustomTileMap : MonoBehaviour
             itemList = new List<GameObject>();
             _spawnablePostions.Add(pos,itemList);
         }
-
-        var tileComp = obj.AddComponent<MapEditorTile>().InitTile(pos.x,pos.y,index,mapNodeType);
-        var meshRen = obj.GetComponent<MeshRenderer>();
+        GameObject tileObjBase = new GameObject("TileObj");
+        tileObjBase.transform.SetParent(obj.transform.parent);
+        tileObjBase.transform.position = obj.transform.position;
+        var box = obj.AddComponent<BoxCollider>();
+        box.center = Vector3.zero;
+        box.size = new Vector3(1, 1, 0.1f);
+        var tileComp = tileObjBase.AddComponent<MapEditorTile>().InitTile(pos.x,pos.y,index,mapNodeType);
+        var meshRen = tileObjBase.GetComponent<MeshRenderer>();
         if (meshRen != null)
         {
             tileComp.renderer = meshRen;
         }
+        obj.transform.SetParent(tileObjBase.transform);
+        obj.transform.localPosition = Vector3.zero;
         itemList.Add(obj);
         return tileComp;
     }
