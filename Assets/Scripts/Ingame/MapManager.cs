@@ -45,7 +45,7 @@ public class MapManager : MonoSingleton<MapManager>
         grid.Init(data.width, data.height, data.nodeList);
         _pathfindController.Init(grid);
         _pathfindController.SetDiagonalMovement(DiagonalMovement.IfAtLeastOneWalkable);
-        GenerateMapWithPrefabName(data.prefabName, data.width, data.height);
+
       
     }
 
