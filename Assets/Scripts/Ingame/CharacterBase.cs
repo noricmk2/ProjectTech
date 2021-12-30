@@ -35,6 +35,8 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     protected List<Launcher> _laucherList = new List<Launcher>();
     protected CharacterType _curCharType;
     protected Action _deadCallback;
+    protected List<Vector3> _nextMovePath;
+
     private string _prevTrigger;
 
     protected readonly float defaultAttackTerm = 1f;
@@ -79,7 +81,8 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
 
     public virtual void OnMoveEnd()
     {
-        SetAnimatorTrigger("Idle");
+        if(_nextMovePath == null || _nextMovePath.Count == 0) 
+            SetAnimatorTrigger("Idle");
     }
 
     public virtual void SetAnimatorTrigger(string trigger)

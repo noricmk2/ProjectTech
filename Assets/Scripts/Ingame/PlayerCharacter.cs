@@ -11,7 +11,6 @@ public class PlayerCharacter : CharacterBase
 {
     private CharacterBase _attackTarget;
     private readonly Vector2Int direction = new Vector2Int(0, 1);
-    private List<Vector3> _nextMovePath;
     
     public override void Init(CharacterInitData data)
     {
@@ -124,10 +123,15 @@ public class PlayerCharacter : CharacterBase
 
         List<Vector3> path = null;
         if (!FindAttackTarget() || coverPoint == MapManager.NotExistPoint)
+        {
             path = MapManager.Instance.GetPathByRange(MapManager.RangePathType.Straight, startPos, direction,
                 moveRange);
+        }
         else
+        {
             path = MapManager.Instance.GetPathPositionList(startPos, coverPoint);
+        }
+
         if (path != null && path.Count > 0)
         {
             _nextMovePath = path;

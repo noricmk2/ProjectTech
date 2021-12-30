@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using DG.Tweening;
 using System;
+using System.Linq;
 using TCUtil;
 
 public enum MoveState
@@ -80,6 +81,7 @@ public class MoveObject : ObjectBase
         if(path == null && path.Count == 0)
             return;
 
+        DebugEx.Log($"[Move] set path {path.Last()}");
         _onPathEnd = onPathEnd;
         _movePathWithRotate = withRotate;
         _moveSpeed = speed;
