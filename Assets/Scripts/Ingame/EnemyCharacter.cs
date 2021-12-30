@@ -9,7 +9,6 @@ public class EnemyCharacter : CharacterBase
 {
     [SerializeField] private Transform _hudSlot;
     
-    private List<Vector3> _nextMovePath;
     private CharacterBase _attackTarget;
     private readonly Vector2Int direction = new Vector2Int(0, -1);
     private ObjectHUD _hud;
@@ -139,7 +138,8 @@ public class EnemyCharacter : CharacterBase
     {
         if (_attackTarget == null)
             return false;
-        
+        StopPath();
+
         var dir = _attackTarget.transform.position - CachedTransform.position;
         var radian = Vector3.Dot(dir.normalized, CachedTransform.forward);
         float sight = Mathf.Cos(5f * Mathf.Deg2Rad);

@@ -52,7 +52,8 @@ public class PlayerCharacter : CharacterBase
                 _laucherList[i].Reset();
             return false;
         }
-        
+        StopPath();
+
         var dir = _attackTarget.transform.position - CachedTransform.position;
         var radian = Vector3.Dot(dir.normalized, CachedTransform.forward);
         float sight = Mathf.Cos(5f * Mathf.Deg2Rad);
@@ -116,13 +117,16 @@ public class PlayerCharacter : CharacterBase
     
     public override bool FindMoveTarget()
     {
+        if (FindAttackTarget())
+            return false;
+        
         var moveRange = _characterStatus.GetStatusValueByType(StatusType.MoveRange);
         var startPos = Func.GetTilePos(CachedTransform.position);
         var coverPoint =
             MapManager.Instance.GetCoverPointInRange(startPos, direction, moveRange);
 
         List<Vector3> path = null;
-        if (!FindAttackTarget() || coverPoint == MapManager.NotExistPoint)
+        if (coverPoint == MapManager.NotExistPoint)
         {
             path = MapManager.Instance.GetPathByRange(MapManager.RangePathType.Straight, startPos, direction,
                 moveRange);

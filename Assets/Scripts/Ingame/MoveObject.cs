@@ -110,6 +110,14 @@ public class MoveObject : ObjectBase
         _prevWaypoint = CachedTransform.position;
     }
 
+    public virtual void StopPath()
+    {
+        if (_wayPoints != null)
+        {
+            _curWaypointIndex = _wayPoints.Length;
+        }
+    }
+
     public virtual void OnUpdate()
     {
         switch (_curState)
