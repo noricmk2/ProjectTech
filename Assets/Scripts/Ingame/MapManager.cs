@@ -275,7 +275,7 @@ public class MapManager : MonoSingleton<MapManager>
                 break;
         }
         
-        if (nodeList == null || nodeList.Count <= 1)
+        if (nodeList == null || nodeList.Count < 1)
         {
             DebugEx.Log("[Failed] no exist path");
             return null;
