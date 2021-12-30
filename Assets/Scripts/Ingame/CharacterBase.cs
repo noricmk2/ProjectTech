@@ -213,16 +213,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     {
         DebugEx.Log($"[Debug] {this} on cover");
     }
-
-    public virtual bool MoveToSearchedPath(Action onMoveEnd)
-    {
-        return false;
-    }
-
-    protected virtual void FindCover(MoveObject obj)
-    {
-    }
-
+    
     public virtual CharacterType GetCharacterType()
     {
         return _curCharType;

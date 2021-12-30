@@ -7,12 +7,10 @@ using UnityEngine.Assertions;
 public class BehaviorTree
 {
     private CompositeNode _root;
-    private bool _pause;
 
     public void Init(CompositeNode root)
     {
         _root = root;
-        _pause = false;
     }
 
     public void SetOwner(IBehaviorTreeOwner owner)
@@ -39,16 +37,8 @@ public class BehaviorTree
         _root.Reset();
     }
 
-    public void Pause(bool pause)
-    {
-        _pause = pause;
-    }
-
     public BehaviorNodeState OnUpdate()
     {
-        if (_pause)
-            return BehaviorNodeState.Fail;
-        
         return _root.Execute();
     }
 }
