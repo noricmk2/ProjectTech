@@ -29,8 +29,24 @@ MonoBehaviour:
     m_Address: IngamePlayerGauge
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: c50daa1f999605341a21afb35a4253e2
-    m_Address: IngameUI
+  - m_GUID: 14fbd071f16c7dd46b96331e9cf829ca
+    m_Address: IngameUI 1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: ae5a5f22976f9ea478fff41cd1f207be
+    m_Address: UITransition
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 2a84da403b6a8ff4c8a143f07eb86a5e
+    m_Address: UITitle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 0371b9cd51bd797448a0301d3ca45d1c
+    m_Address: IngameUI 1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 63eb1749ef4bb64428a17212f742d6ec
+    m_Address: IngameResult 1
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0
