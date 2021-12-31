@@ -20,7 +20,6 @@ public class IngameManager : MonoSingleton<IngameManager>
     [SerializeField] private Transform _proejctileRoot;
     [SerializeField] private Camera _ingameCamera;
     [SerializeField] private IngameCameraMove _cameraMove;
-    [SerializeField] private Canvas _ingameCanvas;
     #endregion
 
     #region Property
@@ -29,12 +28,11 @@ public class IngameManager : MonoSingleton<IngameManager>
     private ProjectileController _projectileController = new ProjectileController();
     private WaveController _waveController = new WaveController();
     private QuadTreeController _quadTreeController = new QuadTreeController();
-    private IngameUIController _ingameUIController = new IngameUIController();
+    private IngameUIController _ingameUIController;
     public IngameCameraMove CameraMove => _cameraMove;
     public Camera IngameCamera => _ingameCamera;
     public Transform CharacterRoot => _characterRoot;
     public Transform ProjectileRoot => _proejctileRoot;
-    public Canvas IngameCanvas => _ingameCanvas;
 
     private bool _initComplete;
     #endregion
@@ -46,6 +44,7 @@ public class IngameManager : MonoSingleton<IngameManager>
         InitCamera();
         InitIngameState();
         InitController();
+        InitUI();
     }
 
     private void InitController()
@@ -63,11 +62,13 @@ public class IngameManager : MonoSingleton<IngameManager>
         _charController.Init();
         _waveController.Init(stageData.waveList);
         _projectileController.Init();
-        var uiData = new IngameUIController.InitData();
-        uiData.ingameCanvas = _ingameCanvas;
-        _ingameUIController.Init(uiData);
         
         _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit); 
+    }
+
+    private void InitUI()
+    {
+        _ingameUIController = UIManager.Instance.OpenUI<IngameUIController>();
     }
 
     private void InitIngameState()
@@ -80,6 +81,7 @@ public class IngameManager : MonoSingleton<IngameManager>
         updateState.UpdateAction = ControllerUpdate;
         var endState = new IngameStateBase(IngameStageMachine.IngameState.IngameStateEnd);
         endState.UpdateAction = OnEnd;
+        endState.EnterAction = StageEndAction;
         
         _stateMachine.AddState(initState);
         _stateMachine.AddState(startState);
@@ -102,6 +104,8 @@ public class IngameManager : MonoSingleton<IngameManager>
         followData.minZoomValue = 5f;
         _cameraMove.SetFollowData(followData);
         _cameraMove.StartFollow();
+        
+        _ingameUIController.ShowUI();
         _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateUpdate);
     }
 
@@ -127,9 +131,13 @@ public class IngameManager : MonoSingleton<IngameManager>
         _quadTreeController.OnUpdate();
     }
 
+    private void StageEndAction()
+    {
+        UIManager.Instance.CloseCurrentUI();
+    }
+
     private void OnEnd()
     {
-        
     }
 
     private void Update()
@@ -197,9 +205,6 @@ public class IngameManager : MonoSingleton<IngameManager>
 
     public ObjectHUD CreateHUD(CharacterStatus status, Transform target)
     {
-        var obj = ObjectFactory.Instance.GetPoolObject<ObjectHUD>("ObjectHUD");
-        obj.transform.SetParent(_ingameCanvas.transform);
-        obj.Init(_ingameUIController, status, target);
-        return obj;
+        return _ingameUIController.CreateHUD(status, target);
     }
 }

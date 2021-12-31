@@ -12,6 +12,8 @@ public class GameManager : MonoSingleton<GameManager>
     {
         TCSceneManager.Instance.Init();
         TCSceneManager.Instance.EnterScene(SceneBase.GameSceneType.Intro);
+        
+        UIManager.Instance.Init();
     }
 
     public void LoadTable()

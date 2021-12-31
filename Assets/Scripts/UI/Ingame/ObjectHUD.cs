@@ -28,7 +28,7 @@ public class ObjectHUD : UIItemBase, IPoolObjectBase
         CachedRectTransform.SetSiblingIndex(1);
         _maxHp = status.MaxHP;
         _targetTrans = target;
-        CachedRectTransform.anchoredPosition = Func.GetAnchoredPosition(_controller.GetIngameCanvas(), IngameManager.Instance.IngameCamera, _targetTrans.position);
+        CachedRectTransform.anchoredPosition = Func.GetAnchoredPosition(UIManager.Instance.OverlayCanvas, IngameManager.Instance.IngameCamera, _targetTrans.position);
         CachedRectTransform.SetAsFirstSibling();
         SetHP(_maxHp);
     }
@@ -46,7 +46,7 @@ public class ObjectHUD : UIItemBase, IPoolObjectBase
     private void LateUpdate()
     {
         if (_targetTrans)
-            _rectTransform.anchoredPosition = Func.GetAnchoredPosition(_controller.GetIngameCanvas(), IngameManager.Instance.IngameCamera, _targetTrans.position);
+            _rectTransform.anchoredPosition = Func.GetAnchoredPosition(UIManager.Instance.OverlayCanvas, IngameManager.Instance.IngameCamera, _targetTrans.position);
     }
 
     public void SetActive(bool active)

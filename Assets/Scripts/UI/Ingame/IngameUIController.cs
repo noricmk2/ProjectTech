@@ -2,23 +2,53 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//Temp script
-public class IngameUIController : MonoBehaviour
+public class IngameUIController : UIController
 {
-    public class InitData
-    {
-        public Canvas ingameCanvas;
-    }
+    #region Property
+    private Canvas _overlayCanvas;
+    private IngameUIView _ingameView;
 
-    private Canvas _ingameCanvas;
+    private readonly string ingameViewName = "IngameUI";
+    #endregion
     
-    public void Init(InitData data)
+    public override void Init()
     {
-        _ingameCanvas = data.ingameCanvas;
+        base.Init();
+        _overlayCanvas = UIManager.Instance.OverlayCanvas;
+        var data = new IngameUIView.UIData();
+        _ingameView.Init(data);
     }
 
-    public Canvas GetIngameCanvas()
+    protected override void CreateView()
     {
-        return _ingameCanvas;
+        base.CreateView();
+        _ingameView = UIManager.CreateView<IngameUIView>(ingameViewName);
+        _ingameView.Deactivate();
+    }
+
+    public override void ShowUI()
+    {
+        base.ShowUI();
+        _state = ControllerState.Activate;
+    }
+
+    protected override void ActivateView()
+    {
+        base.ActivateView();
+        _ingameView.Activate();
+    }
+
+    public override void CloseUI()
+    {
+        base.CloseUI();
+        _ingameView.Deactivate();
+    }
+
+    public ObjectHUD CreateHUD(CharacterStatus status, Transform target)
+    {
+        var obj = ObjectFactory.Instance.GetPoolObject<ObjectHUD>("ObjectHUD");
+        obj.transform.SetParent(_overlayCanvas.transform);
+        obj.Init(this, status, target);
+        return obj;
     }
 }
