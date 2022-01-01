@@ -15,78 +15,78 @@ MonoBehaviour:
   m_GroupName: Ingame
   m_Data:
     m_SerializedData: []
-  m_GUID: 926f4f8f4d4d38e44b0e161ca5b700ac
+  m_GUID: 1ea8ae6154a11b54ea1d0fc9004913fb
   m_SerializeEntries:
   - m_GUID: c6001f6f6481a7a4f83c70b188e3c9be
     m_Address: Ingame
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 01ad0115f69791a4c96956e227e64c9f
-    m_Address: TestCharacter
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 520a12948354fdd4da5f2405a96fe610
-    m_Address: TestTile
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: acb7a468b78adc04c82b6a44022d2e8c
-    m_Address: TestEnemy2
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 4fc6380dd7f4d004babaa9935defefe2
-    m_Address: TestEnemy1
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 8500c93efda601e4caf1ba034174aaf9
     m_Address: EnemyBullet1
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 3a709b9749013a34b8a2b2a44736e30e
-    m_Address: ObstacleObject
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 6ffaacfa8be954c4d8e2559ebdcea426
-    m_Address: PlayerCharacter1
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: b3349b703cd2b1642b8f0312b0b29eb9
-    m_Address: PlayerBullet1
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: 30a9ed99933f56b42a9ecf00fde65535
     m_Address: EnemyCharacter1
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 942f1d3758286e34da211ebe5673d990
-    m_Address: test3
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 63bb98df996a7a6498a0fbd7feee4276
-    m_Address: Obj_02
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 9e11884f080396845a9f9540c8cfc7c6
-    m_Address: Obj_01
+  - m_GUID: ec1ce7df477943943b4338caf382d3bc
+    m_Address: Floor_01
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 6ea73be0cad0fe84f82f23b437d2153a
     m_Address: Floor_02
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: 5f527320c39d46346b699a60ae09bdc3
-    m_Address: Obj_03
-    m_ReadOnly: 0
-    m_SerializedLabels: []
   - m_GUID: 1b2554e7ece0c0d43abaee5c58be9249
     m_Address: Floor_03
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 9e11884f080396845a9f9540c8cfc7c6
+    m_Address: Obj_01
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 63bb98df996a7a6498a0fbd7feee4276
+    m_Address: Obj_02
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 5f527320c39d46346b699a60ae09bdc3
+    m_Address: Obj_03
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: 6c8d4a9be66b72f49a7e0a3033f6980b
     m_Address: Obj_04
     m_ReadOnly: 0
     m_SerializedLabels: []
-  - m_GUID: ec1ce7df477943943b4338caf382d3bc
-    m_Address: Floor_01
+  - m_GUID: 3a709b9749013a34b8a2b2a44736e30e
+    m_Address: ObstacleObject
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: b3349b703cd2b1642b8f0312b0b29eb9
+    m_Address: PlayerBullet1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 6ffaacfa8be954c4d8e2559ebdcea426
+    m_Address: PlayerCharacter1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 942f1d3758286e34da211ebe5673d990
+    m_Address: test3
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 01ad0115f69791a4c96956e227e64c9f
+    m_Address: TestCharacter
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 4fc6380dd7f4d004babaa9935defefe2
+    m_Address: TestEnemy1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: acb7a468b78adc04c82b6a44022d2e8c
+    m_Address: TestEnemy2
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 520a12948354fdd4da5f2405a96fe610
+    m_Address: TestTile
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

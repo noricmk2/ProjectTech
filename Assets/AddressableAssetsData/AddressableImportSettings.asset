@@ -19,7 +19,7 @@ MonoBehaviour:
     groupName: DataAsset
     LabelMode: 0
     labelRefs: []
-    groupTemplate: {fileID: 11400000, guid: d5f9116ba386ec5488fe3a6ca30e4805, type: 2}
+    groupTemplate: {fileID: 11400000, guid: bb1d803f3aa547e44970b649e9a5de9d, type: 2}
     groupTemplateApplicationMode: 0
     simplified: 1
     addressReplacement: 
@@ -28,7 +28,7 @@ MonoBehaviour:
     groupName: Ingame
     LabelMode: 0
     labelRefs: []
-    groupTemplate: {fileID: 11400000, guid: d5f9116ba386ec5488fe3a6ca30e4805, type: 2}
+    groupTemplate: {fileID: 11400000, guid: bb1d803f3aa547e44970b649e9a5de9d, type: 2}
     groupTemplateApplicationMode: 0
     simplified: 1
     addressReplacement: 
@@ -37,7 +37,7 @@ MonoBehaviour:
     groupName: MapData
     LabelMode: 0
     labelRefs: []
-    groupTemplate: {fileID: 11400000, guid: d5f9116ba386ec5488fe3a6ca30e4805, type: 2}
+    groupTemplate: {fileID: 11400000, guid: bb1d803f3aa547e44970b649e9a5de9d, type: 2}
     groupTemplateApplicationMode: 0
     simplified: 1
     addressReplacement: 
@@ -46,7 +46,7 @@ MonoBehaviour:
     groupName: UIImage
     LabelMode: 0
     labelRefs: []
-    groupTemplate: {fileID: 11400000, guid: d5f9116ba386ec5488fe3a6ca30e4805, type: 2}
+    groupTemplate: {fileID: 11400000, guid: bb1d803f3aa547e44970b649e9a5de9d, type: 2}
     groupTemplateApplicationMode: 0
     simplified: 1
     addressReplacement: 
@@ -55,7 +55,7 @@ MonoBehaviour:
     groupName: UIPrefab
     LabelMode: 0
     labelRefs: []
-    groupTemplate: {fileID: 11400000, guid: d5f9116ba386ec5488fe3a6ca30e4805, type: 2}
+    groupTemplate: {fileID: 11400000, guid: bb1d803f3aa547e44970b649e9a5de9d, type: 2}
     groupTemplateApplicationMode: 0
     simplified: 1
     addressReplacement: 
@@ -64,7 +64,7 @@ MonoBehaviour:
     groupName: Animator
     LabelMode: 0
     labelRefs: []
-    groupTemplate: {fileID: 11400000, guid: d5f9116ba386ec5488fe3a6ca30e4805, type: 2}
+    groupTemplate: {fileID: 11400000, guid: bb1d803f3aa547e44970b649e9a5de9d, type: 2}
     groupTemplateApplicationMode: 0
     simplified: 1
     addressReplacement: 

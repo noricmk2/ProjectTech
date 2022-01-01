@@ -24,9 +24,11 @@ public class UIIngameController : UIController
     protected override void CreateView()
     {
         base.CreateView();
-        _uiIngameView = UIManager.CreateView<UIIngameView>(ingameViewName);
+        if(_uiIngameView == null) 
+            _uiIngameView = UIManager.CreateView<UIIngameView>(ingameViewName);
         _uiIngameView.Deactivate();
-        _uiResultView = UIManager.CreateView<UIIngameResultView>(resultViewName);
+        if(_uiResultView == null) 
+            _uiResultView = UIManager.CreateView<UIIngameResultView>(resultViewName);
         _uiResultView.Deactivate();
     }
 
@@ -46,6 +48,7 @@ public class UIIngameController : UIController
     {
         base.CloseUI();
         _uiIngameView.Deactivate();
+        _uiResultView.Deactivate();
     }
 
     public ObjectHUD CreateHUD(CharacterStatus status, Transform target)

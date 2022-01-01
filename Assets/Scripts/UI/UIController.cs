@@ -34,7 +34,7 @@ public class UIController
 
     protected virtual void ActivateView()
     {
-        _state = ControllerState.Activate;
+        _state = ControllerState.None;
     }
 
     public virtual void OnUpdate()

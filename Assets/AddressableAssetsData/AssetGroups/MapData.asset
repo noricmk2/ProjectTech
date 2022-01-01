@@ -15,18 +15,10 @@ MonoBehaviour:
   m_GroupName: MapData
   m_Data:
     m_SerializedData: []
-  m_GUID: 0ccfdb8a4f67dd44393df66719563646
+  m_GUID: a04eee41729370b44a9fd071c3def82b
   m_SerializeEntries:
   - m_GUID: ca44a0cf5000a5043801f8a627af32e2
     m_Address: MapData
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: e925aeb2566498846b66753fdbc34289
-    m_Address: test_map_1
-    m_ReadOnly: 0
-    m_SerializedLabels: []
-  - m_GUID: 1bcc104b4c979614fac54a2622fb6649
-    m_Address: test_map_detail_1
     m_ReadOnly: 0
     m_SerializedLabels: []
   - m_GUID: df9c33a929276084b8e618fbb7ef6b8c
@@ -35,6 +27,14 @@ MonoBehaviour:
     m_SerializedLabels: []
   - m_GUID: 0133ec2c98f035d46836d0c8c882479d
     m_Address: test3_node
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: e925aeb2566498846b66753fdbc34289
+    m_Address: test_map_1
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 1bcc104b4c979614fac54a2622fb6649
+    m_Address: test_map_detail_1
     m_ReadOnly: 0
     m_SerializedLabels: []
   m_ReadOnly: 0

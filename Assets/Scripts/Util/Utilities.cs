@@ -442,7 +442,7 @@ namespace TCUtil
         {
             if (PlayerPrefs.HasKey(key))
             {
-                return EditorPrefsEx.GetBool(key);
+                return PlayerPrefsEx.GetBool(key);
             }
             else
             {

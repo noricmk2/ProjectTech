@@ -33,7 +33,7 @@ public class AddressableManager : MonoSingleton<AddressableManager>
         DebugEx.Log($"[GameInfo] Addressable Init Start");
         ResourceManager.ExceptionHandler = CustomExceptionHandler;
         
-        var textAsset =LoadAssetSync<TextAsset>(atlasDataName);
+        var textAsset = LoadAssetSync<TextAsset>(atlasDataName);
         _atlasData = JsonConvert.DeserializeObject<SpriteAtlasData>(textAsset.text);
 
         _isInit = true;
