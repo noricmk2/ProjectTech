@@ -40,7 +40,8 @@ public class MapBase : MonoBehaviour
 
         for (int i = 0; i < _mapTiles.Count; i++)
         {
-            _mapTiles[i].SetShowGizmo(_typeDic[_mapTiles[i].nodeType]);
+            if(_typeDic.ContainsKey(_mapTiles[i].nodeType))
+                _mapTiles[i].SetShowGizmo(_typeDic[_mapTiles[i].nodeType]);
         }
     }
 }
