@@ -29,6 +29,11 @@ public class IngameManager : MonoSingleton<IngameManager>
     private WaveController _waveController = new WaveController();
     private QuadTreeController _quadTreeController = new QuadTreeController();
     private UIIngameController _uiIngameController;
+    private Queue<Action> _initActionQueue = new Queue<Action>();
+    private Action _currentInitAction;
+    private int _currentStageIndex;
+    private StageData _currentStageData;
+
     public IngameCameraMove CameraMove => _cameraMove;
     public Camera IngameCamera => _ingameCamera;
     public Transform CharacterRoot => _characterRoot;
@@ -40,41 +45,67 @@ public class IngameManager : MonoSingleton<IngameManager>
     public void Init()
     {
         _initComplete = false;
+        //Temp
+        _currentStageIndex = 4;
+        _currentStageData = DataManager.Instance.GetStageDataByIndex(_currentStageIndex);
 
-        InitCamera();
+        _currentInitAction = null;
         InitIngameState();
-        InitController();
-        InitUI();
+        SetInitAction();
     }
 
-    private void InitController()
+    private void SetInitAction()
     {
-        //Test
-        var stageData = DataManager.Instance.GetStageDataByIndex(4);
+        _initActionQueue.Clear();
+        _initActionQueue.Enqueue(InitCamera);
+        _initActionQueue.Enqueue(InitMap);
+        _initActionQueue.Enqueue(InitCharacter);
+        _initActionQueue.Enqueue(InitUI);
+        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit); 
+    }
+
+    public void OnEndInitJob()
+    {
+        if (_initActionQueue.Count > 0)
+        {
+            _initActionQueue.Dequeue();
+            _currentInitAction = null;
+        }
+        
+        if(_initActionQueue.Count == 0)
+            _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateStart);
+    }
+    
+    private void InitMap()
+    {
         //TODO:타일사이즈 및 맵크기 계산
-        var mapData = stageData.mapData;
+        var mapData = _currentStageData.mapData;
         var size = Vector3.one;
         var tileStartPos = Vector3.zero;
         var rect = new Rect(tileStartPos.x - (size.x * 0.5f), tileStartPos.z - (size.z * 0.5f),
             mapData.width * size.x, mapData.height * size.z);
         _quadTreeController.Init(rect);
         MapManager.Instance.Init(mapData);
+    }
+
+    private void InitCharacter()
+    {
         _charController.Init();
-        _waveController.Init(stageData.waveList);
+        _waveController.Init(_currentStageData.waveList);
         _projectileController.Init();
-        
-        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit); 
+        OnEndInitJob();
     }
 
     private void InitUI()
     {
         _uiIngameController = UIManager.Instance.OpenUI<UIIngameController>();
+        OnEndInitJob();
     }
 
     private void InitIngameState()
     {
         var initState = new IngameStateBase(IngameStageMachine.IngameState.IngameStateInit);
-        initState.UpdateAction = InitCheck;
+        initState.UpdateAction = ProgressInit;
         var startState = new IngameStateBase(IngameStageMachine.IngameState.IngameStateStart);
         startState.UpdateAction = IngameStart;
         var updateState = new IngameStateBase(IngameStageMachine.IngameState.IngameStateUpdate);
@@ -88,9 +119,10 @@ public class IngameManager : MonoSingleton<IngameManager>
         _stateMachine.AddState(updateState);
         _stateMachine.AddState(endState);
     }
-
+    
     private void IngameStart()
     {
+        UIManager.Instance.SetLoadingView(false);
         var followData = new IngameCameraMove.FollowMoveData();
         followData.followTargets = new List<Transform>();
         var charList = _charController.GetPlayerCharacterList();
@@ -114,13 +146,16 @@ public class IngameManager : MonoSingleton<IngameManager>
         var cameraData = AddressableManager.Instance.LoadAssetSync<CameraData>("CameraData");
         _ingameCamera.transform.position = cameraData.Position;
         _ingameCamera.transform.rotation = Quaternion.Euler(cameraData.Rotate);
+        OnEndInitJob();
     }
 
-    private void InitCheck()
+    private void ProgressInit()
     {
-        //Test
-        //if(_initComplete)
-        _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateStart);
+        if (_currentInitAction == null && _initActionQueue.Count > 0)
+        {
+            _currentInitAction = _initActionQueue.Peek();
+            _currentInitAction?.Invoke();
+        }
     }
 
     private void ControllerUpdate()

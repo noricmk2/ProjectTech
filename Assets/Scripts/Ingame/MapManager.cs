@@ -23,14 +23,19 @@ public class MapManager : MonoSingleton<MapManager>
     }
 
     #region Inspector
+
     [SerializeField] private Transform _mapRoot;
+
     #endregion
 
     #region Property
+
     private PathfindController _pathfindController = new PathfindController();
     private MapRawData _curRawData = new MapRawData();
     private MapPlayData _curMapData = new MapPlayData();
     private Vector3 _playerStartPos = new Vector3();
+    private bool _checkInit;
+    
     private readonly Vector3 tileStartPos = new Vector3(0, 0, 0);
     public static readonly Vector2Int NotExistPoint = new Vector2Int(-9999, -9999);
 
@@ -41,15 +46,9 @@ public class MapManager : MonoSingleton<MapManager>
     {
         _curRawData = data;
         GenerateMapWithPrefabName(data.prefabName, data.width, data.height);
-        var grid = new PathfindGrid();
-        grid.Init(data.width, data.height, data.nodeList);
-        _pathfindController.Init(grid);
-        _pathfindController.SetDiagonalMovement(DiagonalMovement.IfAtLeastOneWalkable);
-
-      
     }
 
-    public void GenerateMapWithPrefabName(string prefabName,int width,int height)
+    public void GenerateMapWithPrefabName(string prefabName, int width, int height)
     {
         _curMapData = new MapPlayData();
         _curMapData.widthCount = width;
@@ -57,88 +56,98 @@ public class MapManager : MonoSingleton<MapManager>
         _curMapData.tileList = new List<TileBase>();
         _curMapData.obstacleList = new List<ObstacleObject>();
         int tempSpanwerCount = 1;
-        
-        var mapBase = ObjectFactory.Instance.CreateObject<MapBase>(prefabName, _mapRoot);
-        mapBase.transform.localPosition = Vector3.zero;
-        mapBase.transform.localRotation = Quaternion.identity;
 
-        foreach (Transform childItem in mapBase.TileBaseObj.transform)
+        ObjectFactory.Instance.CreateObjectAsync(prefabName, _mapRoot, result =>
         {
-          //  var tileItem = childItem.GetComponent<TileBase>();
-            var tileItem = childItem.GetComponent<MapEditorTile>();
-            if(tileItem == null)
-                continue;
-
-            var node = tileItem;
-            if(node == null)
-                continue;
-            var tileInfo = new TileBase.TileInfo();
-            var tilePos = Vector3.zero;
-            MapDetailTable detailRecord = null;
-            tileInfo.nodeInfo = new JPSNode(node.x,node.y,(int)node.nodeType);
-            tileInfo.nodeType = (MapNodeType) node.nodeType;
-      
-            tilePos.x += node.x;
-            tilePos.z += node.y;
-            tileItem.CachedTransform.position = tilePos;
-
+            var mapBase = result.GetComponent<MapBase>();
+            if(mapBase == null)
+                DebugEx.LogError($"[Failed] load map failed {prefabName}");
             
-            var detailIndex = tileItem.tileIndex;
-            if (detailIndex > 0)
-                detailRecord = DataManager.Instance.GetRecord<MapDetailTable>(detailIndex);
-            else
-            {
-              
-                continue;
-            }
-            
-            switch (tileInfo.nodeType)
-            {
-                case MapNodeType.Block:
-                    break;
-                case MapNodeType.Road:
-                    break;
-                case MapNodeType.Spanwer:
-                    tileInfo.spanwerName = detailRecord.StringValue;
-                    ++tempSpanwerCount;
-                    break;
-                case MapNodeType.PassableObstacle:
-                {
-                    var initData = new ObstacleObject.ObstacleInitData();
-                    initData.passableObstacle = true;
-                    initData.rectSize = Vector2.one;
-                    initData.tilePos = tileInfo.nodeInfo.pos;
-                    initData.statusData = DataManager.Instance.CreateStatusData(detailRecord.NumberValue);
-                    initData.resourceName = detailRecord.SubResourceName;
-                    var obj = CreateObstacle(tilePos, initData);
-                    _curMapData.obstacleList.Add(obj);
-                }
-                    break;
-                case MapNodeType.UnpassObstacle:
-                {
-                    var initData = new ObstacleObject.ObstacleInitData();
-                    initData.passableObstacle = false;
-                    initData.rectSize = Vector2.one;
-                    initData.tilePos = tileInfo.nodeInfo.pos;
-                    initData.resourceName = detailRecord.SubResourceName;
-                    var obj = CreateObstacle(tilePos, initData);
-                    _curMapData.obstacleList.Add(obj);
-                }
-                    break;
-                case MapNodeType.PlayerSpawner:
-                {
-                    _playerStartPos = tileItem.transform.position;
-                }
-                    break;
-            }
+            mapBase.transform.localPosition = Vector3.zero;
+            mapBase.transform.localRotation = Quaternion.identity;
 
-            tileItem.Init(tileInfo);
-            _curMapData.tileList.Add(tileItem);  
-            _curRawData.nodeList.Add(tileInfo.nodeInfo);
-            _curRawData.mapDetailData[tileItem.x, tileItem.y] = tileItem.tileIndex;
-        }
+            foreach (Transform childItem in mapBase.TileBaseObj.transform)
+            {
+                //  var tileItem = childItem.GetComponent<TileBase>();
+                var tileItem = childItem.GetComponent<MapEditorTile>();
+                if (tileItem == null)
+                    continue;
 
+                var node = tileItem;
+                if (node == null)
+                    continue;
+                var tileInfo = new TileBase.TileInfo();
+                var tilePos = Vector3.zero;
+                MapDetailTable detailRecord = null;
+                tileInfo.nodeInfo = new JPSNode(node.x, node.y, (int) node.nodeType);
+                tileInfo.nodeType = (MapNodeType) node.nodeType;
+
+                tilePos.x += node.x;
+                tilePos.z += node.y;
+                tileItem.CachedTransform.position = tilePos;
+
+
+                var detailIndex = tileItem.tileIndex;
+                if (detailIndex > 0)
+                    detailRecord = DataManager.Instance.GetRecord<MapDetailTable>(detailIndex);
+                else
+                {
+                    continue;
+                }
+
+                switch (tileInfo.nodeType)
+                {
+                    case MapNodeType.Block:
+                        break;
+                    case MapNodeType.Road:
+                        break;
+                    case MapNodeType.Spanwer:
+                        tileInfo.spanwerName = detailRecord.StringValue;
+                        ++tempSpanwerCount;
+                        break;
+                    case MapNodeType.PassableObstacle:
+                    {
+                        var initData = new ObstacleObject.ObstacleInitData();
+                        initData.passableObstacle = true;
+                        initData.rectSize = Vector2.one;
+                        initData.tilePos = tileInfo.nodeInfo.pos;
+                        initData.statusData = DataManager.Instance.CreateStatusData(detailRecord.NumberValue);
+                        initData.resourceName = detailRecord.SubResourceName;
+                        var obj = CreateObstacle(tilePos, initData);
+                        _curMapData.obstacleList.Add(obj);
+                    }
+                        break;
+                    case MapNodeType.UnpassObstacle:
+                    {
+                        var initData = new ObstacleObject.ObstacleInitData();
+                        initData.passableObstacle = false;
+                        initData.rectSize = Vector2.one;
+                        initData.tilePos = tileInfo.nodeInfo.pos;
+                        initData.resourceName = detailRecord.SubResourceName;
+                        var obj = CreateObstacle(tilePos, initData);
+                        _curMapData.obstacleList.Add(obj);
+                    }
+                        break;
+                    case MapNodeType.PlayerSpawner:
+                    {
+                        _playerStartPos = tileItem.transform.position;
+                    }
+                        break;
+                }
+
+                tileItem.Init(tileInfo);
+                _curMapData.tileList.Add(tileItem);
+                _curRawData.nodeList.Add(tileInfo.nodeInfo);
+                _curRawData.mapDetailData[tileItem.x, tileItem.y] = tileItem.tileIndex;
+            }
+            var grid = new PathfindGrid();
+            grid.Init(width, height, _curRawData.nodeList);
+            _pathfindController.Init(grid);
+            _pathfindController.SetDiagonalMovement(DiagonalMovement.IfAtLeastOneWalkable);
+            IngameManager.Instance.OnEndInitJob();
+        }, LayerSettings.Ingame);
     }
+
     //TODO: 맵 프리팹 로드 및 데이터 세팅
     public void GenerateMap(int width, int height)
     {
@@ -210,6 +219,11 @@ public class MapManager : MonoSingleton<MapManager>
             tile.Init(tileInfo);
             _curMapData.tileList.Add(tile);
         }
+        var grid = new PathfindGrid();
+        grid.Init(width, height, _curRawData.nodeList);
+        _pathfindController.Init(grid);
+        _pathfindController.SetDiagonalMovement(DiagonalMovement.IfAtLeastOneWalkable);
+        IngameManager.Instance.OnEndInitJob();
     }
 
     private ObstacleObject CreateObstacle(Vector3 pos, ObstacleObject.ObstacleInitData data)
@@ -236,7 +250,7 @@ public class MapManager : MonoSingleton<MapManager>
             return targetTile.CharacterSpanwer;
         }
     }
-    
+
     public List<Vector3> GetPathPositionList(Vector2Int start, Vector2Int dest)
     {
         var list = new List<Vector3>();
@@ -268,13 +282,13 @@ public class MapManager : MonoSingleton<MapManager>
         switch (type)
         {
             case RangePathType.Random:
-                nodeList = _pathfindController.GetRandomPathInRange(start, (int)range);
+                nodeList = _pathfindController.GetRandomPathInRange(start, (int) range);
                 break;
             case RangePathType.Straight:
                 nodeList = _pathfindController.GetStraightPathInRange(start, dir, (int) range);
                 break;
         }
-        
+
         if (nodeList == null || nodeList.Count < 1)
         {
             DebugEx.Log("[Failed] no exist path");
@@ -285,18 +299,19 @@ public class MapManager : MonoSingleton<MapManager>
         {
             list.Add(new Vector3(nodeList[i].X, 0, nodeList[i].Y));
         }
+
         return list;
     }
 
     public Vector2Int GetCoverPointInRange(Vector2Int start, Vector2Int dir, float range)
     {
-        var nodeList = _pathfindController.GetAllNodeInRange(start, (int)range);
+        var nodeList = _pathfindController.GetAllNodeInRange(start, (int) range);
         var obstacleList = nodeList.FindAll(x =>
             x.state == (int) MapNodeType.PassableObstacle || x.state == (int) MapNodeType.UnpassObstacle);
 
         if (obstacleList == null || obstacleList.Count == 0)
             return NotExistPoint;
-        
+
         obstacleList.Sort((x, y) =>
         {
             var distX = (start - x.pos).sqrMagnitude;
@@ -335,5 +350,5 @@ public class MapManager : MonoSingleton<MapManager>
     public Vector3 GetPlayerStartPos()
     {
         return _playerStartPos;
-    } 
+    }
 }

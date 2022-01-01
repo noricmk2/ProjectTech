@@ -10,6 +10,7 @@ public class GameManager : MonoSingleton<GameManager>
     
     private void Awake()
     {
+        AddressableManager.Instance.Init(() => { });
         TCSceneManager.Instance.Init();
         TCSceneManager.Instance.EnterScene(SceneBase.GameSceneType.Intro);
         

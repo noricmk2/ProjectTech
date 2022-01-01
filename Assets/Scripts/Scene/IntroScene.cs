@@ -25,6 +25,7 @@ public class IntroScene : SceneBase
     public override IEnumerator Exit_C()
     {
         UIManager.Instance.CloseAll();
+        UIManager.Instance.SetLoadingView(true);
         yield return null;
     }
 }

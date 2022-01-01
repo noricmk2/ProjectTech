@@ -26,8 +26,11 @@ public class UIManager : MonoSingleton<UIManager>
     #endregion
 
     #region Property
+    private readonly string loadingViewName = "UILoading";
+    
     private Stack<UIController> _currentUIStack = new Stack<UIController>();
     private Dictionary<UIType, UIController> _uiControllerDict = new Dictionary<UIType, UIController>();
+    private UILoadingView _loadingView;
 
     public Canvas OverlayCanvas => _overlayCanvas;
     public Canvas CameraCanvas => _cameraCanvas;
@@ -43,6 +46,9 @@ public class UIManager : MonoSingleton<UIManager>
             UIType type = (UIType) i;
             _uiControllerDict[type] = CreateController(type);
         }
+
+        _loadingView = CreateView<UILoadingView>(loadingViewName);
+        _loadingView.Deactivate();
     }
 
     private UIController CreateController(UIType type)
@@ -160,6 +166,14 @@ public class UIManager : MonoSingleton<UIManager>
         {
             DebugEx.LogError($"[Failed] ui stack is empty");
         }
+    }
+
+    public void SetLoadingView(bool activate)
+    {
+        if(activate) 
+            _loadingView.Activate();
+        else
+            _loadingView.Deactivate();
     }
 
     public static T CreateView<T>(string name, CanvasType canvas = CanvasType.Overlay) where T : UIView

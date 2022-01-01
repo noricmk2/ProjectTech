@@ -33,7 +33,7 @@ public class SpriteAtlasData
         var iter = atlasInfo.GetEnumerator();
         while (iter.MoveNext())
         {
-            if (0 < iter.Current.Value.BinarySearch(spriteName))
+            if (0 <= iter.Current.Value.BinarySearch(spriteName))
                 return iter.Current.Key;
         }
 
