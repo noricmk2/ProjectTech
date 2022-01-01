@@ -1,9 +1,15 @@
 using System.Collections;
 using System.Collections.Generic;
+using TMPro;
 using UnityEngine;
 
 public class IngameUIView : UIView
 {
+    #region Inspector
+    [SerializeField] private TextMeshProUGUI _timeText;
+    [SerializeField] private CustomButton _pauseBtn;
+    #endregion
+    
     public class UIData : UIDataBase
     {
     }
@@ -32,5 +38,10 @@ public class IngameUIView : UIView
     public override void Activate()
     {
         base.Activate();
+    }
+
+    public void OnClickPause()
+    {
+        
     }
 }
