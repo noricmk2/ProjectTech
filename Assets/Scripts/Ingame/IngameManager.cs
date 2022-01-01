@@ -59,8 +59,8 @@ public class IngameManager : MonoSingleton<IngameManager>
         _initActionQueue.Clear();
         _initActionQueue.Enqueue(InitCamera);
         _initActionQueue.Enqueue(InitMap);
-        _initActionQueue.Enqueue(InitCharacter);
         _initActionQueue.Enqueue(InitUI);
+        _initActionQueue.Enqueue(InitCharacter);
         _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateInit); 
     }
 
@@ -168,7 +168,6 @@ public class IngameManager : MonoSingleton<IngameManager>
 
     private void StageEndAction()
     {
-        UIManager.Instance.CloseCurrentUI();
     }
 
     private void OnEnd()
@@ -185,6 +184,8 @@ public class IngameManager : MonoSingleton<IngameManager>
         HttpRequest.SendEndIngame(data.victory, res =>
         {
             _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateEnd);
+            UIManager.Instance.CloseCurrentUI();
+            _uiIngameController.ShowResult(data.victory);
         });
     }
 
@@ -241,5 +242,10 @@ public class IngameManager : MonoSingleton<IngameManager>
     public ObjectHUD CreateHUD(CharacterStatus status, Transform target)
     {
         return _uiIngameController.CreateHUD(status, target);
+    }
+    
+    public void RetryBattle()
+    {
+        TCSceneManager.Instance.EnterScene(SceneBase.GameSceneType.Ingame, forcedEnter:true);
     }
 }

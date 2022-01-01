@@ -25,6 +25,13 @@ public class PlayerController
     
     public void OnUpdate()
     {
+        if (_testCharacter.CheckDead())
+        {
+            var endData = new IngameManager.GameEndData();
+            endData.victory = false;
+            IngameManager.Instance.SetIngameEnd(endData);
+        }
+
         if (InputWrapper.Input.touchCount > 0)
         {
             var cam = IngameManager.Instance.IngameCamera;

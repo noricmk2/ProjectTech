@@ -36,6 +36,7 @@ public class CharacterBase : MoveObject, IBehaviorTreeOwner, IPoolObjectBase
     protected CharacterType _curCharType;
     protected Action _deadCallback;
     protected List<Vector3> _nextMovePath;
+    protected Vector2Int _curCoverPoint;
 
     private string _prevTrigger;
 

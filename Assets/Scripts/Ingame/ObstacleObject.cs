@@ -33,6 +33,7 @@ public class ObstacleObject : ObjectBase, IQuadTreeObject, IPoolObjectBase
         _passable = data.passableObstacle;
         _rect = new Rect(CachedTransform.position.x - _rectSize.x * 0.5f,
             CachedTransform.position.y - _rectSize.y * 0.5f, _rectSize.x, _rectSize.y);
+        CachedTransform.rotation = Quaternion.Euler(-90f, 0, -90f);
     }
     
     #region QuadTreeImplement

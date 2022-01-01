@@ -14,9 +14,9 @@ public class TCSceneManager : MonoSingleton<TCSceneManager>
             _sceneDic[(SceneBase.GameSceneType)i] = SceneBase.CreateScene((SceneBase.GameSceneType)i);
     }
 
-    public void EnterScene(SceneBase.GameSceneType scene, bool loadAsync = false, bool unloadResource = true)
+    public void EnterScene(SceneBase.GameSceneType scene, bool loadAsync = false, bool unloadResource = true, bool forcedEnter = false)
     {
-        if (_currentScene == null || scene != _currentScene.SceneType)
+        if (forcedEnter || _currentScene == null || scene != _currentScene.SceneType)
             StartCoroutine(LoadScene_C(scene, loadAsync, unloadResource));
     }
 

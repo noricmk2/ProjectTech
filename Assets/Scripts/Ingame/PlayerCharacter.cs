@@ -9,8 +9,11 @@ using UnityEngine.Assertions;
 
 public class PlayerCharacter : CharacterBase
 {
+    [SerializeField] private Transform _hudSlot;
+    
     private CharacterBase _attackTarget;
     private readonly Vector2Int direction = new Vector2Int(0, 1);
+    private ObjectHUD _hud;
     
     public override void Init(CharacterInitData data)
     {
@@ -22,6 +25,7 @@ public class PlayerCharacter : CharacterBase
             _behaviorTree.SetOwner(this);
         }
         SetAIEnable(true);
+        _hud = IngameManager.Instance.CreateHUD(_characterStatus, _hudSlot);
     }
 
     public override void OnUpdate()
@@ -42,6 +46,39 @@ public class PlayerCharacter : CharacterBase
     public void PauseAI(bool pause)
     {
         _behaviorTree.Pause(pause);
+    }
+
+    public override void OnDamaged(DamageData data)
+    {
+        base.OnDamaged(data);
+        if (_characterStatus.GetStatusValueByType(StatusType.Hp) <= 0)
+        {
+            DebugEx.Log($"[Dead] hp is zero");
+            _behaviorTree.Reset();
+        }
+        _hud?.SetHP(_characterStatus.GetStatusValueByType(StatusType.Hp));
+    }
+    
+    public override bool CheckDead()
+    {
+        return _characterStatus.GetStatusValueByType(StatusType.Hp) <= 0;
+    }
+
+    public override void OnDead(Action onDead)
+    {
+        base.OnDead(onDead);
+        for (int i = 0; i < _laucherList.Count; ++i)
+            _laucherList[i].Release();
+        _laucherList.Clear();
+
+        if (_hud != null)
+        {
+            ObjectFactory.Instance.DeactivePoolObject(_hud);
+            _hud = null;
+        }
+
+        SetAnimatorTrigger("Dead");
+        _deadCallback = onDead;
     }
 
     public override bool Attack(Action onAttackEnd)
@@ -126,7 +163,7 @@ public class PlayerCharacter : CharacterBase
             MapManager.Instance.GetCoverPointInRange(startPos, direction, moveRange);
 
         List<Vector3> path = null;
-        if (coverPoint == MapManager.NotExistPoint)
+        if (coverPoint == MapManager.NotExistPoint || _curCoverPoint == coverPoint || coverPoint.y < startPos.y)
         {
             path = MapManager.Instance.GetPathByRange(MapManager.RangePathType.Straight, startPos, direction,
                 moveRange);
@@ -168,5 +205,21 @@ public class PlayerCharacter : CharacterBase
     
     protected override void FindCover(MoveObject obj)
     {
+        SetAnimatorTrigger("Idle");
+        _curCoverPoint = Func.GetTilePos(obj.CachedTransform.position);
+    }
+
+    public override void Release()
+    {
+        base.Release();
+        if (_hud != null)
+        {
+            ObjectFactory.Instance.DeactivePoolObject(_hud);
+            _hud = null;
+        }
+        
+        for (int i = 0; i < _laucherList.Count; ++i)
+            _laucherList[i].Release();
+        _laucherList.Clear();
     }
 }

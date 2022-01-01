@@ -121,6 +121,7 @@ public class EnemyCharacter : CharacterBase
 
     protected override void FindCover(MoveObject obj)
     {
+        SetAnimatorTrigger("Idle");
     }
 
     public override void Fire(int launcherIndex = 0, int slotIndex = 0)

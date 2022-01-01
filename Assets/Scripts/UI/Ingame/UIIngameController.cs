@@ -7,8 +7,10 @@ public class UIIngameController : UIController
     #region Property
     private Canvas _overlayCanvas;
     private UIIngameView _uiIngameView;
+    private UIIngameResultView _uiResultView;
 
     private readonly string ingameViewName = "IngameUI";
+    private readonly string resultViewName = "IngameResult";
     #endregion
     
     public override void Init()
@@ -24,6 +26,8 @@ public class UIIngameController : UIController
         base.CreateView();
         _uiIngameView = UIManager.CreateView<UIIngameView>(ingameViewName);
         _uiIngameView.Deactivate();
+        _uiResultView = UIManager.CreateView<UIIngameResultView>(resultViewName);
+        _uiResultView.Deactivate();
     }
 
     public override void ShowUI()
@@ -50,5 +54,11 @@ public class UIIngameController : UIController
         obj.transform.SetParent(_overlayCanvas.transform);
         obj.Init(this, status, target);
         return obj;
+    }
+
+    public void ShowResult(bool isVictory)
+    {
+        _uiResultView.Activate();
+        _uiResultView.SetResult(isVictory);
     }
 }

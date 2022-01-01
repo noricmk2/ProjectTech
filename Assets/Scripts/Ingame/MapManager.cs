@@ -330,6 +330,7 @@ public class MapManager : MonoSingleton<MapManager>
         {
             var nearestObj = obstacleList[index];
             var dest = nearestObj.pos - dir;
+
             if (_pathfindController.IsWalkable(dest))
                 return dest;
             ++index;
