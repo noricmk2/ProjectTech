@@ -1,0 +1,69 @@
+{
+  "atlasInfo": {
+    "AtlasIngame": [
+      "cost_gauge",
+      "cost_gauge_base",
+      "icon_skill_a_off",
+      "icon_skill_a_on",
+      "icon_type_1",
+      "ingame_btn_pause",
+      "ingame_btn_play",
+      "ingame_char_face_a_off",
+      "ingame_char_face_a_on",
+      "Ingame_gauge_base",
+      "Ingame_gauge_enemy",
+      "Ingame_gauge_player",
+      "‌Ingame_icon_time",
+      "ingame_info_base",
+      "Ingame_select_effect_frame",
+      "Ingame_skill_fx_glow",
+      "Ingame_skill_fx_white",
+      "Ingame_skill_icon_1",
+      "Ingame_skill_icon_2",
+      "ingame_skill_sp_base",
+      "Ingame_skillinfo_base",
+      "ingame_sp_base",
+      "ingame_sp_gauge",
+      "ingame_sp_gauge_on",
+      "ingame_spinfo_text",
+      "Ingame_‌stageinfo_base"
+    ],
+    "AtlasLoading": [
+      "loading_ani_1",
+      "loading_ani_2",
+      "loading_ani_3",
+      "loading_ani_4",
+      "loading_ani_5",
+      "loading_ani_6",
+      "loading_ani_7",
+      "loading_ani_8"
+    ],
+    "AtlasResult": [
+      "black_box",
+      "btn_yellow",
+      "ingame_defeat_text_1",
+      "ingame_defeat_text_2",
+      "ingame_result_popupbase",
+      "ingame_victory_deco_dia1",
+      "ingame_victory_deco_dia2",
+      "ingame_victory_text_1",
+      "ingame_victory_text_base",
+      "particle_dia1",
+      "particle_dia2",
+      "particle_star",
+      "particle_triangle1",
+      "particle_triangle2",
+      "result_deco_gradient",
+      "result_deco_line"
+    ],
+    "AtlasTitle": [
+      "btn_blue",
+      "title_deco_band",
+      "title_deco_line",
+      "title_dia_illust",
+      "title_text_project",
+      "title_text_subtitle",
+      "title_text_tech"
+    ]
+  }
+}

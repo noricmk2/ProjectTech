@@ -382,6 +382,12 @@ namespace TCUtil
                 return false;
             return true;
         }
+        
+        public static string GetProjectPath()
+        { 
+            int index = Application.dataPath.IndexOf("Assets");
+            return Application.dataPath.Substring(0, index - 1);
+        }
     }
     #endregion
 

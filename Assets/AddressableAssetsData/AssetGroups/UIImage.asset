@@ -16,7 +16,39 @@ MonoBehaviour:
   m_Data:
     m_SerializedData: []
   m_GUID: aa8acb2fa40d1604581a5c19c47ea796
-  m_SerializeEntries: []
+  m_SerializeEntries:
+  - m_GUID: a26dea7a1f2f36d42bf110bb6b89ecd6
+    m_Address: AtlasLoading
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c0f31de405e54ea408b4c15887849973
+    m_Address: UIImage
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 7df2ea8ef2fc53c45bf2783987f1da10
+    m_Address: AtlasIngame
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 79b9f68997cb4dc4e82e34127cc6f415
+    m_Address: AtlasResult
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: d95284f19f77f6e478052914d451e07b
+    m_Address: AtlasTitle
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: c687359b5808bc24e8f3946e6caf58b0
+    m_Address: loading_bg
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 258d00ec0fe136a499989a616b303f5c
+    m_Address: title_illust
+    m_ReadOnly: 0
+    m_SerializedLabels: []
+  - m_GUID: 2fdbc2b06e160e5488266cba8182709d
+    m_Address: SpriteAtlasInfo
+    m_ReadOnly: 0
+    m_SerializedLabels: []
   m_ReadOnly: 0
   m_Settings: {fileID: 11400000, guid: 26a9d6b7bd67ec0428730bae9199c281, type: 2}
   m_SchemaSet:

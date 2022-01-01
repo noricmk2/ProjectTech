@@ -43,26 +43,66 @@ SpriteAtlas:
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
-    - {fileID: 2800000, guid: a1e90bae8652d614f897b8f8f1fbf84b, type: 3}
-    - {fileID: 2800000, guid: 0cc5383e95ffbc64bb4fba64658f0a99, type: 3}
-    - {fileID: 2800000, guid: ffda27b3625201640bcb3679daf53b4c, type: 3}
-    - {fileID: 2800000, guid: f8a65dd8ca4768b488cf3f629c699bad, type: 3}
-    - {fileID: 2800000, guid: 48fb3dd184e1e3a4286bdf8f0fe3a208, type: 3}
-    - {fileID: 2800000, guid: 25682c5ec75da0448878db92234f39a0, type: 3}
-    - {fileID: 2800000, guid: a837ee67ec11ce649bcda24bab36bd75, type: 3}
-    - {fileID: 2800000, guid: bda088b69e7ee6a45910260c355debdd, type: 3}
-    - {fileID: 2800000, guid: fd97d99349722f54fbe9c690d9cd97af, type: 3}
-    - {fileID: 2800000, guid: 9aa81655c16792d428ec75e755c1793e, type: 3}
-    - {fileID: 2800000, guid: a1533fad038f14e41855146ae517b908, type: 3}
-    - {fileID: 2800000, guid: acae20d96fe35d14da5048edb43f4d52, type: 3}
-    - {fileID: 2800000, guid: f54238e5f94c8d4449a7c3c9c8d12b7e, type: 3}
-    totalSpriteSurfaceArea: 0
+    - {fileID: 102900000, guid: 637d93f62f92b76408fee24c71f8b619, type: 3}
+    totalSpriteSurfaceArea: 193768
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
-  m_PackedSprites: []
-  m_PackedSpriteNamesToIndex: []
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 5cc54d900e9742b41a541afb653c26a9, type: 3}
+  - {fileID: 21300000, guid: 48fb3dd184e1e3a4286bdf8f0fe3a208, type: 3}
+  - {fileID: 21300000, guid: fd97d99349722f54fbe9c690d9cd97af, type: 3}
+  - {fileID: 21300000, guid: ffda27b3625201640bcb3679daf53b4c, type: 3}
+  - {fileID: 21300000, guid: 092c3144c2bb625489b37a7be33501d4, type: 3}
+  - {fileID: 21300000, guid: 9aa81655c16792d428ec75e755c1793e, type: 3}
+  - {fileID: 21300000, guid: f54238e5f94c8d4449a7c3c9c8d12b7e, type: 3}
+  - {fileID: 21300000, guid: bda088b69e7ee6a45910260c355debdd, type: 3}
+  - {fileID: 21300000, guid: efab8dd62cd8ca448b7c1bd8a7902be2, type: 3}
+  - {fileID: 21300000, guid: a837ee67ec11ce649bcda24bab36bd75, type: 3}
+  - {fileID: 21300000, guid: 104013b78dfcd4842a951c42c457c064, type: 3}
+  - {fileID: 21300000, guid: c2632ad7a5a2ea14681003ccf00f33d3, type: 3}
+  - {fileID: 21300000, guid: b2dcb18897299c744bcb0851ffa08f82, type: 3}
+  - {fileID: 21300000, guid: 25cf47d8a4289084b9b8b3a77c34e516, type: 3}
+  - {fileID: 21300000, guid: f8a65dd8ca4768b488cf3f629c699bad, type: 3}
+  - {fileID: 21300000, guid: acae20d96fe35d14da5048edb43f4d52, type: 3}
+  - {fileID: 21300000, guid: 6f49931abf5e4fb4b9a3cc2b053f35dc, type: 3}
+  - {fileID: 21300000, guid: 3071fefa3bd714c46816e12e00363248, type: 3}
+  - {fileID: 21300000, guid: fcca4d0ce974a8548935bba171d0df7b, type: 3}
+  - {fileID: 21300000, guid: a1533fad038f14e41855146ae517b908, type: 3}
+  - {fileID: 21300000, guid: 934e140ec316c3542a769e84c19fbb40, type: 3}
+  - {fileID: 21300000, guid: 71ed641e1f827cf4b988abefbb33204b, type: 3}
+  - {fileID: 21300000, guid: 0cc5383e95ffbc64bb4fba64658f0a99, type: 3}
+  - {fileID: 21300000, guid: 25682c5ec75da0448878db92234f39a0, type: 3}
+  - {fileID: 21300000, guid: a1e90bae8652d614f897b8f8f1fbf84b, type: 3}
+  - {fileID: 21300000, guid: 8090a3fed2cfaf3499dbb6d0828a9740, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Ingame_skill_icon_1
+  - Ingame_skillinfo_base
+  - Ingame_gauge_player
+  - ingame_char_face_a_off
+  - ingame_btn_play
+  - "\u200CIngame_icon_time"
+  - ingame_char_face_a_on
+  - Ingame_gauge_enemy
+  - ingame_spinfo_text
+  - ingame_sp_gauge
+  - cost_gauge_base
+  - icon_type_1
+  - ingame_btn_pause
+  - cost_gauge
+  - ingame_skill_sp_base
+  - icon_skill_a_on
+  - ingame_sp_gauge_on
+  - Ingame_skill_fx_glow
+  - Ingame_skill_icon_2
+  - icon_skill_a_off
+  - Ingame_skill_fx_white
+  - Ingame_select_effect_frame
+  - ingame_info_base
+  - "Ingame_\u200Cstageinfo_base"
+  - ingame_sp_base
+  - Ingame_gauge_base
   m_RenderDataMap: {}
   m_Tag: AtlasIngame
   m_IsVariant: 0

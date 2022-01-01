@@ -43,28 +43,46 @@ SpriteAtlas:
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
-    - {fileID: 2800000, guid: 45b426c44df45504287b295876d5ee9e, type: 3}
-    - {fileID: 2800000, guid: 88282a7c21cff3e4b8107ab30319d093, type: 3}
-    - {fileID: 2800000, guid: daecaefde5ec3294693e2a031a60aacb, type: 3}
-    - {fileID: 2800000, guid: 76f9b9c74ab2a1b4f8a356efdf1d2c2d, type: 3}
-    - {fileID: 2800000, guid: 6375b941f4ec66b4e8b531db141f9aa6, type: 3}
-    - {fileID: 2800000, guid: 5fbb8ecc1bdadd14585e0ba23919efba, type: 3}
-    - {fileID: 2800000, guid: b86e0b1a4fa96c84692cf33dc5b210c3, type: 3}
-    - {fileID: 2800000, guid: d22f2c88b54c11c4c981fb370734127a, type: 3}
-    - {fileID: 2800000, guid: de8a2272b0b80a04e88803b119a1e916, type: 3}
-    - {fileID: 2800000, guid: 11b7ae33562b163418fa1219654271c7, type: 3}
-    - {fileID: 2800000, guid: 92c5e26725391e2498c82b4d35c9cae2, type: 3}
-    - {fileID: 2800000, guid: 8b498f968b16dc34b900d55dbe6329d6, type: 3}
-    - {fileID: 2800000, guid: 922f3cc47f6c7a74cbb32c8ef77f29b5, type: 3}
-    - {fileID: 2800000, guid: 73b8520aa08b8904c97902031b2f7914, type: 3}
-    - {fileID: 2800000, guid: 1e49d0f420c6b674cbf58372a038e531, type: 3}
+    - {fileID: 102900000, guid: c879a19973357dd419fcb5cd7465c0dc, type: 3}
     totalSpriteSurfaceArea: 0
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
   m_MasterAtlas: {fileID: 0}
-  m_PackedSprites: []
-  m_PackedSpriteNamesToIndex: []
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 0a76e81067028eb4bb9b147155daa2fa, type: 3}
+  - {fileID: 21300000, guid: 6375b941f4ec66b4e8b531db141f9aa6, type: 3}
+  - {fileID: 21300000, guid: de8a2272b0b80a04e88803b119a1e916, type: 3}
+  - {fileID: 21300000, guid: 11b7ae33562b163418fa1219654271c7, type: 3}
+  - {fileID: 21300000, guid: 45b426c44df45504287b295876d5ee9e, type: 3}
+  - {fileID: 21300000, guid: 922f3cc47f6c7a74cbb32c8ef77f29b5, type: 3}
+  - {fileID: 21300000, guid: 1e49d0f420c6b674cbf58372a038e531, type: 3}
+  - {fileID: 21300000, guid: 8b498f968b16dc34b900d55dbe6329d6, type: 3}
+  - {fileID: 21300000, guid: 92c5e26725391e2498c82b4d35c9cae2, type: 3}
+  - {fileID: 21300000, guid: 76f9b9c74ab2a1b4f8a356efdf1d2c2d, type: 3}
+  - {fileID: 21300000, guid: d22f2c88b54c11c4c981fb370734127a, type: 3}
+  - {fileID: 21300000, guid: 73b8520aa08b8904c97902031b2f7914, type: 3}
+  - {fileID: 21300000, guid: b86e0b1a4fa96c84692cf33dc5b210c3, type: 3}
+  - {fileID: 21300000, guid: 88282a7c21cff3e4b8107ab30319d093, type: 3}
+  - {fileID: 21300000, guid: 5fbb8ecc1bdadd14585e0ba23919efba, type: 3}
+  - {fileID: 21300000, guid: daecaefde5ec3294693e2a031a60aacb, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - particle_star
+  - ingame_victory_deco_dia1
+  - particle_dia1
+  - particle_dia2
+  - black_box
+  - result_deco_gradient
+  - btn_yellow
+  - particle_triangle2
+  - particle_triangle1
+  - ingame_result_popupbase
+  - ingame_victory_text_base
+  - result_deco_line
+  - ingame_victory_text_1
+  - ingame_defeat_text_1
+  - ingame_victory_deco_dia2
+  - ingame_defeat_text_2
   m_RenderDataMap: {}
   m_Tag: AtlasResult
   m_IsVariant: 0
