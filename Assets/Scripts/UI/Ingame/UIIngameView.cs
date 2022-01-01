@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 
-public class IngameUIView : UIView
+public class UIIngameView : UIView
 {
     #region Inspector
     [SerializeField] private TextMeshProUGUI _timeText;

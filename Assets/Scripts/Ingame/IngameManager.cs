@@ -28,7 +28,7 @@ public class IngameManager : MonoSingleton<IngameManager>
     private ProjectileController _projectileController = new ProjectileController();
     private WaveController _waveController = new WaveController();
     private QuadTreeController _quadTreeController = new QuadTreeController();
-    private IngameUIController _ingameUIController;
+    private UIIngameController _uiIngameController;
     public IngameCameraMove CameraMove => _cameraMove;
     public Camera IngameCamera => _ingameCamera;
     public Transform CharacterRoot => _characterRoot;
@@ -68,7 +68,7 @@ public class IngameManager : MonoSingleton<IngameManager>
 
     private void InitUI()
     {
-        _ingameUIController = UIManager.Instance.OpenUI<IngameUIController>();
+        _uiIngameController = UIManager.Instance.OpenUI<UIIngameController>();
     }
 
     private void InitIngameState()
@@ -105,7 +105,7 @@ public class IngameManager : MonoSingleton<IngameManager>
         _cameraMove.SetFollowData(followData);
         _cameraMove.StartFollow();
         
-        _ingameUIController.ShowUI();
+        _uiIngameController.ShowUI();
         _stateMachine.ChangeState(IngameStageMachine.IngameState.IngameStateUpdate);
     }
 
@@ -205,6 +205,6 @@ public class IngameManager : MonoSingleton<IngameManager>
 
     public ObjectHUD CreateHUD(CharacterStatus status, Transform target)
     {
-        return _ingameUIController.CreateHUD(status, target);
+        return _uiIngameController.CreateHUD(status, target);
     }
 }

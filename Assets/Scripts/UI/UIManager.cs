@@ -51,9 +51,10 @@ public class UIManager : MonoSingleton<UIManager>
         switch (type)
         {
             case UIType.Title:
+                controller = new UITitleController();
                 break;
             case UIType.Ingame:
-                controller = new IngameUIController();
+                controller = new UIIngameController();
                 break;
         }
 
@@ -66,7 +67,7 @@ public class UIManager : MonoSingleton<UIManager>
         {
             case "IngameUIController":
                 return UIType.Ingame;
-            case "TitleUIController":
+            case "UITitleController":
                 return UIType.Title;
         }
 

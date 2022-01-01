@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class IngameUIController : UIController
+public class UIIngameController : UIController
 {
     #region Property
     private Canvas _overlayCanvas;
-    private IngameUIView _ingameView;
+    private UIIngameView _uiIngameView;
 
     private readonly string ingameViewName = "IngameUI";
     #endregion
@@ -15,15 +15,15 @@ public class IngameUIController : UIController
     {
         base.Init();
         _overlayCanvas = UIManager.Instance.OverlayCanvas;
-        var data = new IngameUIView.UIData();
-        _ingameView.Init(data);
+        var data = new UIIngameView.UIData();
+        _uiIngameView.Init(data);
     }
 
     protected override void CreateView()
     {
         base.CreateView();
-        _ingameView = UIManager.CreateView<IngameUIView>(ingameViewName);
-        _ingameView.Deactivate();
+        _uiIngameView = UIManager.CreateView<UIIngameView>(ingameViewName);
+        _uiIngameView.Deactivate();
     }
 
     public override void ShowUI()
@@ -35,13 +35,13 @@ public class IngameUIController : UIController
     protected override void ActivateView()
     {
         base.ActivateView();
-        _ingameView.Activate();
+        _uiIngameView.Activate();
     }
 
     public override void CloseUI()
     {
         base.CloseUI();
-        _ingameView.Deactivate();
+        _uiIngameView.Deactivate();
     }
 
     public ObjectHUD CreateHUD(CharacterStatus status, Transform target)

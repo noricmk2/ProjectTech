@@ -19,10 +19,10 @@ public class ObjectHUD : UIItemBase, IPoolObjectBase
     #endregion
     
     private float _maxHp;
-    private IngameUIController _controller;
+    private UIIngameController _controller;
     private Transform _targetTrans;
     
-    public void Init(IngameUIController controller, CharacterStatus status, Transform target)
+    public void Init(UIIngameController controller, CharacterStatus status, Transform target)
     {
         _controller = controller;
         CachedRectTransform.SetSiblingIndex(1);

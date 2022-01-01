@@ -16,6 +16,7 @@ public class IngameScene : SceneBase
 
     public override IEnumerator Exit_C()
     {
+        UIManager.Instance.CloseAll();
         yield return null;
     }
 }
